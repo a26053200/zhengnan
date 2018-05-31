@@ -12,4 +12,26 @@ public class StringUtils
     {
         return str == null || str == "";
     }
+
+    public static String RemoveAllEmpty(String resource)
+    {
+        StringBuffer src = new StringBuffer(resource);
+        src = RemoveAllChar(src, ' ');
+        return src.toString();
+    }
+
+    public static StringBuffer RemoveAllChar(StringBuffer src, char ch)
+    {
+        StringBuffer buffer = new StringBuffer();
+        int position = 0;
+        char currentChar;
+
+        while (position > 0)
+        {
+            currentChar = src.charAt(position++);
+            if (currentChar != ch)
+                buffer.append(currentChar);
+        }
+        return buffer;
+    }
 }

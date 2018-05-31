@@ -10,7 +10,7 @@ import java.io.*;
  */
 public class FileUtils
 {
-    public String GetTextFile(String path)
+    public static String GetTextFile(String path)
     {
         try {
             FileReader fr = new FileReader(path);
@@ -31,7 +31,7 @@ public class FileUtils
         return null;
     }
 
-    public void SaveTextFile(String path,String content)
+    public static void SaveTextFile(String path,String content)
     {
         try {
             FileWriter fileWriter = new FileWriter(path);
@@ -42,5 +42,11 @@ public class FileUtils
         } catch (IOException e) {
             System.out.println(e.toString());
         }
+    }
+
+    public static void main(String args[])
+    {
+        String json = FileUtils.GetTextFile("config\\ServerConfig.json");
+        System.out.print(JsonUtils.trim(json));
     }
 }
