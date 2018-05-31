@@ -6,15 +6,12 @@ using System.Net;
 
 public class CommandReader
 {
-    private byte[] jsonBytes;
-
     private MemoryStream memStream;
     private BinaryReader reader;
 
     private int packLen;
     public CommandReader()
     {
-        jsonBytes = new byte[JsonSocket.MAX_PACK_LEN];
 		memStream = new MemoryStream();
 		reader = new BinaryReader(memStream);
 	}

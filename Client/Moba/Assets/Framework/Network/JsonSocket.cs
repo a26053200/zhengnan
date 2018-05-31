@@ -17,6 +17,8 @@ public class JsonSocket : SocketBase
 
     public OnReceiveHandler OnReceive;//接收数据回调
 
+    public bool isLoginSuccess = true; //是否重新登录成功,默认是登录成功的
+
     private List<byte[]> _tmpDatas = new List<byte[]>();
     private CommandReader _reader;
     private string start = "\"cmd\":";
@@ -44,6 +46,7 @@ public class JsonSocket : SocketBase
                 string json = JCode.GetString(data, data.Length);
                 StringBuilder sb = new StringBuilder(json);
                 int cmd = int.Parse(getPT(sb));
+                MyDebug.Log(json);
                 OnReceive(cmd, sb);
             }
         }
