@@ -29,7 +29,7 @@ public class SimpleChatServer {
         EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
-            ServerBootstrap b = new ServerBootstrap(); // (2)
+            ServerBootstrap b = new ServerBootstrap();  // (12)
             b.group(bossGroup, workerGroup)
              .channel(NioServerSocketChannel.class) // (3)
              .childHandler(new SimpleChatServerInitializer())  //(4)
@@ -59,7 +59,7 @@ public class SimpleChatServer {
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);
         } else {
-            port = 8080;
+            port = 8081;
         }
         new SimpleChatServer(port).run();
         //initLog();
