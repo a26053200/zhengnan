@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using LitJson;
 //
 // Class Introduce
 // Author: zhengnan
@@ -118,11 +119,7 @@ public class JsonClient :  ClientBase
             if (rspdList.Contains(handler))
                 rspdList.Remove(handler);
     }
-    public void send(NetData obj)
-    {
-        socket.send(obj);
-    }
-    public void send(object obj)
+    public void send(JsonData obj)
     {
         socket.send(obj);
     }

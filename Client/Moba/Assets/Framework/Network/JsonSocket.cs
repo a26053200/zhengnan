@@ -1,4 +1,5 @@
 ﻿
+using LitJson;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -51,9 +52,14 @@ public class JsonSocket : SocketBase
             }
         }
     }
-    public void send(object data)
+    public void send(JsonData data)
     {
-        string json = JCode.Encode(data);
+        string json = data.ToString();
+        if (Global.EnableLogNetwork)
+        {
+            int cmd = getPT(json);
+            MyDebug.Log(string.Format("[Socket] <color=#df5c4aff>send json</color>:{0}\t{1}\n{2}", cmd, JCode.ToFormart(json)));
+        }
         StartCoroutine(doSendCo(json));
     }
     public void sendNoLogin(object data)
@@ -74,11 +80,7 @@ public class JsonSocket : SocketBase
             if (Global.EnableLogNetwork) MyDebug.LogError("[Socket] can't send msg. Socket is not connect.");
             return;
         }
-        if (Global.EnableLogNetwork)
-        {
-            int cmd = getPT(json);
-            MyDebug.Log(string.Format("[Socket] <color=#df5c4aff>send json</color>:{0}\t{1}\n{2}", cmd, JCode.ToFormart(json)));
-        }
+        
         byte[] dataBytes = JCode.GetBytes(json);
         byte[] sendByteBuff = new byte[dataBytes.Length + 4];
         byte[] lenBytes = BitConverter.GetBytes(IPAddress.NetworkToHostOrder(dataBytes.Length));
