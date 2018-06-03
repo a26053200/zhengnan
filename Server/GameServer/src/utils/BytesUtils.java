@@ -18,7 +18,9 @@ public class BytesUtils {
 	{
 		String res = "decode fail string";//转码失败
 		try{
-			res = new String(buff.readBytes(len).array(),ServerConfig.CHARSET_UTF_8);
+			byte[] bytes = new byte[len];
+			buff.writeBytes(bytes);
+			res = new String(bytes,ServerConfig.CHARSET_UTF_8);
 		}catch(UnsupportedEncodingException e){
 			e.printStackTrace();
 		}

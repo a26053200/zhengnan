@@ -8,4 +8,5 @@ package server.common;
  */
 public class Message
 {
+
 }
