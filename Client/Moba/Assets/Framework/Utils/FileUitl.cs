@@ -2,7 +2,7 @@
 using System.IO;
 using System;
 
-public class FileUitls{
+public class FileUtils{
 	public static string GetTextFile(string fn)
     {
 		byte[] data = GetFileData(fn);

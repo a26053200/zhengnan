@@ -27,10 +27,10 @@ public class FileEncode
             {
                 string dirPath = filePath.Replace(path, "");
                 string destPath = Path.Combine(savePath, dirPath);
-                byte[] content = FileUitls.GetFileData(filePath);
+                byte[] content = FileUtils.GetFileData(filePath);
                 Encoding srcEncode = GetBytesEncoding(content);
                 byte[] res = Encoding.Convert(srcEncode, encode, content);
-                FileUitls.SaveFileData(destPath, res);
+                FileUtils.SaveFileData(destPath, res);
             });
     }
 

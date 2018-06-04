@@ -54,11 +54,11 @@ public class JsonSocket : SocketBase
     }
     public void send(JsonData data)
     {
-        string json = data.ToString();
+        string json = data.ToJson();
         if (Global.EnableLogNetwork)
         {
-            int cmd = getPT(json);
-            MyDebug.Log(string.Format("[Socket] <color=#df5c4aff>send json</color>:{0}\t{1}\n{2}", cmd, JCode.ToFormart(json)));
+            //int cmd = getPT(json);
+            MyDebug.Log(string.Format("[Send] <color=#df5c4aff>send json</color>:{0}", json));
         }
         StartCoroutine(doSendCo(json));
     }
@@ -82,6 +82,7 @@ public class JsonSocket : SocketBase
         }
         
         byte[] dataBytes = JCode.GetBytes(json);
+        //Array.Reverse(dataBytes);
         byte[] sendByteBuff = new byte[dataBytes.Length + 4];
         byte[] lenBytes = BitConverter.GetBytes(IPAddress.NetworkToHostOrder(dataBytes.Length));
         Array.Copy(lenBytes, sendByteBuff, lenBytes.Length);

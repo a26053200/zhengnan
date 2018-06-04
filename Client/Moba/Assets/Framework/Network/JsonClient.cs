@@ -119,7 +119,7 @@ public class JsonClient :  ClientBase
             if (rspdList.Contains(handler))
                 rspdList.Remove(handler);
     }
-    public void send(JsonData obj)
+    public void sendJson(JsonData obj)
     {
         socket.send(obj);
     }

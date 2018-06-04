@@ -16,7 +16,10 @@ public class SocketBase : MonoBehaviour
     protected int MAX_READ = 8192;//缓冲区最大容量
 
     protected byte[] _byteBuffer;
+
     protected bool sendComplete = false;
+
+    protected int startConnectTime = 0;//开始连接时间
     public virtual void init()
     {
         eventDispatcher = new EventDispatch();
@@ -76,6 +79,7 @@ public class SocketBase : MonoBehaviour
         else
         {
             status = NetStatus.Connected;
+            startConnectTime = Environment.TickCount;
             MyDebug.Log(string.Format("[Socket] Client has connected successful from server:{0}:{1}", host, port));
         }
     }
@@ -186,7 +190,7 @@ public class SocketBase : MonoBehaviour
     public virtual void disconnect()
     {
         status = NetStatus.Disconnected;
-        MyDebug.Log("Try to close connect! " + Environment.TickCount);
+        MyDebug.Log("Try to close connect! This connection lasted " + (Environment.TickCount - startConnectTime) + "ms");
         if (socket != null)
         {
             try
@@ -198,7 +202,7 @@ public class SocketBase : MonoBehaviour
                 if (_recvArgs != null)
                     _recvArgs.Completed -= onReceiveCompleted;
                 _recvArgs = null;
-                MyDebug.Log("[Socket] close success! " + Environment.TickCount);
+                MyDebug.Log("[Socket] close success! This connection lasted ");
             }
             catch (System.Exception ex)
             {
