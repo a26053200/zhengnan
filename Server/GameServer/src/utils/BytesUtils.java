@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 
 import config.ServerConfig;
 import io.netty.buffer.ByteBuf;
@@ -17,13 +18,13 @@ public class BytesUtils {
 	public static String readString(ByteBuf buff,int len)
 	{
 		String res = "decode fail string";//转码失败
-		try{
+//		try{
 			byte[] bytes = new byte[len];
-			buff.writeBytes(bytes);
-			res = new String(bytes,ServerConfig.CHARSET_UTF_8);
-		}catch(UnsupportedEncodingException e){
-			e.printStackTrace();
-		}
+			buff.readBytes(bytes);
+			res = new String(bytes, Charset.forName(ServerConfig.CHARSET_UTF_8));
+//		}catch(UnsupportedEncodingException e){
+//			e.printStackTrace();
+//		}
 		return res.trim();
 	}
 }

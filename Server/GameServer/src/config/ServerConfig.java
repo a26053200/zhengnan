@@ -8,7 +8,7 @@ package config;
  */
 public class ServerConfig {
 
-	public static final String CHARSET_UTF_8 = "utf-8";
+	public static final String CHARSET_UTF_8 = "UTF-8";
 	
 	public static final int BUFFER_MAX_SIZE = 2048;
 	

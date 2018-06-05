@@ -5,14 +5,12 @@ import org.apache.log4j.Logger;
 
 public class Debug
 {
-    public static void initLog()
+    static String s_serverName;
+
+    public static void initLog(String serverName)
     {
+        s_serverName = serverName;
         PropertyConfigurator.configure("log4j.properties");
-    }
-    public static Logger CreateLog(String className)
-    {
-        Logger log = Logger.getLogger(className);
-        return log;
     }
 
     private static Logger s_instance = null;
@@ -20,7 +18,7 @@ public class Debug
     public static Logger getInstance()
     {
         if (s_instance == null)
-            s_instance = Logger.getLogger(Debug.class.getName());
+            s_instance = Logger.getLogger(s_serverName);
         return  s_instance;
     }
 
@@ -39,3 +37,4 @@ public class Debug
         getInstance().error(msg);
     }
 }
+

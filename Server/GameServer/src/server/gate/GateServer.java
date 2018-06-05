@@ -7,6 +7,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.apache.log4j.Logger;
 import server.common.BaseServer;
 import server.simplechat.SimpleChatServer;
 import server.simplechat.SimpleChatServerInitializer;
@@ -26,6 +27,7 @@ public class GateServer extends BaseServer
     @Override
     public void run() throws Exception
     {
+        Logger logger = Logger.getLogger(GateServer.class);
         EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -36,7 +38,7 @@ public class GateServer extends BaseServer
                     .option(ChannelOption.SO_BACKLOG, 128)          // (5)
                     .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
 
-            System.out.println("GateServer 启动了");
+            logger.info("GateServer startup successful!!!");
 
             // 绑定端口，开始接收进来的连接
             ChannelFuture f = b.bind(port).sync(); // (7)
@@ -49,11 +51,11 @@ public class GateServer extends BaseServer
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
 
-            System.out.println("GateServer 关闭了");
+            logger.info("GateServer close up successful!!!");
         }
     }
     public static void main(String[] args) throws Exception {
-        Debug.initLog();
+        Debug.initLog("[GateServer]");
         int port;
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);

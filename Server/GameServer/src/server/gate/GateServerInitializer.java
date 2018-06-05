@@ -7,6 +7,7 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 import io.netty.handler.codec.Delimiters;
 import io.netty.handler.codec.string.StringDecoder;
 import io.netty.handler.codec.string.StringEncoder;
+import org.apache.log4j.Logger;
 import server.simplechat.SimpleChatServerHandler;
 
 /**
@@ -18,6 +19,7 @@ import server.simplechat.SimpleChatServerHandler;
 public class GateServerInitializer extends
         ChannelInitializer<SocketChannel>
 {
+    Logger logger = Logger.getLogger(GateServerEncoder.class);
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
@@ -27,6 +29,6 @@ public class GateServerInitializer extends
         pipeline.addLast("encoder", new GateServerEncoder());
         pipeline.addLast("handler", new GateServerHandler());
 
-        System.out.println("GateServer:"+ch.remoteAddress() +"连接上");
+        logger.info("client ip:"+ch.remoteAddress() +" has connected");
     }
 }
