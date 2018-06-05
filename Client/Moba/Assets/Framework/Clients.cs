@@ -23,7 +23,10 @@ public class Clients : MonoBehaviour {
     {
         yield return new WaitForSeconds(1);
         JsonData json = new JsonData();
-        json["cmd"] = "123123123";
+        json["server"] = "LoginServer";
+        json["action"] = "login";
+        json["username"] = "123456";
+        json["password"] = "123";
         jsonClient.sendJson(json);
     }
 
