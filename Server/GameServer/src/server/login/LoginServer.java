@@ -1,4 +1,4 @@
-package server.gate;
+package server.login;
 
 import common.log.Debug;
 import io.netty.bootstrap.ServerBootstrap;
@@ -9,38 +9,37 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
 import server.common.BaseServer;
-import server.simplechat.SimpleChatServer;
-import server.simplechat.SimpleChatServerInitializer;
+import server.gate.GateServer;
+import server.gate.GateServerInitializer;
 
 /**
- * @ClassName: GateServer
- * @Description: 网关服务器
+ * @ClassName: LoginServer
+ * @Description: 登陆服务器
  * @Author: zhengnan
- * @Date: 2018/6/1 20:49
+ * @Date: 2018/6/5 23:45
  */
-public class GateServer extends BaseServer
+public class LoginServer extends BaseServer
 {
-    public static final String ServerName = "GateServer";
-    public GateServer(int port)
+    public static final String ServerName = "LoginServer";
+    public LoginServer(int port)
     {
         super(port);
     }
     @Override
     public void run() throws Exception
     {
-        Logger logger = Logger.getLogger(GateServer.class);
+        Logger logger = Logger.getLogger(LoginServer.class);
         EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap(); // (2)
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class) // (3)
-                    .childHandler(new GateServerInitializer())  //(4)
+                    .childHandler(new LoginServerInitializer())  //(4)
                     .option(ChannelOption.SO_BACKLOG, 128)          // (5)
                     .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
 
-            logger.info(ServerName + "startup successful!!!");
-
+            logger.info(ServerName + " startup successful!!!");
 
             ChannelFuture f = b.bind(port).sync(); // (7)
 
@@ -61,6 +60,6 @@ public class GateServer extends BaseServer
         } else {
             port = 8080;
         }
-        new GateServer(port).run();
+        new LoginServer(port).run();
     }
 }
