@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class GateServerEncoder extends ByteArrayEncoder
 {
-    Logger logger = Logger.getLogger(GateServerEncoder.class);
+    final static Logger logger = Logger.getLogger(GateServerEncoder.class);
     @Override
     protected void encode(ChannelHandlerContext ctx, byte[] msg, List<Object> out) throws Exception
     {

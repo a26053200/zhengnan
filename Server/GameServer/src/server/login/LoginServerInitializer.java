@@ -17,16 +17,19 @@ import server.gate.GateServerHandler;
 public class LoginServerInitializer extends
         ChannelInitializer<SocketChannel>
 {
-    Logger logger = Logger.getLogger(GateServerEncoder.class);
+    final static Logger logger = Logger.getLogger(GateServerEncoder.class);
+
+    static LoginMonitor monitor;
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();
-
+        if(monitor == null)
+            monitor = new LoginMonitor();
         //pipeline.addLast("framer", new DelimiterBasedFrameDecoder(8192, Delimiters.lineDelimiter()));
-        pipeline.addLast("decoder", new LoginServerDecoder());
-        pipeline.addLast("encoder", new LoginServerEncoder());
-        pipeline.addLast("handler", new LoginServerHandler());
+        pipeline.addLast("decoder", new LoginServerDecoder(monitor));
+        pipeline.addLast("encoder", new LoginServerEncoder(monitor));
+        pipeline.addLast("handler", new LoginServerHandler(monitor));
 
-        logger.info("client ip:"+ch.remoteAddress() +" has connected");
+        logger.info("Client ip:"+ch.remoteAddress() +" has connected");
     }
 }

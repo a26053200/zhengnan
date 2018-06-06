@@ -16,7 +16,7 @@ import org.apache.log4j.Logger;
  */
 public class GateServerHandler extends SimpleChannelInboundHandler<String>
 {
-    Logger logger = Logger.getLogger(GateServerHandler.class.getName());
+    final static Logger logger = Logger.getLogger(GateServerHandler.class.getName());
 
     public static ChannelGroup channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     @Override

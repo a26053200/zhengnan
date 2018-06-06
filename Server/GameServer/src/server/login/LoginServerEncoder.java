@@ -14,7 +14,13 @@ import java.util.List;
  */
 public class LoginServerEncoder extends ByteArrayEncoder
 {
-    Logger logger = Logger.getLogger(LoginServerEncoder.class);
+    protected LoginMonitor monitor;
+
+    public LoginServerEncoder(LoginMonitor monitor)
+    {
+        this.monitor = monitor;
+    }
+    final static Logger logger = Logger.getLogger(LoginServerEncoder.class);
     @Override
     protected void encode(ChannelHandlerContext ctx, byte[] msg, List<Object> out) throws Exception
     {

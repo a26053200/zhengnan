@@ -5,8 +5,13 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import org.apache.log4j.Logger;
-import utils.BytesUtils;
+import redis.clients.jedis.Jedis;
+import server.common.Monitor;
+import server.redis.RedisClient;
+import server.redis.RedisKeys;
+import utils.*;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,22 +22,18 @@ import java.util.List;
  */
 public class LoginServerDecoder extends ByteArrayDecoder
 {
-    Logger logger = Logger.getLogger(LoginServerDecoder.class);
+    final static Logger logger = Logger.getLogger(LoginServerDecoder.class);
+
+    protected LoginMonitor monitor;
+
+    public LoginServerDecoder(LoginMonitor monitor)
+    {
+        this.monitor = monitor;
+    }
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytes, List<Object> out) throws Exception
     {
         super.decode(ctx, bytes, out);
-
-        int msgLen = bytes.readableBytes();
-        long packHead = bytes.readUnsignedInt();
-        long packLen = packHead;
-        String json = BytesUtils.readString(bytes,(int)packLen);
-        logger.info(String.format("[recv] msgLen:%d json:%s",msgLen,json));
-        //已知JSONObject,目标要转换为json字符串
-        JSONObject jsonObject = JSONObject.parseObject(json);
-
-        logger.info(String.format("用户:%s 登陆成功",jsonObject.get("username").toString()));
-        //gateMnt.clientReceive(msg);
-        //out.add(gateMnt);
+        monitor.recvJson(ctx, bytes);
     }
 }

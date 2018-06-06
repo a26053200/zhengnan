@@ -16,7 +16,7 @@ import java.util.List;
  */
 public class GateServerDecoder extends ByteArrayDecoder
 {
-    Logger logger = Logger.getLogger(GateServerDecoder.class);
+    final static Logger logger = Logger.getLogger(GateServerDecoder.class);
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytes, List<Object> out) throws Exception
     {

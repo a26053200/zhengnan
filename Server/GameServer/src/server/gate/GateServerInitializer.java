@@ -19,7 +19,7 @@ import server.simplechat.SimpleChatServerHandler;
 public class GateServerInitializer extends
         ChannelInitializer<SocketChannel>
 {
-    Logger logger = Logger.getLogger(GateServerEncoder.class);
+    final static Logger logger = Logger.getLogger(GateServerEncoder.class);
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
         ChannelPipeline pipeline = ch.pipeline();

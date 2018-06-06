@@ -11,6 +11,8 @@ import org.apache.log4j.Logger;
 import server.common.BaseServer;
 import server.gate.GateServer;
 import server.gate.GateServerInitializer;
+import server.redis.RedisClient;
+import utils.IdGenerator;
 
 /**
  * @ClassName: LoginServer
@@ -40,6 +42,10 @@ public class LoginServer extends BaseServer
                     .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
 
             logger.info(ServerName + " startup successful!!!");
+            //连接数据库
+            RedisClient.getInstance().createDB("127.0.0.1");
+            //Id生成器
+            IdGenerator.init(Thread.currentThread().getId());
 
             ChannelFuture f = b.bind(port).sync(); // (7)
 
