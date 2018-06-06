@@ -46,9 +46,9 @@ public class JsonSocket : SocketBase
             {
                 string json = JCode.GetString(data, data.Length);
                 StringBuilder sb = new StringBuilder(json);
-                int cmd = int.Parse(getPT(sb));
+                int cmd = 0;// int.Parse(getPT(sb));
                 MyDebug.Log(json);
-                OnReceive(cmd, sb);
+                //OnReceive(cmd, sb);
             }
         }
     }

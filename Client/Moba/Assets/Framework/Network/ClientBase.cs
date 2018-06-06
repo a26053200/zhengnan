@@ -58,7 +58,7 @@ public abstract class ClientBase:MonoBehaviour
     {
         if (status == ClientStatus.ConnectedSuccess)
         {//已经连接
-            checkNetwork();
+            //checkNetwork();//暂时关闭重新登录功能
             if (status == ClientStatus.Disconnected)
             {//重新连接
                 _isReconnect = true;
