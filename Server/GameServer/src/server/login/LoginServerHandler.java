@@ -5,6 +5,8 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.util.concurrent.Future;
+import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.apache.log4j.Logger;
 import server.common.Monitor;
@@ -29,7 +31,7 @@ public class LoginServerHandler extends SimpleChannelInboundHandler<Monitor>
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception
     {  // (2)
         Channel incoming = ctx.channel();
-
+        logger.info("Client ip:" + incoming.remoteAddress() + " is added");
         // Broadcast a message to multiple Channels
         // channels.writeAndFlush("[SERVER] - " + incoming.remoteAddress() + " 加入\n");
 
@@ -42,7 +44,13 @@ public class LoginServerHandler extends SimpleChannelInboundHandler<Monitor>
         Channel incoming = ctx.channel();
         logger.info("Channel:" + incoming.id());
     }
-
+    @Override
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
+        super.channelReadComplete(ctx);
+        Channel incoming = ctx.channel();
+        logger.info("Client ip:" + incoming.remoteAddress() + " read msg over");
+        ctx.flush();
+    }
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception
     { // (5)
@@ -64,7 +72,22 @@ public class LoginServerHandler extends SimpleChannelInboundHandler<Monitor>
         Channel incoming = ctx.channel();
         logger.error("Client ip:" + incoming.remoteAddress() + " is exception");
         // 当出现异常就关闭连接
-        cause.printStackTrace();
-        ctx.close();
+        //cause.printStackTrace();
+        ctx.close().addListener(new GenericFutureListener<Future<? super Void>>()
+        {
+            @Override
+            public void operationComplete(Future<? super Void> future)
+                    throws Exception
+            {
+                if (future.isSuccess())
+                {
+                    logger.info("[LoginServer]异常关闭成功");
+                }
+                else
+                {
+                    logger.info("[LoginServer]异常关闭失败");
+                }
+            }
+        });
     }
 }

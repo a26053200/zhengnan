@@ -1,84 +1,36 @@
+package server.common;
+
 /**
- * @ClassName: RedisClient
+ * @ClassName: House
  * @Description: TODO
  * @Author: zhengnan
- * @Date: 2018/6/5 1:07
+ * @Date: 2018/6/6 23:51
  */
-package server.redis;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisShardInfo;
-import redis.clients.jedis.ShardedJedis;
-import redis.clients.jedis.ShardedJedisPool;
-import redis.clients.jedis.SortingParams;
-
-
-public class RedisClient
+public class House
 {
-    private static RedisClient s_instance = null;
-
-    public static RedisClient getInstance()
-    {
-        if (s_instance == null)
-            s_instance = new RedisClient();
-        return s_instance;
-    }
-
-    private Jedis jedis;
-
-    public RedisClient()
-    {
-    }
-
-    public Jedis createDB(String host)
-    {
-        if (jedis == null)
-            jedis = createDB(host, 6379);
-        return jedis;
-    }
-
-    public Jedis createDB(String host, int port)
-    {
-        if (jedis == null)
-            jedis = new Jedis(host, port);
-        return jedis;
-    }
-
-    public Jedis getDB(int index)
-    {
-        jedis.select(index);
-        return jedis;
-    }
-
     //测试
     public static void main(String[] args)
     {
-        /*
-        //连接本地的 Redis 服务
-        Jedis jedis = new Jedis("localhost");
-        System.out.println("连接成功");
-        //设置 redis 字符串数据
-        jedis.set("runoobkey", "www.runoob.com");
-        // 获取存储的数据并输出
-        System.out.println("redis 存储的字符串为: " + jedis.get("runoobkey"));
-        */
         float houseSize = 100;
         float destPrice = 50000;
         float depositPerMon = 20000;
         float srcPrice = 40000;
         float rise = 0.01f;
-        float repaymentPerMon = 0.003f;//每个月还0.003;
+        float repaymentPerMon = 0.00333333f;//每个月还0.003;
         float decoration = 300000;//装修
         cal(100, 50000, 20000, 40000, 0.01f, 1000000, 0.0033333333f, 300000);
     }
 
+    /**
+     * @param houseSize 目标房子面积
+     * @param destPrice 目标房价
+     * @param depositPerMon 平均每月存款
+     * @param srcPrice 房子现价
+     * @param rise 房价每月涨幅
+     * @param loan 贷款额度
+     * @param repaymentPerMon 每月还款
+     * @param decoration 装修所需
+     */
     public static void cal(float houseSize, float destPrice,
                            float depositPerMon, float srcPrice,
                            float rise, float loan, float repaymentPerMon,
@@ -95,7 +47,7 @@ public class RedisClient
         System.out.println(String.format("目标房子:%f 贷款:%f 需要存款:%f", destTotal, loan, destTotal - loan));
         do
         {
-            residueRepayment = 904000f - 1000000f * repaymentPerMon * count;
+            residueRepayment = 904001f - 1000000f * repaymentPerMon * count;
             lastPrice = lastPrice * (1f + rise);
             lastSell = 89f * lastPrice;
             depositTotal = count * depositPerMon;

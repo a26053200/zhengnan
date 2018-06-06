@@ -24,6 +24,9 @@ public class LoginServerEncoder extends ByteArrayEncoder
     @Override
     protected void encode(ChannelHandlerContext ctx, byte[] msg, List<Object> out) throws Exception
     {
+        logger.info("send msg:"+msg.length);
         super.encode(ctx,msg,out);
+        //out.add(msg);
+        //ctx.flush();
     }
 }
