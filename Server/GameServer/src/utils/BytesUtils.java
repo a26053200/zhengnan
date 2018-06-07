@@ -15,20 +15,19 @@ import io.netty.buffer.ByteBuf;
  */
 public class BytesUtils
 {
-
+    //所有数据转换为字符串
+    public static String readString(ByteBuf buff)
+    {
+        return readString(buff, buff.readableBytes());
+    }
     public static String readString(ByteBuf buff, int len)
     {
         String res = "decode fail string";//转码失败
-//		try{
         byte[] bytes = new byte[len];
         buff.readBytes(bytes);
         res = new String(bytes, Charset.forName(ServerConfig.CHARSET_UTF_8));
-//		}catch(UnsupportedEncodingException e){
-//			e.printStackTrace();
-//		}
         return res.trim();
     }
-
     public static byte[] string2Bytes(String str)
     {
         str = str + "\0";
