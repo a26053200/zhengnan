@@ -6,20 +6,6 @@ using System;
 **/
 public class EventObject
 {
-    public const String ACTIVATE = "activate";
-    public const String ADDED = "added";
-    public const String ADDED_TO_STAGE = "addedToStage";
-    public const String CANCEL = "cancel";
-    public const String CHANGE = "change";
-    public const String CLEAR = "clear";
-    public const String CLOSE = "close";
-    public const String CLOSING = "closing";
-    public const String COMPLETE = "complete";
-    public const String CONNECT = "connect";
-    public const String OPEN = "open";
-
-    public const String DISCONNECT = "disconnect";
-    public const String SERVER_CONNECTED = "server connected";
     private EventTrigger _target;
     private int _eventPhase;
     private EventTrigger _currentTarget;

@@ -24,6 +24,7 @@ public class SocketBase : MonoBehaviour
     {
         eventDispatcher = new EventDispatch();
         _byteBuffer = new byte[MAX_READ];
+        status = NetStatus.Disconnected;
     }
     public bool connect(string host, int port)
     {
@@ -190,6 +191,8 @@ public class SocketBase : MonoBehaviour
     }
     public virtual void disconnect()
     {
+        if (status == NetStatus.Disconnected)
+            return;
         status = NetStatus.Disconnected;
         MyDebug.Log("Try to close connect! This connection lasted " + (Environment.TickCount - startConnectTime) + "ms");
         if (socket != null)
