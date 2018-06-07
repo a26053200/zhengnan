@@ -14,6 +14,7 @@ public class ReturnCode
     {
         UNKNOWN_ERROR,
         WRONG_PASSWORD,
+        FETCH_GAME_SERVER_LIST_ERROR,
 
         MAX_CODE_NUM
     }
@@ -24,6 +25,7 @@ public class ReturnCode
 
         code[Code.UNKNOWN_ERROR.ordinal()] = "未知错误";
         code[Code.WRONG_PASSWORD.ordinal()] = "密码错误";
+        code[Code.FETCH_GAME_SERVER_LIST_ERROR.ordinal()] = "获取游戏服务器列表错误";
     }
 
     public static String getMsg(Code codeId)

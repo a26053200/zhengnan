@@ -8,9 +8,9 @@ package utils;
  */
 public class StringUtils
 {
-    public static boolean isNullOrEmpty(String str)
+    public static boolean isNullOrEmpty(String s)
     {
-        return str == null || str == "";
+        return s == null || s.length() <= 0;
     }
 
     public static String RemoveAllEmpty(String resource)

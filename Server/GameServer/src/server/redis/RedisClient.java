@@ -6,22 +6,15 @@
  */
 package server.redis;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
+import org.apache.log4j.Logger;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
-import redis.clients.jedis.JedisShardInfo;
-import redis.clients.jedis.ShardedJedis;
-import redis.clients.jedis.ShardedJedisPool;
-import redis.clients.jedis.SortingParams;
+import server.gate.GateClientHandler;
 
 
 public class RedisClient
 {
+    private static final Logger logger = Logger.getLogger(GateClientHandler.class);
+
     private static RedisClient s_instance = null;
 
     public static RedisClient getInstance()
@@ -37,17 +30,18 @@ public class RedisClient
     {
     }
 
-    public Jedis createDB(String host)
+    public Jedis connectDB(String host)
     {
         if (jedis == null)
-            jedis = createDB(host, 6379);
+            jedis = connectDB(host, 6379);
         return jedis;
     }
 
-    public Jedis createDB(String host, int port)
+    public Jedis connectDB(String host, int port)
     {
         if (jedis == null)
             jedis = new Jedis(host, port);
+        logger.info(String.format("Redis Database connection success! connection info:%s:%d", host, port));
         return jedis;
     }
 

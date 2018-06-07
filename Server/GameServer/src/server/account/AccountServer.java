@@ -14,6 +14,8 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import org.apache.log4j.Logger;
 import server.common.BaseServer;
 import server.login.LoginServer;
+import server.redis.RedisClient;
+import utils.IdGenerator;
 
 /**
  * @ClassName: AccountServer
@@ -54,9 +56,16 @@ public class AccountServer extends BaseServer
                     }).option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
+            //连接数据库
+            RedisClient.getInstance().connectDB("127.0.0.1");
+            //Id生成器
+            IdGenerator.init(Thread.currentThread().getId());
+            logger.info(ServerName + " startup successful!!!");
             ChannelFuture f = b.bind(port).sync();
 
             f.channel().closeFuture().sync();
+
+            logger.info(ServerName + " close up...");
         } finally {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
@@ -70,7 +79,7 @@ public class AccountServer extends BaseServer
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);
         } else {
-            port = 80;
+            port = 8080;
         }
         new AccountServer(port).run();
     }

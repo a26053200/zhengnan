@@ -34,6 +34,6 @@ public class LoginServerDecoder extends ByteArrayDecoder
     protected void decode(ChannelHandlerContext ctx, ByteBuf bytes, List<Object> out) throws Exception
     {
         super.decode(ctx, bytes, out);
-        monitor.recvJson(ctx, bytes);
+        monitor.recvByteBuf(ctx, bytes);
     }
 }

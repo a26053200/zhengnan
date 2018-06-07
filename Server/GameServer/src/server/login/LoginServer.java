@@ -9,8 +9,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
 import server.common.BaseServer;
-import server.gate.GateServer;
-import server.gate.GateServerInitializer;
 import server.redis.RedisClient;
 import utils.IdGenerator;
 
@@ -43,7 +41,7 @@ public class LoginServer extends BaseServer
 
             logger.info(ServerName + " startup successful!!!");
             //连接数据库
-            RedisClient.getInstance().createDB("127.0.0.1");
+            RedisClient.getInstance().connectDB("127.0.0.1");
             //Id生成器
             IdGenerator.init(Thread.currentThread().getId());
 
@@ -55,7 +53,7 @@ public class LoginServer extends BaseServer
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
 
-            logger.info(ServerName + "close up successful!!!");
+            logger.info(ServerName + " close up...");
         }
     }
     public static void main(String[] args) throws Exception {

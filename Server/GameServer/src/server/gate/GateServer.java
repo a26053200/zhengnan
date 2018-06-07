@@ -39,7 +39,7 @@ public class GateServer extends BaseServer
                     .option(ChannelOption.SO_BACKLOG, 128)          // (5)
                     .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
 
-            logger.info(ServerName + "startup successful!!!");
+            logger.info(ServerName + " startup successful!!!");
 
 
             ChannelFuture f = b.bind(port).sync(); // (7)
@@ -50,7 +50,7 @@ public class GateServer extends BaseServer
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
 
-            logger.info(ServerName + "close up successful!!!");
+            logger.info(ServerName + " close up...");
         }
     }
     public static void main(String[] args) throws Exception {

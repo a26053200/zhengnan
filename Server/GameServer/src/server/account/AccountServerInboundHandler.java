@@ -15,6 +15,7 @@ import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.HttpHeaders.Values;
 import org.apache.log4j.Logger;
 import utils.BytesUtils;
+import utils.StringUtils;
 
 public class AccountServerInboundHandler extends ChannelInboundHandlerAdapter
 {
@@ -24,7 +25,6 @@ public class AccountServerInboundHandler extends ChannelInboundHandlerAdapter
     private AccountMonitor monitor;
 
     private HttpRequest request = null;
-    private FullHttpResponse response = null;
 
     public AccountServerInboundHandler(AccountMonitor monitor)
     {
@@ -35,43 +35,62 @@ public class AccountServerInboundHandler extends ChannelInboundHandlerAdapter
     public void channelRead(ChannelHandlerContext ctx, Object msg)
             throws Exception
     {
-        if (msg instanceof HttpRequest) {
+        String res = "";
+        if (msg instanceof HttpRequest)
+        {
             request = (HttpRequest) msg;
             String uri = request.uri();
-            String res = "";
-            try {
+            try
+            {
                 res = uri.substring(1);
-                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(res.getBytes("UTF-8")));
-            } catch (Exception e) {//处理出错，返回错误信息
-                res = "<html><body>Server Error</body></html>";
-                response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.wrappedBuffer(res.getBytes("UTF-8")));
-                setHeaders(response);
+                if (!StringUtils.isNullOrEmpty(res))
+                {
+                    logger.info("[recv]" + res);
+                    monitor.recvJson(ctx, res);
+                }
             }
-            if (response != null)
-                ctx.write(response);
-            logger.info(res);
+            catch (Exception e)
+            {//处理出错，返回错误信息
+                e.printStackTrace();
+                responseError(ctx, "Account Server Error");
+            }
         }
-        if (msg instanceof HttpContent) {
-            HttpContent content = (HttpContent) msg;
-            ByteBuf buf = content.content();
-            logger.info(BytesUtils.readString(buf));
-            buf.release();
+        if (msg instanceof HttpContent)
+        {
+            try
+            {
+                HttpContent content = (HttpContent) msg;
+                ByteBuf buf = content.content();
+                res = BytesUtils.readString(buf);
+                buf.release();
+                if (StringUtils.isNullOrEmpty(res))
+                {
+                    responseError(ctx, "Http request data is Empty!");
+                }
+                else
+                {
+                    logger.info("[recv]" + res);
+                    monitor.recvJson(ctx, res);
+                }
+            }
+            catch (Exception e)
+            {//处理出错，返回错误信息
+                e.printStackTrace();
+                responseError(ctx,"Account Server Error");
+            }
         }
     }
-    /**
-     * 设置HTTP返回头信息
-     */
-    private void setHeaders(FullHttpResponse response) {
-        response.headers().set(HttpHeaders.Names.CONTENT_TYPE, "text/html");
-        response.headers().set(HttpHeaders.Names.CONTENT_LANGUAGE, response.content().readableBytes());
-        if (HttpHeaders.isKeepAlive(request)) {
-            response.headers().set(HttpHeaders.Names.CONNECTION, Values.KEEP_ALIVE);
-        }
+
+    private void responseError(ChannelHandlerContext ctx, String errorMsg)
+    {
+        logger.error(errorMsg);
+        ctx.channel().write(BytesUtils.string2Bytes(errorMsg));
     }
+
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception
     {
-        System.out.println("server channelReadComplete..");
+        logger.info("http server channelReadComplete..");
         ctx.flush();//刷新后才将数据发出到SocketChannel
     }
 
@@ -79,7 +98,7 @@ public class AccountServerInboundHandler extends ChannelInboundHandlerAdapter
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
             throws Exception
     {
-        System.out.println("server exceptionCaught..");
+        logger.error("http server exceptionCaught..");
         ctx.close();
     }
 
