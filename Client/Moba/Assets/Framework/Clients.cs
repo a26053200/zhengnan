@@ -45,10 +45,12 @@ public class Clients : MonoBehaviour
         httpRequest.SendMsg("http://127.0.0.1:8080", json, "OnHttpLogin");
     }
 
-    void OnHttpLogin(JsonData json1)
+    void OnHttpLogin(JsonData json)
     {
-        JsonData gameSrv = json1["list"][0];
-  
+        MyDebug.Log(json["aid"]);
+        JsonData srvList = json["srvList"];
+        JsonData list = srvList["list"];
+        JsonData gameSrv = list[0];
         jsonClient = gameObject.AddComponent<JsonClient>();
         //连接游戏网关服务器
         jsonClient.connect((string)gameSrv["host"], (int)gameSrv["port"]);
@@ -60,8 +62,8 @@ public class Clients : MonoBehaviour
             JsonData loginGate = new JsonData();
             loginGate["server"] = "GateServer";
             loginGate["action"] = "login_game_gateway";
-            loginGate["username"] = "123456";
-            loginGate["password"] = "123";
+            loginGate["aid"] = json["aid"];
+            loginGate["token"] = json["token"];
 
             jsonClient.sendJson(loginGate);
         });

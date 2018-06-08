@@ -139,7 +139,40 @@ public static class JCode
         //return System.Text.Encoding.ASCII.GetString(data);
         return System.Text.Encoding.UTF8.GetString(data, 0, length);
     }
-
+    public static Encoding GetBytesEncoding(byte[] bs)
+    {
+        int len = bs.Length;
+        if (len >= 3 && bs[0] == 0xEF && bs[1] == 0xBB && bs[2] == 0xBF)
+        {
+            return Encoding.UTF8;
+        }
+        int[] cs = { 7, 5, 4, 3, 2, 1, 0, 6, 14, 30, 62, 126 };
+        for (int i = 0; i < len; i++)
+        {
+            int bits = -1;
+            for (int j = 0; j < 6; j++)
+            {
+                if (bs[i] >> cs[j] == cs[j + 6])
+                {
+                    bits = j;
+                    break;
+                }
+            }
+            if (bits == -1)
+            {
+                return Encoding.Default;
+            }
+            while (bits-- > 0)
+            {
+                i++;
+                if (i == len || bs[i] >> 6 != 2)
+                {
+                    return Encoding.Default;
+                }
+            }
+        }
+        return Encoding.UTF8;
+    }
     public static String ToFormart(String jsonStr)
     {
 #if UNITY_EDITOR

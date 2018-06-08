@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using LitJson;
+using System.Text;
 //
 // HttpRequest
 // Author: zhengnan
@@ -17,8 +18,8 @@ public class HttpRequest : MonoBehaviour
     {
         string error = null;
         if (Global.EnableLogNetwork)
-            MyDebug.Log(string.Format("[Http] {0}{1}", requestUrl, dataString));
-        using (var www = new WWW(requestUrl, System.Text.Encoding.UTF8.GetBytes(dataString)))
+            MyDebug.Log(string.Format("[Http] {0}/{1}", requestUrl, dataString));
+        using (var www = new WWW(requestUrl, Encoding.UTF8.GetBytes(dataString)))
         {
             yield return www;
             if (!string.IsNullOrEmpty(www.error))
@@ -31,8 +32,12 @@ public class HttpRequest : MonoBehaviour
             }
             else
             {
-                MyDebug.Log("[Http recv]" + www.text);
-                JsonData netData = new JsonData(www.text);
+                UTF8Encoding utf = new UTF8Encoding(true, true);
+                StringBuilder sb = new StringBuilder( Encoding.ASCII.GetString(www.bytes));
+                sb.Append('\0');
+                //string json = JCode.ToFormart(www.text);
+                MyDebug.Log("[Http recv]" + sb.ToString());
+                JsonData netData = JsonMapper.ToObject(www.text.Trim());
                 SendMessage(callback, netData);
                 yield break;
             }
