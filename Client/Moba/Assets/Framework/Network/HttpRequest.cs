@@ -32,12 +32,11 @@ public class HttpRequest : MonoBehaviour
             }
             else
             {
-                UTF8Encoding utf = new UTF8Encoding(true, true);
-                StringBuilder sb = new StringBuilder( Encoding.ASCII.GetString(www.bytes));
-                sb.Append('\0');
-                //string json = JCode.ToFormart(www.text);
-                MyDebug.Log("[Http recv]" + sb.ToString());
-                JsonData netData = JsonMapper.ToObject(www.text.Trim());
+                //去掉结尾的 '\0' 字符 要不然会解析不出json  这个查了很多资料 
+                //最终通过打印2进制数组一个一个字节对比才发现的 - -!
+                string json = Encoding.UTF8.GetString(www.bytes,0, www.bytes.Length - 1);
+                MyDebug.Log("[Http recv] " + json);
+                JsonData netData = JsonMapper.ToObject(json);
                 SendMessage(callback, netData);
                 yield break;
             }

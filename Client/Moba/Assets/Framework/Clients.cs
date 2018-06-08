@@ -47,7 +47,7 @@ public class Clients : MonoBehaviour
 
     void OnHttpLogin(JsonData json)
     {
-        MyDebug.Log(json["aid"]);
+        MyDebug.Log(json["token"]);
         JsonData srvList = json["srvList"];
         JsonData list = srvList["list"];
         JsonData gameSrv = list[0];
@@ -60,8 +60,8 @@ public class Clients : MonoBehaviour
         {
             //登陆游戏网关
             JsonData loginGate = new JsonData();
-            loginGate["server"] = "GateServer";
-            loginGate["action"] = "login_game_gateway";
+            loginGate["server"] = "GameServer";
+            loginGate["action"] = "login_game_server";
             loginGate["aid"] = json["aid"];
             loginGate["token"] = json["token"];
 
