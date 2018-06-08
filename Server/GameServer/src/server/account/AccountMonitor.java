@@ -7,7 +7,6 @@ import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import org.apache.log4j.Logger;
-import redis.clients.jedis.Jedis;
 import server.common.Action;
 import server.common.Monitor;
 import server.common.ReturnCode;
@@ -54,6 +53,13 @@ public class AccountMonitor extends Monitor
                 login(ctx, jsonObject);
                 break;
         }
+    }
+
+    @Override
+    protected void initDB()
+    {
+        //获取数据库
+        db = RedisClient.getInstance().getDB(0);
     }
 
     private void login(ChannelHandlerContext ctx, JSONObject recvJson)
@@ -107,6 +113,8 @@ public class AccountMonitor extends Monitor
 
     private void httpResponse(ChannelHandlerContext ctx, String msg)
     {
+        //msg = StringUtils.AddControlChar(msg);
+        //msg = StringUtils.AddControlChar(msg);
         logger.info(String.format("[Rspd]:%s", msg));
         FullHttpResponse response = new DefaultFullHttpResponse(
                 HTTP_1_1, OK, Unpooled.wrappedBuffer(BytesUtils.string2Bytes(msg)));

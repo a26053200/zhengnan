@@ -14,8 +14,6 @@ import io.netty.handler.codec.http.HttpResponseEncoder;
 import org.apache.log4j.Logger;
 import server.common.BaseServer;
 import server.login.LoginServer;
-import server.redis.RedisClient;
-import utils.IdGenerator;
 
 /**
  * @ClassName: AccountServer
@@ -29,7 +27,7 @@ public class AccountServer extends BaseServer
 
     public AccountServer(int port)
     {
-        super(port);
+        super(ServerName, port);
     }
 
     @Override
@@ -70,7 +68,7 @@ public class AccountServer extends BaseServer
 
     public static void main(String[] args) throws Exception
     {
-        Debug.initLog("[" + ServerName + "]");
+        Debug.initLog("[" + ServerName + "]","log4j_account_server.properties");
         int port;
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);

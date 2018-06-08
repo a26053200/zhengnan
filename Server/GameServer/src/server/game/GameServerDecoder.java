@@ -1,10 +1,10 @@
-package server.gate;
+package server.game;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import org.apache.log4j.Logger;
-import utils.BytesUtils;
+import server.gate.GateMonitor;
 
 import java.util.List;
 
@@ -14,13 +14,13 @@ import java.util.List;
  * @Author: zhengnan
  * @Date: 2018/6/1 21:00
  */
-public class GateServerDecoder extends ByteArrayDecoder
+public class GameServerDecoder extends ByteArrayDecoder
 {
-    final static Logger logger = Logger.getLogger(GateServerDecoder.class);
+    final static Logger logger = Logger.getLogger(GameServerDecoder.class);
 
-    GateMonitor monitor;
+    GameMonitor monitor;
 
-    public GateServerDecoder(GateMonitor monitor)
+    public GameServerDecoder(GameMonitor monitor)
     {
         this.monitor = monitor;
     }
@@ -28,6 +28,6 @@ public class GateServerDecoder extends ByteArrayDecoder
     protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception
     {
         super.decode(ctx, msg, out);
-        monitor.recvByteBuf(ctx,msg);
+        monitor.recvJsonBuff(ctx,msg);
     }
 }

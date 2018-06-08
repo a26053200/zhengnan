@@ -1,8 +1,9 @@
-package server.gate;
+package server.game;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import org.apache.log4j.Logger;
+import server.gate.GateMonitor;
 
 import java.util.List;
 
@@ -12,13 +13,13 @@ import java.util.List;
  * @Author: zhengnan
  * @Date: 2018/6/1 21:01
  */
-public class GateServerEncoder extends ByteArrayEncoder
+public class GameServerEncoder extends ByteArrayEncoder
 {
-    final static Logger logger = Logger.getLogger(GateServerEncoder.class);
+    final static Logger logger = Logger.getLogger(GameServerEncoder.class);
 
-    GateMonitor monitor;
+    GameMonitor monitor;
 
-    public GateServerEncoder(GateMonitor monitor)
+    public GameServerEncoder(GameMonitor monitor)
     {
         this.monitor = monitor;
     }

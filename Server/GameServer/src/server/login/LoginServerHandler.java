@@ -72,7 +72,8 @@ public class LoginServerHandler extends SimpleChannelInboundHandler<Monitor>
         Channel incoming = ctx.channel();
         logger.error("Client ip:" + incoming.remoteAddress() + " is exception");
         // 当出现异常就关闭连接
-        //cause.printStackTrace();
+        cause.printStackTrace();
+        logger.info(String.format("[LoginServer] 远程IP:%s 的链接出现异常,其通道即将关闭", incoming.remoteAddress()));
         ctx.close().addListener(new GenericFutureListener<Future<? super Void>>()
         {
             @Override
@@ -80,13 +81,9 @@ public class LoginServerHandler extends SimpleChannelInboundHandler<Monitor>
                     throws Exception
             {
                 if (future.isSuccess())
-                {
-                    logger.info("[LoginServer]异常关闭成功");
-                }
+                    logger.info("异常关闭成功");
                 else
-                {
-                    logger.info("[LoginServer]异常关闭失败");
-                }
+                    logger.info("异常关闭失败");
             }
         });
     }

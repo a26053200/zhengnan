@@ -13,7 +13,9 @@ public abstract class BaseServer
 {
     protected int port;
 
-    public BaseServer(int port)
+    protected String serverName;
+
+    public BaseServer(String serverName, int port)
     {
         this.port = port;
         //连接数据库

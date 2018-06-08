@@ -7,10 +7,10 @@ public class Debug
 {
     static String s_serverName;
 
-    public static void initLog(String serverName)
+    public static void initLog(String serverName, String propFile)
     {
         s_serverName = serverName;
-        PropertyConfigurator.configure("log4j.properties");
+        PropertyConfigurator.configure(propFile);
     }
 
     private static Logger s_instance = null;

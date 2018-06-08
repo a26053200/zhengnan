@@ -35,25 +35,23 @@ public abstract class Monitor
      */
     protected Jedis db;
 
-    public Monitor()
-    {
-        //所有已经链接的通道,用于广播
-        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
-        //获取数据库
-        db = RedisClient.getInstance().getDB(0);
-    }
-
     public ChannelGroup getChannelGroup()
     {
         return channelGroup;
     }
-
 
     public Channel getChannel(ChannelId channelId)
     {
         return channelGroup.find(channelId);
     }
 
+    public Monitor()
+    {
+        //所有已经链接的通道,用于广播
+        channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+        //初始化数据库
+        initDB();
+    }
 
     public void recvByteBuf(ChannelHandlerContext ctx, ByteBuf buf)
     {
@@ -87,8 +85,22 @@ public abstract class Monitor
         }
     }
 
+    public void recvJsonBuff(ChannelHandlerContext ctx, ByteBuf buf)
+    {
+        String json = BytesUtils.readString(buf);
+        recvJson(ctx,json);
+    }
+
+    /**
+     * @param ctx
+     * @param jsonObject
+     */
     protected abstract void RespondJson(ChannelHandlerContext ctx, JSONObject jsonObject);
 
+    /**
+     * 初始化数据库
+     */
+    protected abstract void initDB();
 
     protected void sendString(ChannelHandlerContext ctx, String msg)
     {

@@ -10,4 +10,6 @@ public class Action
 {
     //登陆帐号服务器
     public final static String LOGIN_ACCOUNT = "login_account";
+    //登陆游戏网关服务器
+    public final static String LOGIN_GAME_SEVER = "login_game_server";
 }

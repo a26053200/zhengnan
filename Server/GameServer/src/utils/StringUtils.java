@@ -34,4 +34,30 @@ public class StringUtils
         }
         return buffer;
     }
+
+    /// <summary>
+    /// 添加转义字符
+    /// </summary>
+    /// <param name="src"></param>
+    /// <returns></returns>
+    public static String AddControlChar(String src)
+    {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < src.length(); i++)
+        {
+            switch(src.charAt(i))
+            {
+                case '"':
+                case '\\':
+                    sb.append('\\');
+                    sb.append(src.charAt(i));
+                    break;
+                default:
+                    sb.append(src.charAt(i));
+                    break;
+            }
+        }
+        return sb.toString();
+
+    }
 }

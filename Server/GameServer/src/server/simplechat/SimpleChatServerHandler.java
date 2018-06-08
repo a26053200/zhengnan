@@ -46,7 +46,7 @@ public class SimpleChatServerHandler extends SimpleChannelInboundHandler<String>
 	protected void channelRead0(ChannelHandlerContext ctx, String s) throws Exception { // (4)
 		Channel incoming = ctx.channel();
 		for (Channel channel : channels) {
-            Debug.info("[Recv]" + s);
+            //Debug.info("[Recv]" + s);
             if (channel != incoming){
                 channel.writeAndFlush("[" + incoming.remoteAddress() + "]" + s + "\n");
             } else {

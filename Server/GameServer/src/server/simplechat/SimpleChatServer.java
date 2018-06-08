@@ -63,7 +63,7 @@ public class SimpleChatServer {
         }
         new SimpleChatServer(port).run();
         //initLog();
-        Debug.initLog("[SimpleChatServer]");
+        Debug.initLog("[SimpleChatServer]","log4j_common.properties");
     }
 
     public static void initLog()

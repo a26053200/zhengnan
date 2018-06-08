@@ -2,7 +2,6 @@ package server.configure;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import common.log.Debug;
 import redis.clients.jedis.Jedis;
 import server.redis.RedisClient;
 
@@ -16,7 +15,7 @@ public class OnKeyConfigServer
 {
     public static void main(String[] args)
     {
-        Debug.initLog("[OnKeyConfigServer]");
+        //Debug.initLog("[OnKeyConfigServer]");
         //连接数据库
         RedisClient.getInstance().connectDB("127.0.0.1");
 

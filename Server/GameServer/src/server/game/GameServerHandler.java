@@ -1,15 +1,13 @@
-package server.gate;
+package server.game;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import org.apache.log4j.Logger;
 import server.common.Monitor;
+import server.gate.GateMonitor;
 
 /**
  * @ClassName: GateServerHandler
@@ -17,22 +15,21 @@ import server.common.Monitor;
  * @Author: zhengnan
  * @Date: 2018/6/1 21:05
  */
-public class GateServerHandler extends SimpleChannelInboundHandler<Monitor>
+public class GameServerHandler extends SimpleChannelInboundHandler<Monitor>
 {
-    final static Logger logger = Logger.getLogger(GateServerHandler.class.getName());
+    final static Logger logger = Logger.getLogger(GameServerHandler.class.getName());
 
-    protected GateMonitor monitor;
+    protected GameMonitor monitor;
 
-    public GateServerHandler(GateMonitor monitor)
+    public GameServerHandler(GameMonitor monitor)
     {
         this.monitor = monitor;
     }
-
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception
     {  // (2)
         Channel incoming = ctx.channel();
-        logger.info("Client ip:" + incoming.remoteAddress() + " is added");
+        logger.info("GameServer Client ip:" + incoming.remoteAddress() + " is added");
         // Broadcast a message to multiple Channels
         // channels.writeAndFlush("[SERVER] - " + incoming.remoteAddress() + " 加入\n");
 
@@ -43,30 +40,27 @@ public class GateServerHandler extends SimpleChannelInboundHandler<Monitor>
     protected void channelRead0(ChannelHandlerContext ctx, Monitor monitor) throws Exception
     {
         Channel incoming = ctx.channel();
-        logger.info("Channel:" + incoming.id());
+        logger.info("GameServer Channel:" + incoming.id());
     }
-
     @Override
-    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception
-    {
+    public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         super.channelReadComplete(ctx);
         Channel incoming = ctx.channel();
-        logger.info("Client ip:" + incoming.remoteAddress() + " read msg over");
+        logger.info("GameServer Client ip:" + incoming.remoteAddress() + " read msg over");
         ctx.flush();
     }
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception
     { // (5)
         Channel incoming = ctx.channel();
-        logger.info("Client ip:" + incoming.remoteAddress() + " is online");
+        logger.info("GameServer Client ip:" + incoming.remoteAddress() + " is online");
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception
     { // (6)
         Channel incoming = ctx.channel();
-        logger.info("Client ip:" + incoming.remoteAddress() + " is offline");
+        logger.info("GameServer Client ip:" + incoming.remoteAddress() + " is offline");
         monitor.getChannelGroup().remove(ctx.channel());
     }
 
@@ -74,10 +68,10 @@ public class GateServerHandler extends SimpleChannelInboundHandler<Monitor>
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
     {
         Channel incoming = ctx.channel();
-        logger.error("Client ip:" + incoming.remoteAddress() + " is exception");
+        logger.error("GameServer Client ip:" + incoming.remoteAddress() + " is exception");
         // 当出现异常就关闭连接
         cause.printStackTrace();
-        logger.info(String.format("[GateServer] 远程IP:%s 的链接出现异常,其通道即将关闭", incoming.remoteAddress()));
+        logger.info(String.format("[GameServer] 远程IP:%s 的链接出现异常,其通道即将关闭", incoming.remoteAddress()));
         ctx.close().addListener(new GenericFutureListener<Future<? super Void>>()
         {
             @Override

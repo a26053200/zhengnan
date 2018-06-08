@@ -23,7 +23,7 @@ public class LoginServer extends BaseServer
     public static final String ServerName = "LoginServer";
     public LoginServer(int port)
     {
-        super(port);
+        super(ServerName, port);
     }
     @Override
     public void run() throws Exception
@@ -54,7 +54,7 @@ public class LoginServer extends BaseServer
         }
     }
     public static void main(String[] args) throws Exception {
-        Debug.initLog("["+ServerName+"]");
+        Debug.initLog("["+ServerName+"]","log4j_common.properties");
         int port;
         if (args.length > 0) {
             port = Integer.parseInt(args[0]);
