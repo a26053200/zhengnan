@@ -16,6 +16,7 @@ import server.redis.RedisClient;
 import server.redis.RedisKeys;
 import utils.BytesUtils;
 import utils.IdGenerator;
+import utils.JwtHelper;
 
 import java.util.Date;
 
@@ -38,66 +39,64 @@ public class AccountMonitor extends Monitor
     //Token 过期时间
     public final static int expiresSecond = 5 * 60 * 60 * 1000;
 
+    public AccountMonitor()
+    {
+        super();
+    }
+
     @Override
     protected void RespondJson(ChannelHandlerContext ctx, JSONObject jsonObject)
     {
         String action = jsonObject.get("action").toString();
 
-        switch (action)
-        {
+        switch (action) {
             case Action.LOGIN_ACCOUNT:
                 login(ctx, jsonObject);
                 break;
         }
     }
 
-
     private void login(ChannelHandlerContext ctx, JSONObject recvJson)
     {
         String username = recvJson.get("username").toString();
         String password = recvJson.get("password").toString();
 
-        Jedis db = RedisClient.getInstance().getDB(0);
         String account_id = db.hget(username, RedisKeys.account_id);
         //帐号存在就验证密码
-        if (account_id == null)
-        {//新建账号和密码
+        if (account_id == null) {//新建账号和密码
             long aid = IdGenerator.getInstance().nextId();
             db.hset(username, RedisKeys.account_id, Long.toString(aid));
             db.hset(username, RedisKeys.account_username, username);
             db.hset(username, RedisKeys.account_password, password);
             db.hset(username, RedisKeys.account_ip, ctx.channel().remoteAddress().toString());
             db.hset(username, RedisKeys.account_reg_time, new Date().toString());
-            onLoginSuccess(ctx, recvJson);
-        }
-        else
-        {
+            logger.info(String.format("用户:%s 登陆成功", username));
+            onLoginSuccess(ctx, account_id);
+        } else {
             String db_password = db.hget(username, RedisKeys.account_password);
-            if (db_password.equals(password))
-            {//密码正确，登陆成功
-                try
-                {//返回游戏服务器的网关地址列表 json
-                    JSONObject gameServerJson = JSONObject.parseObject(db.get("GameServer"));
+            if (db_password.equals(password)) {//密码正确，登陆成功
+                try {
                     logger.info(String.format("用户:%s 登陆成功", username));
-                    onLoginSuccess(ctx, gameServerJson);
-                }
-                catch (Exception ex)
-                {
+                    onLoginSuccess(ctx, account_id);
+                } catch (Exception ex) {
                     ex.printStackTrace();
                     onLoginFail(ctx, recvJson, ReturnCode.Code.FETCH_GAME_SERVER_LIST_ERROR);
                 }
-            }
-            else
-            {//密码错误，登陆失败
+            } else {//密码错误，登陆失败
                 onLoginFail(ctx, recvJson, ReturnCode.Code.WRONG_PASSWORD);
             }
         }
     }
 
-    private void onLoginSuccess(ChannelHandlerContext ctx, JSONObject jsonObject)
+    private void onLoginSuccess(ChannelHandlerContext ctx, String account_id)
     {
-
-        httpResponse(ctx, jsonObject.toString());
+        //游戏服务器的网关地址列表 json
+        JSONObject gameServerJson = JSONObject.parseObject(db.get("GameServer"));
+        JSONObject rspdJson = new JSONObject();
+        rspdJson.put("aid", account_id);
+        rspdJson.put("token", JwtHelper.createJWT(account_id, expiresSecond));
+        rspdJson.put("srvList", gameServerJson);
+        httpResponse(ctx, rspdJson.toString());
     }
 
     private void onLoginFail(ChannelHandlerContext ctx, JSONObject jsonObject, ReturnCode.Code code)
@@ -108,6 +107,7 @@ public class AccountMonitor extends Monitor
 
     private void httpResponse(ChannelHandlerContext ctx, String msg)
     {
+        logger.info(String.format("[Rspd]:%s", msg));
         FullHttpResponse response = new DefaultFullHttpResponse(
                 HTTP_1_1, OK, Unpooled.wrappedBuffer(BytesUtils.string2Bytes(msg)));
         response.headers().set(CONTENT_TYPE, "text/plain");

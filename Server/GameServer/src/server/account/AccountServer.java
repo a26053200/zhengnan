@@ -56,10 +56,6 @@ public class AccountServer extends BaseServer
                     }).option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            //连接数据库
-            RedisClient.getInstance().connectDB("127.0.0.1");
-            //Id生成器
-            IdGenerator.init(Thread.currentThread().getId());
             logger.info(ServerName + " startup successful!!!");
             ChannelFuture f = b.bind(port).sync();
 

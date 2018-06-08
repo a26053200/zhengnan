@@ -12,6 +12,8 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.apache.log4j.Logger;
+import redis.clients.jedis.Jedis;
+import server.redis.RedisClient;
 import utils.BytesUtils;
 
 /**
@@ -28,11 +30,17 @@ public abstract class Monitor
      * 多个客户端链接通道
      */
     protected ChannelGroup channelGroup;
+    /**
+     * 数据库
+     */
+    protected Jedis db;
 
     public Monitor()
     {
         //所有已经链接的通道,用于广播
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+        //获取数据库
+        db = RedisClient.getInstance().getDB(0);
     }
 
     public ChannelGroup getChannelGroup()

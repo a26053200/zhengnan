@@ -90,7 +90,7 @@ public class AccountServerInboundHandler extends ChannelInboundHandlerAdapter
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception
     {
-        logger.info("http server channelReadComplete..");
+        //logger.info("http server channelReadComplete..");
         ctx.flush();//刷新后才将数据发出到SocketChannel
     }
 

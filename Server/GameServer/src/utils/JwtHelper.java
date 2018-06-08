@@ -1,9 +1,8 @@
 package utils;
 
-import javax.crypto.spec.SecretKeySpec;
-import java.security.Key;
+import com.alibaba.fastjson.JSONObject;
 
-import io.jsonwebtoken.*;
+//import io.jsonwebtoken.*;
 
 import java.util.Base64;
 import java.util.Date;
@@ -16,27 +15,53 @@ import java.util.Date;
  */
 public class JwtHelper
 {
+    //明文Token,用于测试 以后有时间再做加密的
 
 
-    //Sample method to validate and read the JWT
-    public static void parseJWT(String jwt, String secretKey)
+    /**
+     * @param id
+     * @param ttlMillis
+     * @return Token
+     */
+    public static String createJWT(String id,long ttlMillis)
     {
+        JSONObject json = new JSONObject();
+        json.put("id",id);
+        json.put("ttlMillis",ttlMillis);
+        return Base64.getEncoder().encodeToString(BytesUtils.string2Bytes(json.toString()));
+    }
 
+    /**
+     * @param jwt
+     * @param limit
+     * @return 是否验证通过
+     */
+    public static boolean parseJWT(String jwt, long limit)
+    {
+        JSONObject json = JSONObject.parseObject(jwt);
+        long ttlMillis = json.getLong("ttlMillis");
+        Date date = new Date(ttlMillis);
+        long now = new Date().getTime();
+        return now - ttlMillis < limit;
+    }
+    //Sample method to validate and read the JWT
+    //public static void parseJWT(String jwt, String secretKey)
+    //{
         //This line will throw an exception if it is not a signed JWS (as expected)
-        Claims claims = Jwts.parser()
-                .setSigningKey(Base64.getDecoder().decode(secretKey))
-                .parseClaimsJws(jwt).getBody();
+        //Claims claims = Jwts.parser()
+                //.setSigningKey(Base64.getDecoder().decode(secretKey))
+                //.parseClaimsJws(jwt).getBody();
         //System.out.println("ID: " + claims.getId());
         //System.out.println("Subject: " + claims.getSubject());
         //System.out.println("Issuer: " + claims.getIssuer());
         //System.out.println("Expiration: " + claims.getExpiration());
-    }
+    //}
 
 
     //Sample method to construct a JWT
+    /*
     public static String createJWT(String id, String issuer, String subject, long ttlMillis, String secretKey)
     {
-
         //The JWT signature algorithm we will be using to sign the token
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
 
@@ -64,6 +89,6 @@ public class JwtHelper
 
         //Builds the JWT and serializes it to a compact, URL-safe string
         return builder.compact();
-    }
+    }*/
 
 }
