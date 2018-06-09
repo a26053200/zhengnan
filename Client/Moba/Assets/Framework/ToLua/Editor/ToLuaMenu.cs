@@ -92,7 +92,7 @@ public static class ToLuaMenu
         typeof(System.Type),
         typeof(System.Collections.IEnumerator),
         typeof(UnityEngine.Object),
-        typeof(LuaInterface.LuaEventObject),
+        typeof(LuaInterface.EventObject),
         typeof(LuaInterface.LuaMethod),
         typeof(LuaInterface.LuaProperty),
         typeof(LuaInterface.LuaField),

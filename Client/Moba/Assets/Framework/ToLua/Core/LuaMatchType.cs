@@ -595,7 +595,7 @@ namespace LuaInterface
                 case LuaTypes.LUA_TNIL:
                     return true;
                 case LuaTypes.LUA_TUSERDATA:
-                    return CheckClassType(typeof(LuaEventObject), L, pos);
+                    return CheckClassType(typeof(EventObject), L, pos);
                 default:
                     return false;
             }

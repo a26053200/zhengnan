@@ -2442,7 +2442,7 @@ namespace LuaInterface
             }
         }
 
-        public static void Push(IntPtr L, LuaEventObject ev)
+        public static void Push(IntPtr L, EventObject ev)
         {
             if (ev == null)
             {
@@ -2808,9 +2808,9 @@ namespace LuaInterface
                 {
                     Push(L, (IEnumerator)obj);
                 }
-                else if (t == typeof(LuaEventObject))
+                else if (t == typeof(EventObject))
                 {
-                    Push(L, (LuaEventObject)obj);
+                    Push(L, (EventObject)obj);
                 }
                 else if (t == monoType)
                 {

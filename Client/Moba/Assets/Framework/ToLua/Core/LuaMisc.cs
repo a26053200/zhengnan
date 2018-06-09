@@ -529,7 +529,7 @@ namespace LuaInterface
         Sub = 2,
     }
 
-    public class LuaEventObject
+    public class EventObject
     {
         [NoToLuaAttribute]
         public EventOp op = EventOp.None;
@@ -539,19 +539,19 @@ namespace LuaInterface
         public Type type;
 
         [NoToLuaAttribute]
-        public LuaEventObject(Type t)
+        public EventObject(Type t)
         {
             type = t;
         }
 
-        public static LuaEventObject operator +(LuaEventObject a, Delegate b)
+        public static EventObject operator +(EventObject a, Delegate b)
         {
             a.op = EventOp.Add;
             a.func = b;
             return a;
         }
 
-        public static LuaEventObject operator -(LuaEventObject a, Delegate b)
+        public static EventObject operator -(EventObject a, Delegate b)
         {
             a.op = EventOp.Sub;
             a.func = b;

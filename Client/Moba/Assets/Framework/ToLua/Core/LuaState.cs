@@ -173,7 +173,7 @@ namespace LuaInterface
             DelegateMetatable = metaMap[typeof(System.Delegate)];
             EnumMetatable = metaMap[typeof(System.Enum)];
             IterMetatable = metaMap[typeof(IEnumerator)];
-            EventMetatable = metaMap[typeof(LuaEventObject)];
+            EventMetatable = metaMap[typeof(EventObject)];
         }
 
         void InitLuaPath()
@@ -2649,7 +2649,7 @@ namespace LuaInterface
             TypeTraits<LuaBaseRef>.Init(_ck.CheckLuaBaseRef);
 
             TypeTraits<LuaByteBuffer>.Init(_ck.CheckByteBuffer);
-            TypeTraits<LuaEventObject>.Init(_ck.CheckEventObject);
+            TypeTraits<EventObject>.Init(_ck.CheckEventObject);
             TypeTraits<IEnumerator>.Init(_ck.CheckEnumerator);
             TypeTraits<Type>.Init(_ck.CheckMonoType);
             TypeTraits<GameObject>.Init(_ck.CheckGameObject);
@@ -2742,7 +2742,7 @@ namespace LuaInterface
             StackTraits<LuaBaseRef>.Init(ToLua.Push, ToLua.CheckLuaBaseRef, ToLua.CheckLuaBaseRef);
 
             StackTraits<LuaByteBuffer>.Init(ToLua.Push, op.CheckLuaByteBuffer, op.ToLuaByteBuffer);
-            StackTraits<LuaEventObject>.Init(ToLua.Push, op.CheckEventObject, op.ToEventObject);
+            StackTraits<EventObject>.Init(ToLua.Push, op.CheckEventObject, op.ToEventObject);
             StackTraits<IEnumerator>.Init(ToLua.Push, ToLua.CheckIter, op.ToIter);
             StackTraits<Type>.Init(ToLua.Push, ToLua.CheckMonoType, op.ToType);
             StackTraits<Type[]>.Init(ToLua.Push, op.CheckTypeArray, op.ToTypeArray);

@@ -97,9 +97,9 @@ namespace LuaInterface
             return (Type)ToLua.ToObject(L, stackPos);
         }
 
-        public LuaEventObject ToEventObject(IntPtr L, int stackPos)
+        public EventObject ToEventObject(IntPtr L, int stackPos)
         {
-            return (LuaEventObject)ToLua.ToObject(L, stackPos);
+            return (EventObject)ToLua.ToObject(L, stackPos);
         }
 
         public Transform ToTransform(IntPtr L, int stackPos)
@@ -197,9 +197,9 @@ namespace LuaInterface
             return new LuaByteBuffer(ToLua.CheckByteBuffer(L, stackPos));
         }
 
-        public LuaEventObject CheckEventObject(IntPtr L, int stackPos)
+        public EventObject CheckEventObject(IntPtr L, int stackPos)
         {
-            return (LuaEventObject)ToLua.CheckObject(L, stackPos, typeof(LuaEventObject));
+            return (EventObject)ToLua.CheckObject(L, stackPos, typeof(EventObject));
         }
 
         public Transform CheckTransform(IntPtr L, int stackPos)

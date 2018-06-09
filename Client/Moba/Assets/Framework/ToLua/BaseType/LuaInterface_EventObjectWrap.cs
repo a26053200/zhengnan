@@ -6,7 +6,7 @@ public class LuaInterface_EventObjectWrap
 {
 	public static void Register(LuaState L)
 	{
-		L.BeginClass(typeof(LuaInterface.LuaEventObject), typeof(System.Object));
+		L.BeginClass(typeof(LuaInterface.EventObject), typeof(System.Object));
 		L.RegFunction("__add", op_Addition);
 		L.RegFunction("__sub", op_Subtraction);
 		L.RegFunction("__tostring", ToLua.op_ToString);
@@ -18,7 +18,7 @@ public class LuaInterface_EventObjectWrap
 	{
         try
         {
-            LuaEventObject arg0 = (LuaEventObject)ToLua.CheckObject(L, 1, typeof(LuaEventObject));
+            EventObject arg0 = (EventObject)ToLua.CheckObject(L, 1, typeof(EventObject));
             arg0.func = ToLua.CheckDelegate(arg0.type, L, 2);
             arg0.op = EventOp.Sub;
             ToLua.Push(L, arg0);
@@ -35,7 +35,7 @@ public class LuaInterface_EventObjectWrap
 	{
         try
         {
-            LuaEventObject arg0 = (LuaEventObject)ToLua.CheckObject(L, 1, typeof(LuaEventObject));
+            EventObject arg0 = (EventObject)ToLua.CheckObject(L, 1, typeof(EventObject));
             arg0.func = ToLua.CheckDelegate(arg0.type, L, 2);
             arg0.op = EventOp.Add;
             ToLua.Push(L, arg0);
