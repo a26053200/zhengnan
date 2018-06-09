@@ -507,10 +507,11 @@ namespace LuaInterface
         {
             if (_instanceID == -1)
             {
-                int start = LuaConst.toluaDir.IndexOf("Assets");
-                int end = LuaConst.toluaDir.LastIndexOf("/Lua");
-                string dir = LuaConst.toluaDir.Substring(start, end - start);
-                dir += "/Core/ToLua.cs";
+                //int start = LuaConst.toluaDir.IndexOf("Assets");
+                //int end = LuaConst.toluaDir.LastIndexOf("/ToLua");
+                //string dir = LuaConst.toluaDir.Substring(start, end - start);
+                //dir += "/Core/ToLua.cs";
+                string dir = "Assets/Framework/ToLua/Core/ToLua.cs";
                 _instanceID = AssetDatabase.LoadAssetAtPath(dir, typeof(MonoScript)).GetInstanceID();//"Assets/ToLua/Core/ToLua.cs"
             }
         }
