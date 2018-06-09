@@ -4,9 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Clients : MonoBehaviour
+public class Client : MonoBehaviour
 {
-    public static Clients Ins { get; private set; }
+    public static Client Ins { get; private set; }
 
     public JsonClient jsonClient { get; private set; }
 
@@ -32,7 +32,9 @@ public class Clients : MonoBehaviour
         json["username"] = "123456";
         json["password"] = "123";
 
-        StartCoroutine(testHttpLogin(json));
+        //StartCoroutine(testHttpLogin(json));
+
+        AppBootstrap.Start(this);
     }
     void Update()
     {
@@ -56,7 +58,7 @@ public class Clients : MonoBehaviour
         jsonClient.connect((string)gameSrv["host"], (int)gameSrv["port"]);
         //MyDebug.Log(string.Format("正在连接服务器 {0}:{1}", gameSrv["host"], gameSrv["port"]));
 
-        jsonClient.eventDispatcher.addEventListener(SocketEvent.SERVER_SOCKET_CONNECTED,delegate(EventObject evt)
+        jsonClient.eventDispatcher.addEventListener(SocketEvent.SERVER_SOCKET_CONNECTED,delegate(EventObj evt)
         {
             //登陆游戏网关
             JsonData loginGate = new JsonData();
