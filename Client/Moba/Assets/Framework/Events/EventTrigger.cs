@@ -8,7 +8,7 @@ using System.Collections.Generic;
 public class EventTrigger
 {
     //定义委托
-    public delegate void EventDelegate(EventObject evt);
+    public delegate void EventDelegate(EventObj evt);
 
     protected Dictionary<String, List<EventDelegate>> captureListeners = null;
 
@@ -106,13 +106,13 @@ public class EventTrigger
         return false;
     }
 
-    public bool dispatchEvent(EventObject evt)
+    public bool dispatchEvent(EventObj evt)
     {
         if (evt == null)
         {
             throw new ArgumentNullException("Parameter EventObject must be non-null.");
         }
-        EventObject event3D = evt;
+        EventObj event3D = evt;
         if (event3D != null)
         {
             event3D.setTarget = this;

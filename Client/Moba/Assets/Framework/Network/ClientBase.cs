@@ -134,16 +134,16 @@ public abstract class ClientBase:MonoBehaviour
     {
 
     }
-    private void onDisconnect(EventObject evt)
+    private void onDisconnect(EventObj evt)
     {
         //AlertManager.alert("登录游戏服务器失败。", "确定", Client.QuitGame);//先通知断开，重连以后做
         status = ClientStatus.Disconnected;//连接已经断开
     }
-    private void onConnectedError(EventObject evt)
+    private void onConnectedError(EventObj evt)
     {
         eventDispatcher.dispatchEvent(new SocketEvent(SocketEvent.SERVER_LOGIN_FAIL));
     }
-    private void onConnectedSuccess(EventObject evt)
+    private void onConnectedSuccess(EventObj evt)
     {
         eventDispatcher.dispatchEvent(new SocketEvent(SocketEvent.SERVER_SOCKET_CONNECTED, _isReconnect));
     }

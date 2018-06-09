@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 
-public class SocketEvent : EventObject
+public class SocketEvent : EventObj
 {
     /// <summary>
     /// 连接失败

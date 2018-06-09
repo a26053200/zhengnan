@@ -16,7 +16,7 @@ public class EventDispatch
     {
         _eventDispatch = eventDispatch;
     }
-    public void dispatchEvent(EventObject evt)
+    public void dispatchEvent(EventObj evt)
     {
         _eventDispatch.dispatchEvent(evt);
     }
