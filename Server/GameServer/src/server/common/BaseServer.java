@@ -2,6 +2,7 @@ package server.common;
 
 import server.redis.RedisClient;
 import utils.IdGenerator;
+import utils.NetUtils;
 
 /**
  * @ClassName: BaseServer
@@ -15,11 +16,15 @@ public abstract class BaseServer
 
     protected String serverName;
 
+    protected String localHost;
+
     public BaseServer(String serverName, int port)
     {
+        this.serverName = serverName;
         this.port = port;
+        this.localHost = NetUtils.GetLocalHostAddress();
         //连接数据库
-        RedisClient.getInstance().connectDB("127.0.0.1");
+        RedisClient.getInstance().connectDB(this.localHost);
         //Id生成器
         IdGenerator.init(Thread.currentThread().getId());
     }
