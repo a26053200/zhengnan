@@ -3,7 +3,6 @@ package server.game;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import org.apache.log4j.Logger;
-import server.gate.GateMonitor;
 
 import java.util.List;
 

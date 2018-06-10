@@ -4,7 +4,6 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.bytes.ByteArrayDecoder;
 import org.apache.log4j.Logger;
-import server.gate.GateMonitor;
 
 import java.util.List;
 

@@ -7,7 +7,6 @@ import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
 import org.apache.log4j.Logger;
 import server.common.Monitor;
-import server.gate.GateMonitor;
 
 /**
  * @ClassName: GateServerHandler
