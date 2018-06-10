@@ -20,10 +20,20 @@ namespace Framework
             s_mgrDict.Add(mgr.GetType().Name, mgr);
         }
 
-        public T GetManager<T>() where T : BaseManager
+        public static T GetManager<T>() where T : BaseManager
         {
             T t = default(T);
-            return s_mgrDict[t.GetType().Name] as T;
+            return s_mgrDict[typeof(T).Name] as T;
+        }
+
+        public static GameManager GetGameManager()
+        {
+            return GetManager<GameManager>();
+        }
+
+        public static AssetsManager GetAssetsManager()
+        {
+            return GetManager<AssetsManager>();
         }
     }
 }

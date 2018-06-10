@@ -3,10 +3,7 @@
 function Main()
     print("toLua logic start" .. Time.timeSinceLevelLoad)
 
-    local timer = Timer.New(function()
-        print("Timer" .. Time.time)
-    end, 1, -1)
-    timer:Start()
+    require ("LuaClient").Start();
 end
 
 --场景切换通知

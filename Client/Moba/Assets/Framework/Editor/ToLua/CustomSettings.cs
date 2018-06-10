@@ -45,7 +45,7 @@ public static class CustomSettings
     };
 
     //在这里添加你要导出注册到lua的类型列表
-    public static BindType[] customTypeList =
+    static BindType[] s_customTypeList = 
     {                
         //------------------------为例子导出--------------------------------
         //_GT(typeof(TestEventListener)),
@@ -152,11 +152,18 @@ public static class CustomSettings
         _GT(typeof(RenderTexture)),
         _GT(typeof(Resources)),     
         _GT(typeof(LuaProfiler)),
-
-        //================
-        _GT(typeof(AssetsManager)),
+        
     };
 
+    public static BindType[] customTypeList
+    {
+        get
+        {
+            List<BindType> list = new List<BindType>(s_customTypeList);
+            list.AddRange(new List<BindType>(CustomWrap.typeList));
+            return list.ToArray();
+        }
+    }
     public static List<Type> dynamicList = new List<Type>()
     {
         typeof(MeshRenderer),

@@ -4,4 +4,9 @@
 --- DateTime: 2018/6/10 20:56
 ---
 
-assetMgr = FrameWork.AssetsManager;
+---UnityEngine
+GameObject = UnityEngine.GameObject;
+
+---Framework
+gameMgr = Framework.BaseManager.GetGameManager()
+assetsMgr = Framework.BaseManager.GetAssetsManager()
