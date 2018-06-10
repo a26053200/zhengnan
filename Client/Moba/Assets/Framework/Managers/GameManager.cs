@@ -7,8 +7,12 @@ using System.Collections.Generic;
 /// <para>Author: zhengnan</para>
 /// <para>Create: 2018/6/10 0:18:45</para>
 /// </summary> 
-public class GameManager : BaseManager
+/// 
+namespace Framework
 {
-    
+    public class GameManager : BaseManager
+    {
+
+    }
 }
 

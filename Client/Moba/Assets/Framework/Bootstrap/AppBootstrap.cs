@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Framework;
 /// <summary>
 /// <para>App 启动引导</para>
 /// <para>Author: zhengnan</para>
@@ -15,6 +16,7 @@ public class AppBootstrap
 
         // Init and add managers
         BaseManager.AddManager(client.gameObject.AddComponent<GameManager>());
+        BaseManager.AddManager(client.gameObject.AddComponent<AssetsManager>());
 
         // Other
         client.gameObject.AddComponent<LuaBootstrap>();
