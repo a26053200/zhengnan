@@ -28,42 +28,41 @@ public class Logger
     public static bool LogInfoTraceStack = true;
 
     static string TimeFormat = "yyyy-MM-dd-HH:mm:ss";
+    static string FileTimeFormat = "yyyy-MM-dd-HH.mm.ss";
     //private static bool writeDown;
-    private static List<string> logers;
-    private static object locker = new object();
-    private static Action logged;
-    private static Logger instance;
+    
+    public static Logger instance;
 
     private List<string> contentList = new List<string>();
     private List<string> writeList = new List<string>();
+    private List<string> logers;
+    private Action logged;
+    private object locker = new object();
     private bool isRunning = false;
     private FileStream fileStream;
     private StreamWriter sw;
     private string logFilePath;
-    private List<string> ContentList
-    {
-        get
-        {
-            List<string> tempList = null;
-            lock (locker)
-            {
-                tempList = new List<string>(tempList);
-            }
-            return tempList;
-        }
-    }
 
-    /// <summary>
-    /// Application.dataPath and Application.persistentDataPath can only be accessed in Unity Thread.
-    /// Do remember to call DebugKit in Unity thread first, not in the work thread you create.
-    /// </summary>
+    public static Logger GetInstance()
+    {
+        if (instance == null)
+            instance = new Logger();
+        else
+            throw new Exception("no more instance");
+        return instance;
+    }
+        /// <summary>
+        /// Application.dataPath and Application.persistentDataPath can only be accessed in Unity Thread.
+        /// Do remember to call DebugKit in Unity thread first, not in the work thread you create.
+        /// </summary>
     public Logger()
     {
-        instance = this;
-        logFilePath = Path.Combine(path,"game.log");
+        string time = DateTime.Now.ToString(FileTimeFormat);
+        logFilePath = Path.Combine(path, time + ".log");
         if (File.Exists(logFilePath))
-            File.Delete(logFilePath);
-        fileStream = new FileStream(logFilePath,FileMode.Create);
+            fileStream = new FileStream(logFilePath, FileMode.Append);
+        else
+            fileStream = new FileStream(logFilePath, FileMode.Create);
         sw = new StreamWriter(fileStream, Encoding.UTF8);
         Application.logMessageReceived += OnApplicationLogMessageReceived;
     }
@@ -76,10 +75,29 @@ public class Logger
         Thread thread = new Thread(ASyncWrite);
         thread.Start();
     }
-
+    public void Dispose()
+    {
+        isRunning = false;
+        Application.logMessageReceived -= OnApplicationLogMessageReceived;
+        sw.Close();
+    }
     public void ASyncWrite()
     {
-        Log();
+        while (isRunning)
+        {
+            lock (locker)
+            {
+                if (contentList.Count == 0)
+                    continue;
+                writeList.AddRange(contentList);
+                contentList.Clear();
+            }
+            for (int i = 0; i < writeList.Count; i++)
+                sw.WriteLine(writeList[i]);
+            if(writeList.Count > 0)
+                sw.Flush();
+            writeList.Clear();
+        }
     }
     /// <summary>
     /// 添加日志输出
@@ -162,8 +180,9 @@ public class Logger
                 break;
             case LogType.Error:
             case LogType.Exception:
-                if (LogInfoToConsole)
-                    Debug.LogError(logContent);
+                Application.logMessageReceived -= OnApplicationLogMessageReceived;
+                Debug.LogError(logContent);
+                Application.logMessageReceived += OnApplicationLogMessageReceived;
                 break;
         }
     }
@@ -183,75 +202,17 @@ public class Logger
             }
         }
         string logContent = string.Format("{0} {1} {2}\r\n{3}", time, tag, message, (showStack ? trace : ""));
-        contentList.Add(logContent);
-        return logContent;
-    }
-    private void Log(string tag, string message)
-    {
-        while (isRunning)
-        {
-            lock (locker)
-            {
-                if (contentList.Count == 0)
-                    Monitor.Wait(locker);
-                writeList.AddRange(contentList);
-                contentList.Clear();
-            }
-            for(int i = 0;i<contentList.Count;i++)
-            {
-                sw.WriteLine(contentList[i]);
-            }
-        }
         lock (locker)
         {
-            //#if UNITY_EDITOR
-            if (logers.Contains(tag))
-            {
-                string time = DateTime.Now.ToString(TimeFormat);
-                string trace = "";
-                bool showStack = LogInfoTraceStack || tag == LogType.Error.ToString() || tag == LogType.Exception.ToString();
-                if (showStack)
-                {
-                    System.Diagnostics.StackTrace st = new System.Diagnostics.StackTrace(true);
-                    System.Diagnostics.StackFrame[] sfs = st.GetFrames();
-                    for (int u = 2; u < sfs.Length; ++u)
-                    {
-                        System.Reflection.MethodBase mb = sfs[u].GetMethod();
-                        trace += "\t" + mb.DeclaringType.FullName + ":" + mb.Name + "() (at " + mb.DeclaringType.FullName.Replace(".", "/") + ".cs: " + sfs[u].GetFileLineNumber() + ")\r\n";
-                    }
-                }
-                string logContent = time + "#(" + tag + ") => " + message + "\r\n" + (showStack ? trace : "");
-                contentList.Add(logContent);
-                if (LogInfoToConsole)
-                    Debug.Log(logContent);
-                if (logged != null)
-                    logged();
-                //Write to file
-                if (!Directory.Exists(path))
-                    Directory.CreateDirectory(path);
-                try
-                {
-                    using (StreamWriter w = new StreamWriter(path + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss") + ".txt", true, Encoding.UTF8))
-                    {
-                        w.WriteLine(logContent);
-                        w.Flush();
-                        w.Close();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError("Write log file exception, message = " + ex.Message);
-                }
-            }
-            //#endif
+            contentList.Add(logContent);
         }
+        return logContent;
     }
     public static void Log(string type,string format, params object[] args)
     {
         string logContent = instance.AddLog(type, string.Format(format, args));
         if (LogInfoToConsole)
             Debug.Log(logContent);
-        //Log(type, string.Format(format, args));
     }
     public static void Info(string format, params object[] args)
     {
@@ -280,18 +241,15 @@ public class Logger
             Debug.Log(logContent);
     }
 
-    private static void OnApplicationLogMessageReceived(string condition, string stackTrace, LogType type)
+    private void OnApplicationLogMessageReceived(string condition, string stackTrace, LogType type)
     {
-        lock (locker)
+        if (type == LogType.Exception)
         {
-            if (type == LogType.Exception)
-            {
-                instance.AddLog(LogType.Exception, condition + "\r\n" + stackTrace);
-            }
-            else if (type == LogType.Error)
-            {
-                instance.AddLog(LogType.Error, condition + "\r\n" + stackTrace);
-            }
+            instance.AddLog(LogType.Exception, condition + "\r\n" + stackTrace);
+        }
+        else if (type == LogType.Error)
+        {
+            instance.AddLog(LogType.Error, condition + "\r\n" + stackTrace);
         }
     }
 }

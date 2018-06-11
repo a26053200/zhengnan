@@ -12,6 +12,7 @@ public class Client : MonoBehaviour
 
     public HttpRequest httpRequest { get; private set; }
 
+    public Logger logger { get; private set; }
     private void Awake()
     {
         if (Ins == null)
@@ -34,14 +35,22 @@ public class Client : MonoBehaviour
 
         //StartCoroutine(testHttpLogin(json));
 
-        Logger.Error("Hell world");
+        logger = Logger.GetInstance();
+        logger.Start();
+        Logger.Error("Hell world1");
+        Logger.Error("Hell world2");
         //AppBootstrap.Start(this);
     }
     void Update()
     {
 
     }
-
+    private void OnApplicationQuit()
+    {
+        logger.Dispose();
+        Logger.instance = null;
+    }
+    
     private IEnumerator testHttpLogin(JsonData json)
     {
         yield return new WaitForSeconds(1);
