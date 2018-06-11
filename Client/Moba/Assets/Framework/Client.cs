@@ -34,7 +34,8 @@ public class Client : MonoBehaviour
 
         //StartCoroutine(testHttpLogin(json));
 
-        AppBootstrap.Start(this);
+        Logger.Error("Hell world");
+        //AppBootstrap.Start(this);
     }
     void Update()
     {
