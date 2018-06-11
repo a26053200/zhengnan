@@ -13,6 +13,22 @@ namespace Framework
 {
     public class AssetsManager : BaseManager
     {
+        //编辑器模式下的加载根目录
+        private const string EDITOT_MODE_ROOT_PATH = "Assets/Res/";
+
+        public string LoadText(string assetName)
+        {
+#if UNITY_EDITOR
+            TextAsset textAsset = null;
+            if(GlobalConsts.isAssetBundleMode)
+                textAsset = LoadAsset_Editor<TextAsset>(assetName);
+            else
+                textAsset = LoadAsset_Editor<TextAsset>(assetName);
+#else
+            TextAsset textAsset = LoadAsset_Editor<TextAsset>(assetName);
+#endif
+            return textAsset.text;
+        }
         public GameObject LoadPrefab(string assetName)
         {
 #if UNITY_EDITOR
@@ -21,15 +37,17 @@ namespace Framework
             return prefab;
         }
 
+#if UNITY_EDITOR
         /// <summary>
         /// 编辑器环境下加载资源
         /// </summary>
         /// <returns></returns>
         T LoadAsset_Editor<T>(string path) where T : UnityEngine.Object
         {
-            T tempTex = AssetDatabase.LoadAssetAtPath("Assets/" + path, typeof(T)) as T;
+            T tempTex = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
             return tempTex;
         }
+#endif
     }
 }
 

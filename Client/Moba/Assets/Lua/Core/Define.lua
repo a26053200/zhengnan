@@ -8,5 +8,6 @@
 GameObject = UnityEngine.GameObject;
 
 ---Framework
+logger = Logger
 gameMgr = Framework.BaseManager.GetGameManager()
 assetsMgr = Framework.BaseManager.GetAssetsManager()

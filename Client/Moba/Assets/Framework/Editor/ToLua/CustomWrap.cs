@@ -19,6 +19,7 @@ public static class CustomWrap
     public static BindType[] typeList =
     {
         //================
+        _GT(typeof(Logger)),
         _GT(typeof(AssetsManager)),
         _GT(typeof(GameManager)),
     };

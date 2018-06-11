@@ -17,7 +17,7 @@ public class HttpRequest : MonoBehaviour
     private IEnumerator Request(string requestUrl, string dataString, string callback)
     {
         string error = null;
-        if (Global.EnableLogNetwork)
+        if (GlobalConsts.EnableLogNetwork)
             MyDebug.Log(string.Format("[Http] {0}/{1}", requestUrl, dataString));
         using (var www = new WWW(requestUrl, Encoding.UTF8.GetBytes(dataString)))
         {

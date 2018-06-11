@@ -34,12 +34,12 @@ public class Client : MonoBehaviour
         json["password"] = "123";
 
         //StartCoroutine(testHttpLogin(json));
-
+        //开启日志
         logger = Logger.GetInstance();
         logger.Start();
-        Logger.Error("Hell world1");
-        Logger.Error("Hell world2");
-        //AppBootstrap.Start(this);
+        //Logger.Error("Hell world1");
+        //Logger.Error("Hell world2");
+        AppBootstrap.Start(this);
     }
     void Update()
     {
@@ -48,7 +48,6 @@ public class Client : MonoBehaviour
     private void OnApplicationQuit()
     {
         logger.Dispose();
-        Logger.instance = null;
     }
     
     private IEnumerator testHttpLogin(JsonData json)

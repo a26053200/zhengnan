@@ -100,7 +100,7 @@ public class SocketBase : MonoBehaviour
         }
         if (e.BytesTransferred <= 0 || e.SocketError != SocketError.Success)
         {
-            if (Global.EnableLogNetwork)
+            if (GlobalConsts.EnableLogNetwork)
             {
                 MyDebug.LogError("[Socket] ProcessReceive e.BytesTransferred  " + e.BytesTransferred + ",LastOperation:" + e.LastOperation + ",SocketError:" + e.SocketError);
                 MyDebug.LogError("看到这条日志，因为收到空包，可能服务器把客户端踢掉了。请检查上条发送的指令逻辑");
@@ -110,7 +110,7 @@ public class SocketBase : MonoBehaviour
         }
         try
         {
-            if (Global.EnableLogNetwork)
+            if (GlobalConsts.EnableLogNetwork)
                 MyDebug.Log("[Socket] Receive data len:" + e.BytesTransferred);
             if (e.BytesTransferred >= MAX_READ)
                 MyDebug.LogError("[Socket] Receive data too long. len:" + e.BytesTransferred);

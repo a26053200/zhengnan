@@ -6,5 +6,6 @@
 
 require "Core.Define"
 require "Core.Function"
+require "Core.Log"
 
-print("Global define has all require")
+log("Global define has all require")

@@ -147,7 +147,7 @@ public class JsonClient :  ClientBase
     }
     private void doReceive(RcvData rcvData)
     {
-        if (Global.EnableLogNetwork)
+        if (GlobalConsts.EnableLogNetwork)
         {
 #if UNITY_EDITOR
             if (rcvData.cmdId != 19999)

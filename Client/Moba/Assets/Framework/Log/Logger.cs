@@ -22,16 +22,18 @@ public class Logger
 #else
     private static string path = Application.persistentDataPath + "/Log/";
 #endif
-    //一般日志是否输出到控制台
-    public static bool LogInfoToConsole = false;
-    //是否输出日志堆栈
-    public static bool LogInfoTraceStack = true;
-
+    
     static string TimeFormat = "yyyy-MM-dd-HH:mm:ss";
     static string FileTimeFormat = "yyyy-MM-dd-HH.mm.ss";
     //private static bool writeDown;
-    
-    public static Logger instance;
+    static Logger instance;
+
+    //一般日志是否输出到控制台
+    public bool LogInfoToConsole = false;
+    //是否输出日志堆栈
+    public bool LogInfoTraceStack = true;
+    //是否输出到文本文件
+    public bool WriteToFile = true;
 
     private List<string> contentList = new List<string>();
     private List<string> writeList = new List<string>();
@@ -47,8 +49,6 @@ public class Logger
     {
         if (instance == null)
             instance = new Logger();
-        else
-            throw new Exception("no more instance");
         return instance;
     }
         /// <summary>
@@ -57,6 +57,9 @@ public class Logger
         /// </summary>
     public Logger()
     {
+        if (instance != null)
+            throw new Exception("no more instance");
+
         string time = DateTime.Now.ToString(FileTimeFormat);
         logFilePath = Path.Combine(path, time + ".log");
         if (File.Exists(logFilePath))
@@ -77,13 +80,25 @@ public class Logger
     }
     public void Dispose()
     {
-        isRunning = false;
-        Application.logMessageReceived -= OnApplicationLogMessageReceived;
-        sw.Close();
+        try
+        {
+            isRunning = false;
+            Application.logMessageReceived -= OnApplicationLogMessageReceived;
+            sw.Close();
+            instance = null;
+        }catch(Exception ex)
+        {
+            Debug.LogError(ex.Message);
+        }
+        finally
+        {
+            isRunning = false;
+            instance = null;
+        }
     }
     public void ASyncWrite()
     {
-        while (isRunning)
+        while (isRunning && WriteToFile)
         {
             lock (locker)
             {
@@ -198,10 +213,10 @@ public class Logger
             for (int u = 2; u < sfs.Length; ++u)
             {
                 System.Reflection.MethodBase mb = sfs[u].GetMethod();
-                trace += "\t" + mb.DeclaringType.FullName + ":" + mb.Name + "() (at " + mb.DeclaringType.FullName.Replace(".", "/") + ".cs: " + sfs[u].GetFileLineNumber() + ")\r\n";
+                trace += "  " + mb.DeclaringType.FullName + ":" + mb.Name + "() (at " + mb.DeclaringType.FullName.Replace(".", "/") + ".cs: " + sfs[u].GetFileLineNumber() + ")\r\n";
             }
         }
-        string logContent = string.Format("{0} {1} {2}\r\n{3}", time, tag, message, (showStack ? trace : ""));
+        string logContent = string.Format("{0} [{1}] {2}\r\n{3}", time, tag, message, (showStack ? trace : ""));
         lock (locker)
         {
             contentList.Add(logContent);
@@ -211,7 +226,7 @@ public class Logger
     public static void Log(string type,string format, params object[] args)
     {
         string logContent = instance.AddLog(type, string.Format(format, args));
-        if (LogInfoToConsole)
+        if (instance.LogInfoToConsole)
             Debug.Log(logContent);
     }
     public static void Info(string format, params object[] args)
@@ -237,7 +252,7 @@ public class Logger
     public static void Todo(string format, params object[] args)
     {
         string logContent = instance.AddLog("TODO", string.Format(format, args));
-        if (LogInfoToConsole)
+        if (instance.LogInfoToConsole)
             Debug.Log(logContent);
     }
 

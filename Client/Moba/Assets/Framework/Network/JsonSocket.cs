@@ -55,7 +55,7 @@ public class JsonSocket : SocketBase
     public void send(JsonData data)
     {
         string json = data.ToJson();
-        if (Global.EnableLogNetwork)
+        if (GlobalConsts.EnableLogNetwork)
         {
             //int cmd = getPT(json);
             MyDebug.Log(string.Format("[Send] <color=#df5c4aff>send json</color>:{0}", json));
@@ -77,7 +77,7 @@ public class JsonSocket : SocketBase
     {
         if (!isConneted())
         {
-            if (Global.EnableLogNetwork) MyDebug.LogError("[Socket] can't send msg. Socket is not connect.");
+            if (GlobalConsts.EnableLogNetwork) MyDebug.LogError("[Socket] can't send msg. Socket is not connect.");
             return;
         }
         
