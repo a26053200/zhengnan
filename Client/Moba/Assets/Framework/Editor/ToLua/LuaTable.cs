@@ -35,6 +35,10 @@ public class LuaTable
         }
         return tableLine;
     }
+    public bool HasTable(string key)
+    {
+        return hashTable.ContainsKey(key);
+    }
     public Dictionary<string, object> GetTable(string key)
     {
         Dictionary<string, object> tableLine = null;

@@ -9,6 +9,18 @@ using System.Text;
 // 
 public class StringUtils
 {
+    public static string ReplaceAll(string src, string oldStr, string newStr)
+    {
+        int index = -1;
+        do
+        {
+            index = src.IndexOf(oldStr);
+            if(index != -1)
+                src = src.Replace(oldStr, newStr);
+        } while (index != -1);
+        return src;
+    }
+
     public static string Trim(string src)
     {
         StringBuilder sb = new StringBuilder();
