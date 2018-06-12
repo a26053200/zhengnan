@@ -4,4 +4,26 @@
 --- DateTime: 2018/6/10 21:12
 ---
 
+
 local IocBootstrap = class("IocBootstrap")
+local IocBinder = require("Core.Ioc.IocBinder")
+local MediatorContext = require("Core.Ioc.MediatorContext")
+local ModelContext = require("Core.Ioc.ModelContext")
+local ServiceContext = require("Core.Ioc.ServiceContext")
+
+function IocBootstrap:Ctor()
+    self.binder = IocBinder.New()
+end
+
+function IocBootstrap:Launch()
+    self.mediatorContext = MediatorContext.New(self.binder)
+    self.mediatorContext:Launch()
+
+    self.modelContext = ModelContext.New(self.binder)
+    self.modelContext:Launch()
+
+    self.serviceContext = ServiceContext.New(self.binder)
+    self.serviceContext:Launch()
+end
+
+return IocBootstrap

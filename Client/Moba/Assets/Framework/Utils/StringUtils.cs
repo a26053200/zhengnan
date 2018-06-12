@@ -17,8 +17,8 @@ public class StringUtils
         {
             if (!string.IsNullOrEmpty(charArr[i].ToString()))
                 sb.Append(charArr[i]);
-            else
-                Debug.Log(charArr[i]);
+            //else
+                //Debug.Log(charArr[i]);
         }
         return sb.ToString();
     }

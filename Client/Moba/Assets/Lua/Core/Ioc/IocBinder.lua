@@ -6,4 +6,43 @@
 
 local IocBinder = class("IocBinder")
 
+function IocBinder:Ctor()
+    self.singleList = {} --单例列表
+    self.typeDict = {}  --类型
+end
+
+function IocBinder:Bind(type)
+    self.type = type
+    return self
+end
+
+function IocBinder:ToSingleton()
+    local singleton = self.type.New()
+    table.insert(self.singleList,singleton)
+    log("[Bind singleton] -- {}",self.type__cname)
+    return singleton
+end
+
+function IocBinder:To(target)
+    self.typeDict[target] = self.type
+    return self
+end
+
+-- inject all the singleton in to the object,but not then self
+function IocBinder:InjectSingle(obj)
+    for _, singleton in pairs(self.singleList) do
+        if singleton.__cname ~= obj.__cname then
+            local index = string.startLower(singleton.__cname) -- the first word startLower
+            obj[idx] = singleton
+        end
+    end
+end
+
+-- inject each other single
+function IocBinder:InjectSingleEachOther(obj)
+    for _, singleton in pairs(self.singleList) do
+        self:InjectSingle(singleton)
+    end
+end
+
 return IocBinder

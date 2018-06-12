@@ -13,8 +13,27 @@ public class FileUtils{
 		}
 		return null;
 	}
-	
-	public static void SaveTextFile(string fn,string txt){
+
+    public static string[] GetFileTextLine(string fn)
+    {
+        if (!File.Exists(fn))
+            return null;
+        StreamReader sr = File.OpenText(fn);
+        List<string> sList = new List<string>();
+        try
+        {
+            while (!sr.EndOfStream)
+                sList.Add(sr.ReadLine());
+        }
+        finally
+        {
+            sr.Close();
+        }
+        return sList.ToArray();
+    }
+
+
+    public static void SaveTextFile(string fn,string txt){
 		byte[] data = System.Text.UTF8Encoding.UTF8.GetBytes(txt);
 		SaveFileData(fn,data);
 	}
