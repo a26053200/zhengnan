@@ -1,1 +1,1 @@
-ViewConfig = {}
+ViewConfig={}

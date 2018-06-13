@@ -66,6 +66,20 @@ public class LuaTable
         return obj;
     }
 
+    public string GetString(string key, string hash)
+    {
+        object obj = GetHashTable(key, hash);
+        return obj != null ? obj.ToString() : "";
+    }
+
+    public int GetInt(string key, string hash)
+    {
+        string value = GetString(key, hash);
+        int i = 0;
+        int.TryParse(value, out i);
+        return i;
+    }
+
     public void fromTextLine(string[] textLine)
     {
         string[] head = GetFileAndValue(textLine[0], '=');
