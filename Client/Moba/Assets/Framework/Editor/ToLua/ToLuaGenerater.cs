@@ -95,8 +95,8 @@ return $CLASS_NAME$
             bool replace = EditorUtility.DisplayDialog("提示", "文件以及存在,是否替换?", "替换", "取消");
             if (replace)
                 FileUtils.SaveTextFile(mdrFilePath, mdrFileText);
-            
         }
+        EditorUtility.DisplayDialog("提示", "生成 Mediator 文件成功", "确定");
     }
 
     //根据路径获得包名

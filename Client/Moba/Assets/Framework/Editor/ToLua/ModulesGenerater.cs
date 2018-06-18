@@ -56,7 +56,7 @@ public class ModulesGenerater : EditorWindow
                 EditModulelist();
                 if (GUILayout.Button("重新生成 ViewConfig.lua 文件"))
                 {
-                    string fileText = luaTable.toString();
+                    string fileText = luaTable.ToString();
                     FileUtils.SaveTextFile(ViewConfigPath, fileText);
                     Debug.Log("保存成功 \n" + fileText);
                 }
@@ -100,6 +100,7 @@ public class ModulesGenerater : EditorWindow
                 string mdrName = Path.GetFileNameWithoutExtension(mdrFilePath);
                 mdrName = mdrName.Replace("Mdr", "");
                 LuaViewInfo viewInfo = new LuaViewInfo(mdrName);
+                viewInfo.viewName = mdrName;
                 viewInfo.viewDirPath = moduleInfo.viewDirPath;
                 if (luaTable.HasTable(mdrName))
                 {//已经存在配置
@@ -127,20 +128,21 @@ public class ModulesGenerater : EditorWindow
                     EditorGUILayout.LabelField("View name:", viewInfo.viewName);
                     if(string.IsNullOrEmpty(viewInfo.prefabUrl))
                         viewInfo.prefabUrl = luaTable.GetString(viewInfo.viewName, "prefab");
-                    FetchPrefabUrl(viewInfo);
-                }
-                else
-                {
-                    Dictionary<string, object> table = luaTable.SetTable(viewInfo.viewName);
-                    oldString = viewInfo.viewName;
-                    viewInfo.viewName = EditorGUILayout.TextField("View name:", viewInfo.viewName);
-                    if(oldString != viewInfo.viewName)
-                        luaTable.SetHashTable(viewInfo.viewName, "name", viewInfo.viewName);
-
                     oldString = viewInfo.prefabUrl;
                     FetchPrefabUrl(viewInfo);
                     if (oldString != viewInfo.prefabUrl)
                         luaTable.SetHashTable(viewInfo.viewName, "prefab", viewInfo.prefabUrl);
+                }
+                else
+                {
+                    EditorGUILayout.BeginHorizontal();
+                    EditorGUILayout.LabelField("搜索到新的View:" + viewInfo.viewName + "是否新建?");
+                    if (GUILayout.Button("新建"))
+                    {
+                        luaTable.SetTable(viewInfo.viewName);
+                        luaTable.SetHashTable(viewInfo.viewName, "name", viewInfo.viewName);
+                    }
+                    EditorGUILayout.EndHorizontal();
                 }
                 if (GUILayout.Button("重新生成 Mediator 文件"))
                 {
@@ -198,7 +200,7 @@ public class ModulesGenerater : EditorWindow
         {
             LuaTable lt = new LuaTable();
             lt.fromTextLine(textLine);
-            Debug.Log("获取LuaTable -- " + lt.toString());
+            Debug.Log("获取LuaTable -- " + lt.ToString());
             return lt;
         }
         else

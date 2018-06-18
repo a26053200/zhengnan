@@ -94,30 +94,22 @@ public class LuaTable
             int start = line.IndexOf("{");
             int end = line.LastIndexOf("}");
             line = line.Substring(start + 1, end - start - 1);
-            hashTable.Add(key, tableLine);
-            string[] data = GetFileAndValue(line,',');
-            for (int j = 0; j < data.Length; j++)
+            if(String.IsNullOrEmpty(line))
             {
-                SetFiledValue(tableLine, data[j]);
+                Debug.Log("Lua 行数据为空");
+            }
+            else
+            {
+                hashTable.Add(key, tableLine);
+                string[] data = GetFileAndValue(line, ',');
+                for (int j = 0; j < data.Length; j++)
+                {
+                    SetFiledValue(tableLine, data[j]);
+                }
             }
         }
     }
 
-    public string toString()
-    {
-        StringBuilder sb = new StringBuilder();
-        //Header
-        sb.AppendLine(string.Format("{0}={{}}",rootName));
-        foreach (var key in hashTable.Keys)
-        {
-            StringBuilder lineSb = new StringBuilder();
-            Dictionary<string, object> tableLine = hashTable[key];
-            foreach (var field in tableLine.Keys)
-                AddFiled(lineSb, field, tableLine[field]);
-            sb.AppendLine(string.Format("{0}.{1}={{{2}}}", rootName, key, lineSb.ToString()));
-        }
-        return sb.ToString();
-    }
     private string[] GetFileAndValue(string src,char sp)
     {
         string[] s = src.Split(sp);
@@ -150,6 +142,24 @@ public class LuaTable
             tableLine.Add(field, fieldValue[1]);
         }
     }
+
+
+    public override string ToString()
+    {
+        StringBuilder sb = new StringBuilder();
+        //Header
+        sb.AppendLine(string.Format("{0}={{}}", rootName));
+        foreach (var key in hashTable.Keys)
+        {
+            StringBuilder lineSb = new StringBuilder();
+            Dictionary<string, object> tableLine = hashTable[key];
+            foreach (var field in tableLine.Keys)
+                AddFiled(lineSb, field, tableLine[field]);
+            sb.AppendLine(string.Format("{0}.{1}={{{2}}}", rootName, key, lineSb.ToString()));
+        }
+        return sb.ToString();
+    }
+
     private void AddFiled(StringBuilder lineSb, string field, object value)
     {
         string temp = StringUtils.Trim(value.ToString());
