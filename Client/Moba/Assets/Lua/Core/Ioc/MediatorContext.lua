@@ -20,7 +20,8 @@ function MediatorContext:GetMediator(viewName)
 end
 
 function MediatorContext:Launch()
-
+    --TODO
+    --TODO
 end
 
 return MediatorContext

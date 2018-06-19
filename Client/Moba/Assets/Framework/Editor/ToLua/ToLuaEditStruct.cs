@@ -18,11 +18,16 @@ public class LuaModuleInfo
     public string viewDirPath;//View目录
     public string modelDirPath;//Model目录
     public string serviceDirPath;//Service目录
+    public string voDirPath;//Service目录
     public List<LuaViewInfo> viewList;
+    public List<string> voList;
+
+    public string newViewMdrName { get; set; }
 
     public LuaModuleInfo(string moduleName)
     {
         viewList = new List<LuaViewInfo>();
+        voList = new List<string>();
         this.moduleName = moduleName;
     }
 }

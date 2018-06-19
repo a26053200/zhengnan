@@ -17,13 +17,8 @@ public class ModulesGenerater : EditorWindow
     private const string LuaModulesDir = "Lua/Modules/";
     private const string PrefabsDir = "Assets/Res/Prefabs/UI/";
     private const string PrefabsRootDir = "Res/Prefabs/UI/";
-    [MenuItem("Tools/Lua/Generated Ioc MVC files")]
-    static void Generated()
-    {
-        
-    }
 
-    [MenuItem("Tools/Lua/OpenModuelsWnd")]
+    [MenuItem("Tools/OpenModuelsWnd")]
     static void OpenModuelsWnd()
     {
         ModulesGenerater wnd = EditorWindow.GetWindow<ModulesGenerater>("New Module");
@@ -31,10 +26,10 @@ public class ModulesGenerater : EditorWindow
         wnd.Init();
     }
     GUILayoutOption endButtonWidth = null;
+    GUIStyle disable = null;
     string moduleName = "";
     string prefabUrl = "";
     string oldString = "";
-    string newViewMdrName = "";
     string newVoName = "";
     int oldInt;
     bool oldBool;
@@ -43,9 +38,11 @@ public class ModulesGenerater : EditorWindow
     Vector2 scrollPos = Vector2.zero;
     void Init()
     {
-        endButtonWidth = GUILayout.Width(position.width * 0.2f);
         luaTable = GetLuaTable(ViewConfigPath);
         minSize = new Vector2(500,500);
+        endButtonWidth = GUILayout.Width(position.width * 0.1f);
+        disable = new GUIStyle();
+        disable.active = new GUIStyleState();
         LoadAllModules();
     }
     private void OnGUI()
@@ -77,11 +74,8 @@ public class ModulesGenerater : EditorWindow
         moduleName = EditorGUILayout.TextField("新增模块 模块名:", moduleName);
         if (GUILayout.Button("生成新模块", endButtonWidth))
         {
-            if(string.IsNullOrEmpty(moduleName))
-            {
-                ShowNotification(new GUIContent("模块名不能为空"));
+            if (!ToLuaGenerater.FileNameValid(moduleName, this))
                 return;
-            }
             if (luaTable.HasTable(moduleName))
             {
                 ShowNotification(new GUIContent("该模块已经存在"));
@@ -109,6 +103,7 @@ public class ModulesGenerater : EditorWindow
             string moduleDirPath = moduleDirs[i];//模块目录路径
             LuaModuleInfo moduleInfo = new LuaModuleInfo(Path.GetFileName(moduleDirs[i]));
             moduleInfo.moduleDirPath = moduleDirPath;//模块目录路径
+            //Views
             moduleInfo.viewDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.View);
             string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
             for (int j = 0; j < mdrFiles.Length; j++)
@@ -126,10 +121,22 @@ public class ModulesGenerater : EditorWindow
                 }
                 moduleInfo.viewList.Add(viewInfo);
             }
+            //Vo
+            RefreshVos(moduleInfo);
             moduleInfoList.Add(moduleInfo);
         }
     }
-
+    void RefreshVos(LuaModuleInfo moduleInfo)
+    {
+        moduleInfo.voDirPath = moduleInfo.moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Vo);
+        moduleInfo.voList = new List<string>();
+        if (Directory.Exists(moduleInfo.voDirPath))
+        {
+            string[] voFiles = Directory.GetFiles(moduleInfo.voDirPath, "*.lua");
+            for (int j = 0; j < voFiles.Length; j++)
+                moduleInfo.voList.Add(Path.GetFileNameWithoutExtension(voFiles[j]));
+        }
+    }
     void EditModulelist()
     {
         for (int i = 0; i < moduleInfoList.Count; i++)
@@ -186,31 +193,35 @@ public class ModulesGenerater : EditorWindow
                 EditorGUILayout.Space();
             }
             EditorGUI.indentLevel--;
+            EditorGUILayout.LabelField("Value Objects:");
+            EditorGUI.indentLevel++;
+            //Vos
+            for (int j = 0; j < moduleInfo.voList.Count; j++)
+                EditorGUILayout.LabelField((j + 1).ToString(), moduleInfo.voList[j] + ".lua");
+            EditFolder(moduleInfo, LuaFolder.Vo);
+            EditorGUI.indentLevel--;
+
+            EditorGUILayout.Space();
             EditFolder(moduleInfo, LuaFolder.Model);
             EditFolder(moduleInfo, LuaFolder.Service);
-            EditFolder(moduleInfo, LuaFolder.Vo);
 
             EditorGUILayout.BeginHorizontal();
-            newViewMdrName = EditorGUILayout.TextField("新View 名称:", newViewMdrName);
+            moduleInfo.newViewMdrName = EditorGUILayout.TextField("新View 名称:", moduleInfo.newViewMdrName);
             if (GUILayout.Button("新增", endButtonWidth))
             {
-                if (string.IsNullOrEmpty(newViewMdrName))
-                {
-                    ShowNotification(new GUIContent("View 名称不能为空"));
+                if (!ToLuaGenerater.FileNameValid(moduleInfo.newViewMdrName, this))
                     return;
-                }
-                LuaViewInfo viewInfo = new LuaViewInfo(newViewMdrName);
-                viewInfo.viewName = newViewMdrName;
+                LuaViewInfo viewInfo = new LuaViewInfo(moduleInfo.newViewMdrName);
+                viewInfo.viewName = moduleInfo.newViewMdrName;
                 viewInfo.viewDirPath = moduleInfo.viewDirPath;
                 luaTable.SetTable(viewInfo.viewName);
                 luaTable.SetHashTable(viewInfo.viewName, "name", viewInfo.viewName);
                 moduleInfo.viewList.Add(viewInfo);
-                newViewMdrName = "";
+                moduleInfo.newViewMdrName = "";
             }
             EditorGUILayout.EndHorizontal();
-            
-            EditorGUILayout.Space();
-            EditorGUILayout.Space();
+
+            EditorGUILayout.Separator();
             EditorGUI.indentLevel--;
         }
     }
@@ -244,14 +255,13 @@ public class ModulesGenerater : EditorWindow
     {
         EditorGUILayout.BeginHorizontal();
         newVoName = EditorGUILayout.TextField("新Vo 名称:", newVoName);
-        if (GUILayout.Button("生成 " + newVoName + "Vo.lua 文件"))
+        if (GUILayout.Button("新增", endButtonWidth))
         {
-            if (string.IsNullOrEmpty(newVoName))
-            {
-                ShowNotification(new GUIContent("Vo 名称不能为空"));
+            if (!ToLuaGenerater.FileNameValid(newVoName,this))
                 return;
-            }
             ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName, newVoName, LuaFolder.Vo);
+            RefreshVos(moduleInfo);
+            newVoName = "";
         }
         EditorGUILayout.EndHorizontal();
     }
