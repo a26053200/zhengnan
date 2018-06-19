@@ -94,9 +94,9 @@ public class LuaTable
             int start = line.IndexOf("{");
             int end = line.LastIndexOf("}");
             line = line.Substring(start + 1, end - start - 1);
-            if(String.IsNullOrEmpty(line))
+            if(string.IsNullOrEmpty(line))
             {
-                Debug.Log("Lua 行数据为空");
+                Debug.LogError("Lua 行数据为空");
             }
             else
             {
@@ -104,7 +104,8 @@ public class LuaTable
                 string[] data = GetFileAndValue(line, ',');
                 for (int j = 0; j < data.Length; j++)
                 {
-                    SetFiledValue(tableLine, data[j]);
+                    if(!string.IsNullOrEmpty(data[j]))
+                        SetFiledValue(tableLine, data[j]);
                 }
             }
         }

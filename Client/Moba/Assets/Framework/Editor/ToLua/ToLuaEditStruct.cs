@@ -14,7 +14,10 @@ using System.Collections.Generic;
 public class LuaModuleInfo
 {
     public string moduleName;
-    public string viewDirPath;
+    public string moduleDirPath;//Module目录
+    public string viewDirPath;//View目录
+    public string modelDirPath;//Model目录
+    public string serviceDirPath;//Service目录
     public List<LuaViewInfo> viewList;
 
     public LuaModuleInfo(string moduleName)
