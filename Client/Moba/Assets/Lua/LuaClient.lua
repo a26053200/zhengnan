@@ -9,7 +9,7 @@ local LuaClient = {}
 
 function LuaClient.Start()
     LuaClient.RequireGlobalDefines()
-    LuaClient.Test()
+    --LuaClient.Test()
 end
 
 --加载全局定义

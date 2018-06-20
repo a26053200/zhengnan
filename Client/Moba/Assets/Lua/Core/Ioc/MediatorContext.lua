@@ -21,6 +21,8 @@ end
 
 function MediatorContext:Launch()
     --TODO
+	self.binder:Bind(require("Modules.Login.View.LoginMdr")):To(ViewConfig.Login.name)
+	self.binder:Bind(require("Modules.Notice.View.NoticeMdr")):To(ViewConfig.Notice.name)
     --TODO
 end
 

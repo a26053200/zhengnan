@@ -17,7 +17,9 @@ public class ModulesGenerater : EditorWindow
     private const string LuaModulesDir = "Lua/Modules/";
     private const string PrefabsDir = "Assets/Res/Prefabs/UI/";
     private const string PrefabsRootDir = "Res/Prefabs/UI/";
-
+    private const string MediatorContextPath = "Assets/Lua/Core/Ioc/MediatorContext.lua";
+    private const string ModelContextPath = "Assets/Lua/Core/Ioc/ModelContext.lua";
+    private const string ServiceContextPath = "Assets/Lua/Core/Ioc/ServiceContext.lua";
     [MenuItem("Tools/OpenModuelsWnd")]
     static void OpenModuelsWnd()
     {
@@ -59,11 +61,12 @@ public class ModulesGenerater : EditorWindow
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(position.height * 0.8f));
                 EditModulelist();
                 EditorGUILayout.EndScrollView();
-                if (GUILayout.Button("重新生成 ViewConfig.lua 文件"))
+                if (GUILayout.Button("重新生成 Mvc 文件"))
                 {
                     string fileText = luaTable.ToString();
                     FileUtils.SaveTextFile(ViewConfigPath, fileText);
                     Debug.Log("保存成功 \n" + fileText);
+                    GeneratedMvcFiles();
                 }
             }
         }
@@ -103,8 +106,12 @@ public class ModulesGenerater : EditorWindow
             string moduleDirPath = moduleDirs[i];//模块目录路径
             LuaModuleInfo moduleInfo = new LuaModuleInfo(Path.GetFileName(moduleDirs[i]));
             moduleInfo.moduleDirPath = moduleDirPath;//模块目录路径
-            //Views
+
             moduleInfo.viewDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.View);
+            moduleInfo.modelDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Model);
+            moduleInfo.serviceDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Service);
+            moduleInfo.voDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Vo);
+            //Views
             string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
             for (int j = 0; j < mdrFiles.Length; j++)
             {
@@ -128,7 +135,6 @@ public class ModulesGenerater : EditorWindow
     }
     void RefreshVos(LuaModuleInfo moduleInfo)
     {
-        moduleInfo.voDirPath = moduleInfo.moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Vo);
         moduleInfo.voList = new List<string>();
         if (Directory.Exists(moduleInfo.voDirPath))
         {
@@ -296,6 +302,40 @@ public class ModulesGenerater : EditorWindow
             Directory.CreateDirectory(moduleDir);
         if (!Directory.Exists(moduleDir + "View/"))
             Directory.CreateDirectory(moduleDir + "View/");
+    }
+
+    void GeneratedMvcFiles()
+    {
+        StringBuilder mdrSb = new StringBuilder();
+        StringBuilder modelSb = new StringBuilder();
+        StringBuilder serviceSb = new StringBuilder();
+        for (int i = 0; i < moduleInfoList.Count; i++)
+        {
+            LuaModuleInfo moduleInfo = moduleInfoList[i];
+            string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
+            for (int j = 0; j < mdrFiles.Length; j++)
+                mdrSb.AppendLine(ToLuaGenerater.GetMdrLuaLine(mdrFiles[j], LuaFolder.Mdr));
+            string[] modelFiles = Directory.GetFiles(moduleInfo.modelDirPath, "*.lua");
+            for (int j = 0; j < modelFiles.Length; j++)
+                modelSb.AppendLine(ToLuaGenerater.GetSingletonLuaLine(modelFiles[j], LuaFolder.Model));
+            string[] serviceFiles = Directory.GetFiles(moduleInfo.serviceDirPath, "*.lua");
+            for (int j = 0; j < serviceFiles.Length; j++)
+                serviceSb.AppendLine(ToLuaGenerater.GetSingletonLuaLine(serviceFiles[j], LuaFolder.Service));
+        }
+        ToLuaGenerater.GeneratedTODOLua(MediatorContextPath, mdrSb);
+        ToLuaGenerater.GeneratedTODOLua(ModelContextPath, modelSb);
+        ToLuaGenerater.GeneratedTODOLua(ServiceContextPath, serviceSb);
+    }
+
+    string GetLuaCodeLine(string filePath,string format,LuaFolder folder,bool isSingle)
+    {
+        string fileName = Path.GetFileNameWithoutExtension(filePath);
+        string viewName = fileName.Replace(folder.ToString(), "");
+        string packName = string.Format("Modules.{0}.{1}.{2}", viewName, folder.ToString(), fileName);
+        if(isSingle)
+            return string.Format(format, packName);
+        else
+            return string.Format(format, packName, viewName);
     }
 
     LuaTable GetLuaTable(string path)

@@ -9,7 +9,7 @@ local BaseMediator = require("Core.Ioc.BaseMediator")
 local LoginMdr = class("LoginMdr",BaseMediator)
 
 function LoginMdr:OnInit()
-    
+    print("MVC 测试")
 end
 
 return LoginMdr

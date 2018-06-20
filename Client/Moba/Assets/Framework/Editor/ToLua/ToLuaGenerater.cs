@@ -130,6 +130,7 @@ end
 return $CLASS_NAME$Vo
 ";
 
+    const string TODO = "--TODO";
     /// <summary>
     /// 生成 Lua 文件
     /// </summary>
@@ -181,31 +182,54 @@ return $CLASS_NAME$Vo
     {
         string[] textLine = FileUtils.GetFileTextLine(orgPath);
         StringBuilder orgSb = new StringBuilder();
-        String state = "";
+        int state = 0;
         for (int i = 0; i < textLine.Length; i++)
         {
             string line = textLine[i];
-            if(state == "")
+            if (state == 0)
             {
-                if (line.IndexOf("--TODO") != -1)
+                orgSb.AppendLine(textLine[i]);
+                if (line.IndexOf(TODO) != -1)
+                {
+                    state = 1;
+                    orgSb.Append(sb.ToString());//插入
+                }
+            }
+            else if (state == 1)
+            {
+                if (line.IndexOf(TODO) != -1)
+                {
                     orgSb.AppendLine(textLine[i]);
-                else
-                    state = "start";
-            }else if (state == "start")
-            {
-                orgSb.Append(sb.ToString());
-                state = "adding";
+                    state = 2;
+                }
             }
-            else if (state == "adding")
-            {
-                if (line.IndexOf("--TODO") != -1)
-                    state = "end";
-            }
-            else if (state == "end")
+            else if (state == 2)
             {
                 orgSb.AppendLine(textLine[i]);
             }
         }
+        Debug.Log(orgSb.ToString());
+        FileUtils.SaveTextFile(orgPath, orgSb.ToString());
+    }
+
+    const string Format_Mdr_Line = "\tself.binder:Bind(require(\"{0}\")):To(ViewConfig.{1}.name)";
+    const string Format_Shingleton_Line = "\tself.binder:Bind(require(\"{0}\")):ToSingleton()";
+
+    //生成lua mvc line
+    public static string GetMdrLuaLine(string filePath, LuaFolder folder)
+    {
+        string fileName = Path.GetFileNameWithoutExtension(filePath);
+        string viewName = fileName.Replace(folder.ToString(), "");
+        string packName = string.Format("Modules.{0}.View.{1}", viewName, fileName);
+        return string.Format(Format_Mdr_Line, packName, viewName);
+    }
+    //生成lua mvc line
+    public static string GetSingletonLuaLine(string filePath, LuaFolder folder)
+    {
+        string fileName = Path.GetFileNameWithoutExtension(filePath);
+        string viewName = fileName.Replace(folder.ToString(), "");
+        string packName = string.Format("Modules.{0}.{1}.{2}", viewName, folder.ToString(), fileName);
+        return string.Format(Format_Shingleton_Line, packName);
     }
     //生成文件夹
     public static void GeneratedFolder(string folderPath)

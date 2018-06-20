@@ -24,6 +24,8 @@ function IocBootstrap:Launch()
 
     self.serviceContext = ServiceContext.New(self.binder)
     self.serviceContext:Launch()
+
+    self.binder:InjectSingleEachOther()
 end
 
 return IocBootstrap
