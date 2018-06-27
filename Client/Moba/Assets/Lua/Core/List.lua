@@ -32,10 +32,6 @@ function List:Size()
     return  #self._array
 end
 
-function List:Add(item)
-    table.insert(self._array,item)
-end
-
 function List:Insert(item,pos)
     if pos <= 0 then
         logError("List out of range")
@@ -50,10 +46,18 @@ function List:RemoveAt(idx)
     return table.remove(self._array,idx)
 end
 
+--在列表末尾添加一个数据项，
+-- UnShift() Push()的等价操作
+function List:Add(item)
+    table.insert(self._array,item)
+end
+
+--列表删除列表首位数据项
 function List:Shift()
     return table.remove(self._array,1)
 end
 
+--
 function List:Pop()
     return table.remove(self._array,#self._array)
 end
@@ -93,7 +97,19 @@ function List:At(idx)
 end
 
 function List:Concat(other)
-    return table.remove(self._array,idx)
+    if nil == other then
+        logError("List Concat a other is not nil")
+    else
+        for i = 1,#other._array do
+            table.insert(self._array,other._array[i])
+        end
+    end
+end
+
+function List:Clone()
+    local newList = List.New()
+    newList:Concat(self)
+    return newList
 end
 
 return List
