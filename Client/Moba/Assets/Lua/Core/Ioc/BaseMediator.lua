@@ -9,7 +9,7 @@ local LuaMonoBehaviour = require('Core.LuaMonoBehaviour')
 local BaseMediator = class("BaseMediator",LuaMonoBehaviour)
 
 function BaseMediator:Ctor()
-
+    LuaMonoBehaviour.Ctor(self)
 end
 
 return BaseMediator

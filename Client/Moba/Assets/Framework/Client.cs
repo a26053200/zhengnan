@@ -32,7 +32,6 @@ public class Client : MonoBehaviour
         json["action"] = "login_account";
         json["username"] = "123456";
         json["password"] = "123";
-
         //StartCoroutine(testHttpLogin(json));
         //开启日志
         logger = Logger.GetInstance();

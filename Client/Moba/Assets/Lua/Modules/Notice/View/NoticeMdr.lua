@@ -4,7 +4,7 @@
 --- DateTime: 2018-06-19-18:06:57
 ---
 
----@class Modules.Notice.Mdr.NoticeMdr : Core.Ioc.BaseMediator
+---@class Modules.Notice.View.NoticeMdr : Core.Ioc.BaseMediator
 local BaseMediator = require("Core.Ioc.BaseMediator")
 local NoticeMdr = class("NoticeMdr",BaseMediator)
 

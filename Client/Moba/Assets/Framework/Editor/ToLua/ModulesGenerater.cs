@@ -286,6 +286,7 @@ public class ModulesGenerater : EditorWindow
                 fileName = fileName.Replace("View", "");
                 moduleName = fileName;
                 prefabPath = StringUtils.ReplaceAll(prefabPath, "\\", "/");
+                prefabPath = StringUtils.ReplaceAll(prefabPath, "Res/", "");
                 prefabPath = prefabPath.Replace(Application.dataPath, "");
                 viewInfo.prefabUrl = prefabPath.Substring(1);
             }
@@ -312,15 +313,26 @@ public class ModulesGenerater : EditorWindow
         for (int i = 0; i < moduleInfoList.Count; i++)
         {
             LuaModuleInfo moduleInfo = moduleInfoList[i];
-            string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
-            for (int j = 0; j < mdrFiles.Length; j++)
-                mdrSb.AppendLine(ToLuaGenerater.GetMdrLuaLine(mdrFiles[j], LuaFolder.Mdr));
-            string[] modelFiles = Directory.GetFiles(moduleInfo.modelDirPath, "*.lua");
-            for (int j = 0; j < modelFiles.Length; j++)
-                modelSb.AppendLine(ToLuaGenerater.GetSingletonLuaLine(modelFiles[j], LuaFolder.Model));
-            string[] serviceFiles = Directory.GetFiles(moduleInfo.serviceDirPath, "*.lua");
-            for (int j = 0; j < serviceFiles.Length; j++)
-                serviceSb.AppendLine(ToLuaGenerater.GetSingletonLuaLine(serviceFiles[j], LuaFolder.Service));
+            if(Directory.Exists(moduleInfo.viewDirPath))
+            {
+                string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
+                for (int j = 0; j < mdrFiles.Length; j++)
+                    mdrSb.AppendLine(ToLuaGenerater.GetMdrLuaLine(mdrFiles[j], LuaFolder.Mdr));
+            }
+
+            if (Directory.Exists(moduleInfo.modelDirPath))
+            {
+                string[] modelFiles = Directory.GetFiles(moduleInfo.modelDirPath, "*.lua");
+                for (int j = 0; j < modelFiles.Length; j++)
+                    modelSb.AppendLine(ToLuaGenerater.GetSingletonLuaLine(modelFiles[j], LuaFolder.Model));
+            }
+
+            if (Directory.Exists(moduleInfo.modelDirPath))
+            {
+                string[] serviceFiles = Directory.GetFiles(moduleInfo.serviceDirPath, "*.lua");
+                for (int j = 0; j < serviceFiles.Length; j++)
+                    serviceSb.AppendLine(ToLuaGenerater.GetSingletonLuaLine(serviceFiles[j], LuaFolder.Service));
+            }
         }
         ToLuaGenerater.GeneratedTODOLua(MediatorContextPath, mdrSb);
         ToLuaGenerater.GeneratedTODOLua(ModelContextPath, modelSb);

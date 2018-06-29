@@ -11,6 +11,20 @@ using UnityEditor;
 
 namespace Framework
 {
+    /// <summary>
+    /// 资源卸载组别
+    /// </summary>
+    public enum AssetsUnloadGroup
+    {
+        /// <summary>
+        /// 永不卸载
+        /// </summary>
+        Common,
+        /// <summary>
+        /// 当前主场景卸载时卸载
+        /// </summary>
+        Scene,
+    }
     public class AssetsManager : BaseManager
     {
         //编辑器模式下的加载根目录
@@ -45,6 +59,8 @@ namespace Framework
         T LoadAsset_Editor<T>(string path) where T : UnityEngine.Object
         {
             T tempTex = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
+            if (tempTex == default(T))
+                Logger.LogError("Asset:'{0}' has not found", path);
             return tempTex;
         }
 #endif

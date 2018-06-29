@@ -4,7 +4,7 @@
 --- DateTime: 2018/6/10 21:12
 ---
 
-
+---@class Core.Ioc.IocBootstrap
 local IocBootstrap = class("IocBootstrap")
 local IocBinder = require("Core.Ioc.IocBinder")
 local MediatorContext = require("Core.Ioc.MediatorContext")

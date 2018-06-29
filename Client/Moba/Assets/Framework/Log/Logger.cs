@@ -256,6 +256,13 @@ public class Logger
             Debug.Log(logContent);
     }
 
+    public static void LogError(string format, params object[] args)
+    {
+        string logContent = instance.AddLog("ErrorLog", string.Format(format, args));
+        if (instance.LogInfoToConsole)
+            Debug.LogError(logContent);
+    }
+
     private void OnApplicationLogMessageReceived(string condition, string stackTrace, LogType type)
     {
         if (type == LogType.Exception)

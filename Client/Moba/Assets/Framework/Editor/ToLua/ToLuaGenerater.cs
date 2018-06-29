@@ -156,12 +156,12 @@ return $CLASS_NAME$Vo
                 break;
         }
         luaFileText = string.Format(luaFileText, SystemUtils.GetSystemUserName(), TimeUtils.NowString());
-        string packerName = GetLuaPackerNameByPath(path + Folder2Directory(folder));//包名
+        LuaFolder moduleFolder = folder == LuaFolder.Mdr ? LuaFolder.View : folder;
+        string packerName = GetLuaPackerNameByPath(path + Folder2Directory(moduleFolder));//包名
         luaFileText = StringUtils.ReplaceAll(luaFileText, CLASS_PACKER, packerName);
         luaFileText = StringUtils.ReplaceAll(luaFileText, CLASS_NAME, className);
         luaFileText = StringUtils.ReplaceAll(luaFileText, "'", "\"");
         //Debug.Log(mdrFileText);
-        LuaFolder moduleFolder = folder == LuaFolder.Mdr ? LuaFolder.View : folder;
         string mdrFilePath = path + Folder2Directory(moduleFolder) + className + folder + ".lua";
         if (!File.Exists(mdrFilePath))
         {

@@ -6,11 +6,86 @@
 ---
 
 ---@class Manager.ViewManager : Core.LuaMonoBehaviour
+---@field public scene Modules.World.Scenes.BaseScene
 local LuaMonoBehaviour = require('Core.LuaMonoBehaviour')
 local ViewManager = class("ViewManager",LuaMonoBehaviour)
 
-function ViewManager:Ctor()
+require("Config.ViewConfig")
+local IocBootstrap = require("Core.Ioc.IocBootstrap").New()
+local ViewStatus = {}
+ViewStatus.Loading = "Loading"
+ViewStatus.Loaded = "Loaded"
+ViewStatus.Unloading = "Unloading"
+ViewStatus.Unloaded = "Unloaded"
 
+function ViewManager:Ctor()
+    IocBootstrap:Launch()
+    self.viewCache = {}
+    self.viewList = List.New()
+end
+
+---@param scene Modules.World.Scenes.BaseScene
+function ViewManager:SetScene(scene)
+    self.scene = scene
+end
+
+---@param viewInfo Core.ViewInfo
+function ViewManager:LoadView(viewInfo)
+    self:DoLoadViewCo(viewInfo)
+end
+
+---@param viewInfo Core.ViewInfo
+function ViewManager:DoLoadViewCo(viewInfo)
+    if viewInfo == nil then
+        logError("'viewInfo' param is nil")
+        return
+    end
+
+    if viewInfo.status == nil then
+        self:LoadViewPrefab(viewInfo,function (go)
+            self:CreateView(viewInfo,go)
+        end)
+    else
+        if viewInfo.status == ViewStatus.Loading or
+            viewInfo.status == ViewStatus.Unloading or
+            viewInfo.status == ViewStatus.Unloaded then
+            logError("View {0} status is {1} ,you can load this view",viewInfo.name, viewInfo.status)
+        end
+    end
+end
+
+---@param viewInfo Core.ViewInfo
+---@param callback function
+function ViewManager:LoadViewPrefab(viewInfo,callback)
+    local prefab = assetsMgr:LoadPrefab(viewInfo.prefab)
+    if prefab then
+        local go = GameObject.Instantiate(prefab)
+        callback(go)
+    end
+end
+
+---@param viewInfo Core.ViewInfo
+---@param go UnityEngine.GameObject
+function ViewManager:CreateView(viewInfo,go)
+    local mdrType = IocBootstrap.mediatorContext:GetMediator(viewInfo.name)
+    if mdrType == nil then
+        logError("view:'{0}' has not register", viewInfo.name)
+        return
+    end
+    local mdr = mdrType.New()
+    if viewInfo == ViewConfig.World then
+        GameObject.DontDestroyOnLoad(go)
+    else
+        mdr.scene = self.scene
+        mdr.uiCanvas = self.scene.uiCanvas
+        go.transform:SetParent(self.scene.uiCanvas)
+    end
+    go.name = viewInfo.name .. "-" ..go.name
+    go.transform.transform.localPosition = Vector3.zero
+    go.transform.transform.localEulerAngles = Vector3.zero
+    go.transform.transform.localScale = Vector3.one
+
+    mdr:OnInit()
 end
 
 return ViewManager

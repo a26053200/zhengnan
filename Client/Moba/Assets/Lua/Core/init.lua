@@ -4,8 +4,19 @@
 --- DateTime: 2018/6/11 0:23
 ---
 
+require "Core.string"
 require "Core.Define"
 require "Core.Function"
 require "Core.Log"
+
+
+
+List = {}
+local _List = require ("Core.List")
+
+---@return Core.List
+function List.New()
+    return _List.New()
+end
 
 log("Global define has all require")

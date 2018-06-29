@@ -19,7 +19,7 @@ end
 function IocBinder:ToSingleton()
     local singleton = self.type.New()
     table.insert(self.singleList,singleton)
-    log("[Bind singleton] -- {}",self.type__cname)
+    log("[Bind singleton] -- {0}",self.type__cname)
     return singleton
 end
 
@@ -33,7 +33,7 @@ function IocBinder:InjectSingle(obj)
     for _, singleton in pairs(self.singleList) do
         if singleton.__cname ~= obj.__cname then
             local index = string.startLower(singleton.__cname) -- the first word startLower
-            obj[idx] = singleton
+            obj[index] = singleton
         end
     end
 end

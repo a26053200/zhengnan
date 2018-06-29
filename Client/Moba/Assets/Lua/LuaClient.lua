@@ -9,19 +9,23 @@ local LuaClient = {}
 
 function LuaClient.Start()
     LuaClient.RequireGlobalDefines()
-    --LuaClient.Test()
+    LuaClient.GameStart()
 end
 
 --加载全局定义
 function LuaClient.RequireGlobalDefines()
     require "Core.init"
+    require "Config.init"
+    require "Manager.init"
 end
 
 
---启动测试代码
-function LuaClient.Test()
-    local timer = Timer.New(LuaClient.DoTestCo, 2, 1)
-    timer:Start()
+--开始游戏
+function LuaClient.GameStart()
+    print("GameStart...")
+    vmgr:LoadView(ViewConfig.World)
+    --local timer = Timer.New(LuaClient.DoTestCo, 2, 1)
+    --timer:Start()
 end
 
 --启动测试代码
