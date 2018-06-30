@@ -57,7 +57,7 @@ end
 ---@param viewInfo Core.ViewInfo
 ---@param callback function
 function ViewManager:LoadViewPrefab(viewInfo,callback)
-    local prefab = assetsMgr:LoadPrefab(viewInfo.prefab)
+    local prefab = self:LoadAsset(viewInfo.prefab)
     if prefab then
         local go = GameObject.Instantiate(prefab)
         callback(go)
@@ -73,13 +73,12 @@ function ViewManager:CreateView(viewInfo,go)
         return
     end
     local mdr = mdrType.New()
-    if viewInfo == ViewConfig.World then
-        GameObject.DontDestroyOnLoad(go)
-    else
+    if viewInfo ~= ViewConfig.World then
         mdr.scene = self.scene
         mdr.uiCanvas = self.scene.uiCanvas
-        go.transform:SetParent(self.scene.uiCanvas)
+        go.transform:SetParent(self.scene.uiCanvas.transform)
     end
+    mdr.gameObject = go
     go.name = viewInfo.name .. "-" ..go.name
     go.transform.transform.localPosition = Vector3.zero
     go.transform.transform.localEulerAngles = Vector3.zero

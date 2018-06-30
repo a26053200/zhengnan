@@ -3,13 +3,66 @@
 --- Created by zheng.
 --- DateTime: 2018/6/29 23:58
 ---
-
+World = {}
+World.ins = nil
+function World.EnterScene(sceneInfo, callback)
+    World.ins:EnterScene(sceneInfo, callback)
+end
 ---@class Modules.Notice.View.WorldMdr : Core.Ioc.BaseMediator
 local BaseMediator = require("Core.Ioc.BaseMediator")
 local WorldMdr = class("WorldMdr",BaseMediator)
 
+function WorldMdr:Ctor()
+    BaseMediator.Ctor(self)
+    self.tempLevel = nil;
+    self.currLevel = "";
+    self.currScene = nil;
+
+    World.ins = self
+end
+
 function WorldMdr:OnInit()
-    vmgr:LoadView(ViewConfig.Login)
+    World.EnterScene(WorldConfig.Login,function()
+        vmgr:LoadView(ViewConfig.Login)
+    end)
+end
+
+function WorldMdr:GetTempLevel()
+    if self.tempLevel == WorldConfig.TempA then
+        return WorldConfig.TempB.level
+    else
+        return WorldConfig.TempA.level
+    end
+end
+
+function WorldMdr:EnterScene(sceneInfo, callback)
+    if string.isValid(sceneInfo.level) then
+        if self.currLevel == sceneInfo.level then
+            logError("you can not load then same scene - " .. sceneInfo.level)
+        elseif sceneInfo.level == "Temp" then
+            self.tempLevel = self:GetTempLevel()
+            self:LoadLevel(self.tempLevel, sceneInfo, callback)
+        else
+            self:LoadLevel(sceneInfo.level,sceneInfo, callback)
+        end
+    end
+end
+
+function WorldMdr:LoadLevel(level,sceneInfo, callback)
+    sceneMgr:LoadSceneAsync(level, function ()
+        local sceneType = require(string.format("Modules.World.Scenes.%sScene",sceneInfo.sceneName,sceneInfo.sceneName))
+        if sceneType == nil then
+            err("can not find scene "..sceneInfo.sceneName)
+            logStack()
+            return
+        end
+        local scene = sceneType.New()
+        self.currScene = scene
+        self.currLevel = level
+        if callback ~= nil then
+            callback()
+        end
+    end)
 end
 
 return WorldMdr

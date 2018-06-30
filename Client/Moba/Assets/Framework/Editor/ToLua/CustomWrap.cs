@@ -21,6 +21,7 @@ public static class CustomWrap
         //================
         _GT(typeof(Logger)),
         _GT(typeof(AssetsManager)),
+        _GT(typeof(SceneManager)),
         _GT(typeof(GameManager)),
     };
 }

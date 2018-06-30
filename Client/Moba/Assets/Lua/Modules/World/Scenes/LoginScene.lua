@@ -10,9 +10,6 @@ local LoginScene = class("BaseScene",BaseScene)
 
 function LoginScene:Ctor()
     BaseScene.Ctor(self)
-
 end
-
-
 
 return LoginScene

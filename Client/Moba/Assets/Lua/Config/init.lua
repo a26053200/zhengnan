@@ -5,5 +5,6 @@
 ---
 
 require "Config.ViewConfig"
+require "Config.WorldConfig"
 
 log("Global config has all require")

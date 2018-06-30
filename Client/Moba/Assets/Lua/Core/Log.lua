@@ -30,3 +30,7 @@ function logWarn(msg,...)
     local arg = ...
     logger.Warning(msg,arg)
 end
+
+function logStack()
+    logger.Error(debug.traceback("",2))
+end

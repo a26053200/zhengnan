@@ -11,3 +11,4 @@ GameObject = UnityEngine.GameObject;
 logger = Logger
 gameMgr = Framework.BaseManager.GetGameManager()
 assetsMgr = Framework.BaseManager.GetAssetsManager()
+sceneMgr = Framework.BaseManager.GetSceneManager()

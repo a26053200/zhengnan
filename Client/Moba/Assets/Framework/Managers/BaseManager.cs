@@ -35,6 +35,11 @@ namespace Framework
         {
             return GetManager<AssetsManager>();
         }
+
+        public static SceneManager GetSceneManager()
+        {
+            return GetManager<SceneManager>();
+        }
     }
 }
 

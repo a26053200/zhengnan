@@ -63,3 +63,29 @@ function class(className, super)
 
     return cls
 end
+
+---回调
+function handler(obj,method)
+    if method == nil then
+        logError("method is nil")
+    end
+    return function (...)
+        return method(obj, ...)
+    end
+end
+
+---异步销毁
+function destroy(obj,delay)
+    delay = delay or 0
+    GameObject.Destroy(obj,delay)
+end
+
+---同步销毁
+function destroyImmediate(obj)
+    GameObject.DestroyImmediate(obj)
+end
+
+---标志不销毁对象
+function dontDestroyOnLoad(obj)
+    GameObject.DontDestroyOnLoad(obj)
+end

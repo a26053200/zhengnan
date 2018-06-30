@@ -14,8 +14,9 @@ function BaseScene:Ctor()
     self:Init()
 end
 
-function LoginScene:Init()
-    self.uiCanvas = GameObject.Instantiate(assetsMgr:LoadPrefab("Prefabs/UI/Common"))
+function BaseScene:Init()
+    local prefab = self:LoadAsset("Prefabs/UI/Common/UICanvas.prefab")
+    self.uiCanvas = GameObject.Instantiate(prefab)
     vmgr:SetScene(self)
 end
 

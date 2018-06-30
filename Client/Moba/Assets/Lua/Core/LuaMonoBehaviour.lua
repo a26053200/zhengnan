@@ -13,4 +13,12 @@ function LuaMonoBehaviour:Ctor()
 
 end
 
+function LuaMonoBehaviour:LoadAsset(assetName)
+    local prefab = assetsMgr:LoadPrefab(assetName)
+    if prefab == nil then
+        logStack()
+    end
+    return prefab
+end
+
 return LuaMonoBehaviour

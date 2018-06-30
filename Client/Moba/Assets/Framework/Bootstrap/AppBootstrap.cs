@@ -17,7 +17,7 @@ public class AppBootstrap
         // Init and add managers
         BaseManager.AddManager(client.gameObject.AddComponent<GameManager>());
         BaseManager.AddManager(client.gameObject.AddComponent<AssetsManager>());
-
+        BaseManager.AddManager(client.gameObject.AddComponent<SceneManager>());
         // Other
         client.gameObject.AddComponent<LuaBootstrap>();
     }
