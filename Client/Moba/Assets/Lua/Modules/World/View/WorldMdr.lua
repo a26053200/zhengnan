@@ -22,6 +22,7 @@ function WorldMdr:Ctor()
 end
 
 function WorldMdr:OnInit()
+    dontDestroyOnLoad(self.gameObject)
     World.EnterScene(WorldConfig.Login,function()
         vmgr:LoadView(ViewConfig.Login)
     end)

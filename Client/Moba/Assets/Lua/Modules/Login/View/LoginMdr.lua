@@ -13,14 +13,20 @@ function LoginMdr:OnInit()
 
     ---@type Core.List
     local testList = List.New()
-    testList:Add(123)
-    testList:Add(123)
-    testList:Add(123)
-    testList:Add(123)
+    testList:Add(1)
+    testList:Add(2)
+    testList:Add(3)
+    testList:Add(4)
 
     for i = 1, testList:Size() do
         print(testList[i])
     end
+
+    vmgr:LoadView(ViewConfig.Notice)
+end
+
+function LoginMdr:Update()
+
 end
 
 return LoginMdr

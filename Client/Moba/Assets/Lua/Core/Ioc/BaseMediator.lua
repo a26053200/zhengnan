@@ -12,4 +12,34 @@ function BaseMediator:Ctor()
     LuaMonoBehaviour.Ctor(self)
 end
 
+function BaseMediator:Start()
+    self:OnInit()
+    self:OnAutoRegisterEvent()
+end
+
+function BaseMediator:OnInit()
+
+end
+
+--自动注册事件
+function BaseMediator:OnAutoRegisterEvent()
+    local buttons = LuaHelper.GetChildrenButtons(self.gameObject)
+    for i = 0,buttons.Length - 1 do
+        local funName = "On_Click_"..buttons[i].gameObject.name
+        if self[funName] then
+            print(funName)
+            LuaHelper.AddButtonClick(buttons[i].gameObject,handler(self,self[funName]))
+        end
+    end
+end
+
+function BaseMediator:OnDestroy()
+    --print("OnDestroy")
+    self:OnRemove()
+end
+
+function BaseMediator:OnRemove()
+
+end
+
 return BaseMediator

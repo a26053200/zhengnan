@@ -7,7 +7,7 @@ using Framework;
 /// <para>Author: zhengnan</para>
 /// <para>Create: 2018/6/10 0:27:05</para>
 /// </summary> 
-public class AppBootstrap
+public static class AppBootstrap
 {
     static Client s_client = null;
     public static void Start(Client client)
@@ -15,9 +15,10 @@ public class AppBootstrap
         s_client = client;
 
         // Init and add managers
-        BaseManager.AddManager(client.gameObject.AddComponent<GameManager>());
-        BaseManager.AddManager(client.gameObject.AddComponent<AssetsManager>());
-        BaseManager.AddManager(client.gameObject.AddComponent<SceneManager>());
+        GameManager.AddManager(client.gameObject.AddComponent<GameManager>());
+        GameManager.AddManager(client.gameObject.AddComponent<AssetsManager>());
+        GameManager.AddManager(client.gameObject.AddComponent<SceneManager>());
+        GameManager.AddManager(client.gameObject.AddComponent<MonoBehaviourManager>());
         // Other
         client.gameObject.AddComponent<LuaBootstrap>();
     }

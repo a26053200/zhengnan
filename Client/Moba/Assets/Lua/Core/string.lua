@@ -44,3 +44,9 @@ function string.startLower(s)
     local first = string.sub(s, 1, 1)
     return string.lower(first)..string.sub(s, 2)
 end
+
+--首字母小写
+function string.startWith(s,k)
+    local index = string.find(s, k)
+    return index ~= nil and index == 0
+end

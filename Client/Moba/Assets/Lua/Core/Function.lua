@@ -55,6 +55,7 @@ function class(className, super)
 
         function cls.New(...)
             local instance = setmetatable({}, cls)
+            for k,v in pairs(cls) do instance[k] = v end
             instance.class = cls
             instance:Ctor(...)
             return instance

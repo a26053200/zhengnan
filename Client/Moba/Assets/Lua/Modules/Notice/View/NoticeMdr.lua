@@ -9,7 +9,11 @@ local BaseMediator = require("Core.Ioc.BaseMediator")
 local NoticeMdr = class("NoticeMdr",BaseMediator)
 
 function NoticeMdr:OnInit()
-    
+    print("NoticeMdr_OnInit")
+end
+
+function NoticeMdr:On_Click_BtnClose()
+    print("On_Click_BtnClose")
 end
 
 return NoticeMdr

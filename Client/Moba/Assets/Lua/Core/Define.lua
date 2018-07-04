@@ -9,6 +9,8 @@ GameObject = UnityEngine.GameObject;
 
 ---Framework
 logger = Logger
-gameMgr = Framework.BaseManager.GetGameManager()
-assetsMgr = Framework.BaseManager.GetAssetsManager()
-sceneMgr = Framework.BaseManager.GetSceneManager()
+gameMgr = Framework.GameManager.GetGameManager()
+assetsMgr = Framework.GameManager.GetAssetsManager()
+sceneMgr = Framework.GameManager.GetSceneManager()
+
+LuaHelper = Framework.LuaHelper

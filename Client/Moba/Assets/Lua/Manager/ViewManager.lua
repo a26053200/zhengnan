@@ -20,8 +20,8 @@ ViewStatus.Unloaded = "Unloaded"
 
 function ViewManager:Ctor()
     IocBootstrap:Launch()
-    self.viewCache = {}
-    self.viewList = List.New()
+    --self.viewCache = {}
+    --self.viewList = List.New()
 end
 
 ---@param scene Modules.World.Scenes.BaseScene
@@ -41,15 +41,17 @@ function ViewManager:DoLoadViewCo(viewInfo)
         return
     end
 
-    if viewInfo.status == nil then
+    if viewInfo.status == nil or viewInfo.status == ViewStatus.Unloaded then
+        viewInfo.status = ViewStatus.Loading
         self:LoadViewPrefab(viewInfo,function (go)
             self:CreateView(viewInfo,go)
+            viewInfo.status = ViewStatus.Loaded
         end)
     else
         if viewInfo.status == ViewStatus.Loading or
             viewInfo.status == ViewStatus.Unloading or
-            viewInfo.status == ViewStatus.Unloaded then
-            logError("View {0} status is {1} ,you can load this view",viewInfo.name, viewInfo.status)
+            viewInfo.status == ViewStatus.Loaded then
+            logError("View {0} status is {1} ,you can't load this view",viewInfo.name, viewInfo.status)
         end
     end
 end
@@ -79,12 +81,12 @@ function ViewManager:CreateView(viewInfo,go)
         go.transform:SetParent(self.scene.uiCanvas.transform)
     end
     mdr.gameObject = go
-    go.name = viewInfo.name .. "-" ..go.name
+    go.name = viewInfo.name .. " - " ..go.name
     go.transform.transform.localPosition = Vector3.zero
     go.transform.transform.localEulerAngles = Vector3.zero
     go.transform.transform.localScale = Vector3.one
 
-    mdr:OnInit()
+    mdr:AddLuaMonoBehaviour(go,"Mediator")
 end
 
 return ViewManager

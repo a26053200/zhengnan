@@ -9,8 +9,20 @@
 local LuaObject = require("Core.LuaObject")
 local LuaMonoBehaviour = class("LuaMonoBehaviour",LuaObject)
 
+local BehaviourFun = {"Awake","Start","OnEnable","OnDisable","OnDestroy","Update","LateUpdate","FixedUpdate"}
+
 function LuaMonoBehaviour:Ctor()
 
+end
+
+function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
+    local behaviour = nil
+    for k, v in pairs(BehaviourFun) do
+        if self[v] then
+            behaviour = LuaHelper.AddLuaMonoBehaviour(go,name,v,handler(self,self[v]))
+        end
+    end
+    return behaviour
 end
 
 function LuaMonoBehaviour:LoadAsset(assetName)
