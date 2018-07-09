@@ -66,7 +66,7 @@ public class Client : MonoBehaviour
         jsonClient.connect((string)gameSrv["host"], (int)gameSrv["port"]);
         //MyDebug.Log(string.Format("正在连接服务器 {0}:{1}", gameSrv["host"], gameSrv["port"]));
 
-        jsonClient.eventDispatcher.addEventListener(SocketEvent.SERVER_SOCKET_CONNECTED,delegate(EventObj evt)
+        jsonClient.eventDispatcher.addEventListener(JsonSocketEvent.SERVER_SOCKET_CONNECTED,delegate(EventObj evt)
         {
             //登陆游戏网关
             JsonData loginGate = new JsonData();

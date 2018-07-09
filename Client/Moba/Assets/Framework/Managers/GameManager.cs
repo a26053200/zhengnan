@@ -46,6 +46,11 @@ namespace Framework
         {
             return GetManager<MonoBehaviourManager>();
         }
+
+        public static NetworkManager GetNetworkManager()
+        {
+            return GetManager<NetworkManager>();
+        }
     }
 }
 

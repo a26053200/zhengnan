@@ -41,7 +41,7 @@ public abstract class ClientBase:MonoBehaviour
         socket.init();
         socket.OnReceive = OnReceiveHandler;
         socket.eventDispatcher.addEventListener(SocketEvent.ERROR, onConnectedError);
-        //socket.eventDispatcher.addEventListener(SocketEvent.DISCONNECTED, onDisconnect);
+        socket.eventDispatcher.addEventListener(SocketEvent.DISCONNECTED, onDisconnect);
     }
     public void reconnect()
     {
@@ -130,7 +130,7 @@ public abstract class ClientBase:MonoBehaviour
             status = ClientStatus.Disconnected;//连接已经断开
         }
     }
-    protected virtual void OnReceiveHandler(int cmdId, StringBuilder json)
+    protected virtual void OnReceiveHandler(StringBuilder json)
     {
 
     }
@@ -141,11 +141,11 @@ public abstract class ClientBase:MonoBehaviour
     }
     private void onConnectedError(EventObj evt)
     {
-        eventDispatcher.dispatchEvent(new SocketEvent(SocketEvent.SERVER_LOGIN_FAIL));
+        eventDispatcher.dispatchEvent(new JsonSocketEvent(JsonSocketEvent.SERVER_SOCKET_FAIL));
     }
     private void onConnectedSuccess(EventObj evt)
     {
-        eventDispatcher.dispatchEvent(new SocketEvent(SocketEvent.SERVER_SOCKET_CONNECTED, _isReconnect));
+        eventDispatcher.dispatchEvent(new JsonSocketEvent(JsonSocketEvent.SERVER_SOCKET_CONNECTED, _isReconnect));
     }
     public virtual void disconnect()
     {
@@ -153,6 +153,9 @@ public abstract class ClientBase:MonoBehaviour
     }
     public virtual void dispose()
     {
+        socket.OnReceive = null;
+        socket.eventDispatcher.removeEeventListener(SocketEvent.ERROR, onConnectedError);
+        socket.eventDispatcher.removeEeventListener(SocketEvent.DISCONNECTED, onDisconnect);
         socket.dispose();
     }
 }

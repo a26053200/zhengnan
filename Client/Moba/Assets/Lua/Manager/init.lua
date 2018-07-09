@@ -5,5 +5,6 @@
 ---
 
 vmgr = require("Manager.ViewManager").New()
+nmgr = require("Manager.NetworkManager").New()
 
 log("All managers has all require")

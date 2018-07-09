@@ -28,3 +28,17 @@ public class BehaviourFunction
 
     public const string FIXED_UPDATE = "FixedUpdate";
 }
+
+public class NetworkFunction
+{
+    public const string OnConnect = "OnConnect";
+
+    public const string OnConnectFail = "OnConnectFail";
+
+    public const string OnReConnect = "OnReConnect";
+
+    public const string OnHttpRspd = "OnHttpRspd";
+
+    public const string OnJsonRspd = "OnJsonRspd";
+    
+}

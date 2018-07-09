@@ -12,7 +12,9 @@ using LitJson;
 public class JsonClient :  ClientBase
 {
     public delegate void CmdHandler(NetData data);
-    public delegate void CmdJsonHandler(string json);
+    public delegate void CmdJsonHandler(StringBuilder json);
+
+    public CmdJsonHandler jsonCallback;
 
     protected Dictionary<int, int> _errorMessages;
 
@@ -64,6 +66,7 @@ public class JsonClient :  ClientBase
         if (_rspdTypeMap.ContainsKey(pactetId))
             _rspdTypeMap.Remove(pactetId);
     }
+    /*
     public void addSocketListener(NetCmd packetId, CmdHandler handler)
     {
         List<CmdHandler> rspdList = null;
@@ -81,7 +84,7 @@ public class JsonClient :  ClientBase
             if (rspdList.Contains(handler))
                 rspdList.Remove(handler);
     }
-    /*
+    
     public void addServiceListener(NetCmd cmd, BaseService service, MethodInfo method, Type type)
     {
         CmdMethodInfo cmdMethod = null;
@@ -101,7 +104,7 @@ public class JsonClient :  ClientBase
             if (serviceType.methodList.Contains(method))
                 serviceType.methodList.Remove(method);
     }
-    */
+    
     public void addJsonListener(int cmd, CmdJsonHandler handler)
     {
         List<CmdJsonHandler> rspdList = null;
@@ -119,6 +122,12 @@ public class JsonClient :  ClientBase
             if (rspdList.Contains(handler))
                 rspdList.Remove(handler);
     }
+    */
+    public void SetJsonCallback(CmdJsonHandler handler)
+    {
+        this.jsonCallback = handler;
+    }
+
     public void sendJson(JsonData obj)
     {
         socket.send(obj);
@@ -127,23 +136,16 @@ public class JsonClient :  ClientBase
     {
         socket.send(json, true);
     }
-    protected override void OnReceiveHandler(int cmdId, StringBuilder json)
+    protected override void OnReceiveHandler(StringBuilder json)
     {
-        base.OnReceiveHandler(cmdId, json);
+        base.OnReceiveHandler(json);
 #if UNITY_EDITOR
         //showErrorCodeTip(cmdId);
 #endif
-        if (!_rspdTypeMap.ContainsKey((NetCmd)cmdId) && !_rspdJsonListMap.ContainsKey(cmdId) && !_cmdMethodInfoListMap.ContainsKey((NetCmd)cmdId))
-        {
-            MyDebug.LogError(string.Format("[Socket] Receive command has not regist! NetCmd: {0}", cmdId));
-        }
-        else
-        {
-            //object obj = System.Activator.CreateInstance(rspdType);
-            //MyDebug.Log("收到数据 NetCmd:" + " " + cmdId);
-            RcvData rcvData = new RcvData(cmdId, json);
-            _rcvDataQueue.Enqueue(rcvData);//进入消息处理队列
-        }
+        //object obj = System.Activator.CreateInstance(rspdType);
+        //MyDebug.Log("收到数据 NetCmd:" + " " + cmdId);
+        RcvData rcvData = new RcvData(0, json);
+        _rcvDataQueue.Enqueue(rcvData);//进入消息处理队列
     }
     private void doReceive(RcvData rcvData)
     {
@@ -157,6 +159,8 @@ public class JsonClient :  ClientBase
                 MyDebug.Log(string.Format("[Socket] recv json:{0}\t{1}\n{2}", rcvData.cmdId, (NetCmd)rcvData.cmdId, JCode.ToFormart(rcvData.json.ToString())));
 #endif
         }
+        if (jsonCallback != null)
+            jsonCallback(rcvData.json);
         //默认监听对象
         RspdType rspdType = null;
         NetData obj = null;
@@ -194,7 +198,7 @@ public class JsonClient :  ClientBase
         {
             for (int i = 0; i < rspdJsonList.Count; i++)
             {
-                rspdJsonList[i](rcvData.json.ToString());
+                //rspdJsonList[i](rcvData.json.ToString());
             }
         }
     }

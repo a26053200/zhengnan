@@ -14,7 +14,7 @@ public class JsonSocket : SocketBase
 
     public const int MAX_SEND = 2048;//缓冲区最大容量
 
-    public delegate void OnReceiveHandler(int cmd, StringBuilder json);
+    public delegate void OnReceiveHandler(StringBuilder json);
 
     public OnReceiveHandler OnReceive;//接收数据回调
 
@@ -45,10 +45,10 @@ public class JsonSocket : SocketBase
             if (data != null && data.Length > 0)
             {
                 string json = JCode.GetString(data, data.Length);
-                //StringBuilder sb = new StringBuilder(json);
+                StringBuilder sb = new StringBuilder(json);
                 //int cmd = 0;// int.Parse(getPT(sb));
-                MyDebug.Log(json);
-                //OnReceive(cmd, sb);
+                //MyDebug.Log(json);
+                OnReceive(sb);
             }
         }
     }

@@ -24,6 +24,7 @@ public static class CustomWrap
         _GT(typeof(SceneManager)),
         _GT(typeof(GameManager)),
         _GT(typeof(MonoBehaviourManager)),
+        _GT(typeof(NetworkManager)),
 
         _GT(typeof(LuaHelper)),
     };
