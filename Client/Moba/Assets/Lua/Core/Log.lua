@@ -34,3 +34,8 @@ end
 function logStack()
     logger.Error(debug.traceback("",2))
 end
+
+function doLog(msg,...)
+    local arg = {...}
+
+end

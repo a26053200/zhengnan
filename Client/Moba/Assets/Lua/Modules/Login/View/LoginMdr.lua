@@ -9,24 +9,20 @@ local BaseMediator = require("Core.Ioc.BaseMediator")
 local LoginMdr = class("LoginMdr",BaseMediator)
 
 function LoginMdr:OnInit()
-    print("MVC 测试")
-
-    ---@type Core.List
-    local testList = List.New()
-    testList:Add(1)
-    testList:Add(2)
-    testList:Add(3)
-    testList:Add(4)
-
-    for i = 1, testList:Size() do
-        print(testList[i])
-    end
-
-    vmgr:LoadView(ViewConfig.Notice)
+    --vmgr:LoadView(ViewConfig.Notice)
 end
 
-function LoginMdr:Update()
+function LoginMdr:On_Click_BtnLogin()
+    local json = {}
+    json["server"] = "AccountServer";
+    json["action"] = "login_account";
+    json["username"] = "123456";
+    json["password"] = "123";
+    nmgr:HttpRqst("http://127.0.0.1:8080","login_account", json, handler(self,self.OnHttpLogin))
+end
 
+function LoginMdr:OnHttpLogin(data)
+    log("aid:{0} token:", data.aid)
 end
 
 return LoginMdr

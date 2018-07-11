@@ -9,6 +9,7 @@
 ---@field public scene Modules.World.Scenes.BaseScene
 local LuaMonoBehaviour = require('Core.LuaMonoBehaviour')
 local NetworkManager = class("NetworkManager",LuaMonoBehaviour)
+local json = require ("cjson")
 
 function NetworkManager:Ctor()
     self.respondMap = {} --同步响应回调
@@ -29,11 +30,13 @@ function NetworkManager:AddPush(action, callback)
 end
 
 --添加Http请求
-function NetworkManager:HttpRqst(url, action, json, callback)
+function NetworkManager:HttpRqst(url, action, data, callback)
     if callback ~= nil then
         self:addCallback(action, callback)
     end
-    netMgr:HttpRequest(url, json)
+    local jsonStr = json.encode(data)
+    print("[Send]"..jsonStr)
+    netMgr:HttpRequest(url, jsonStr)
 end
 
 --异步发送
@@ -50,23 +53,25 @@ function NetworkManager:Request(action, json, callback)
 end
 
 function NetworkManager:OnConnect()
-    print("OnConnect")
+    print("OnConnect ")
 end
 
 function NetworkManager:OnConnectFail()
-    print("OnConnectFail")
+    print("OnConnectFail ")
 end
 
-function NetworkManager:OnReConnect(json)
-    print("OnReConnect"..json)
+function NetworkManager:OnReConnect(data)
+    print("OnReConnect "..json)
 end
 
-function NetworkManager:OnHttpRspd(json)
-    print("OnHttpRspd"..json)
+function NetworkManager:OnHttpRspd(jsonStr)
+    local jsonData = json.decode(jsonStr)
+    self:handlerCallback(jsonData.action, jsonData)
 end
 
-function NetworkManager:OnJsonRspd(json)
-    print("OnHttpRspd"..json)
+function NetworkManager:OnJsonRspd(data)
+    local jsonStr = json.encode(data)
+    print("OnJsonRspd "..jsonStr)
 end
 
 function NetworkManager:addCallback(action,handler)
@@ -93,6 +98,10 @@ function NetworkManager:addPushCallback(action,handler)
 end
 
 function NetworkManager:handlerCallback(action,json)
+    if action == nil then
+        logError("action is nil")
+        return
+    end
     local callbackList = self.respondMap[action]
     if callbackList ~= nil then
         for i = 1, callbackList:Size() do

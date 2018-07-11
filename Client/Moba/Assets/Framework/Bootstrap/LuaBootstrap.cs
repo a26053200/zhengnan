@@ -8,6 +8,10 @@ using System.Collections.Generic;
 /// </summary> 
 public class LuaBootstrap : LuaClient
 {
-
+    protected override void OpenLibs()
+    {
+        base.OpenLibs();
+        OpenCJson();//打开cjson
+    }
 }
 

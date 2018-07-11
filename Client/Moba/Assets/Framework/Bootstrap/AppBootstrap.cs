@@ -19,6 +19,7 @@ public static class AppBootstrap
         GameManager.AddManager(client.gameObject.AddComponent<AssetsManager>());
         GameManager.AddManager(client.gameObject.AddComponent<SceneManager>());
         GameManager.AddManager(client.gameObject.AddComponent<MonoBehaviourManager>());
+        GameManager.AddManager(client.gameObject.AddComponent<NetworkManager>());
         // Other
         client.gameObject.AddComponent<LuaBootstrap>();
     }

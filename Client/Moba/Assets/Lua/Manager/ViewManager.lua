@@ -87,6 +87,8 @@ function ViewManager:CreateView(viewInfo,go)
     go.transform.transform.localScale = Vector3.one
 
     mdr:AddLuaMonoBehaviour(go,"Mediator")
+
+    log("View has loaded {0}", viewInfo.name)
 end
 
 return ViewManager

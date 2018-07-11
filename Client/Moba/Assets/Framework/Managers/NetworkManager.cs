@@ -51,7 +51,7 @@ public class NetworkManager : BaseManager
 
     void OnHttpRspd(JsonData json)
     {
-        luaFun[NetworkFunction.OnHttpRspd].Call(json.ToString());
+        luaFun[NetworkFunction.OnHttpRspd].Call(json.ToJson());
     }
     public void Connect(string host, int port)
     {
