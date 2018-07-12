@@ -54,7 +54,7 @@ public class GateMonitor extends Monitor
     @Override
     protected void initDB()
     {
-        //网关服务器不需要服务器
+        //网关服务器不需要数据库
     }
 
     //转发给游戏服务器

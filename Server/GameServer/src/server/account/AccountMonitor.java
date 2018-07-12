@@ -99,6 +99,7 @@ public class AccountMonitor extends Monitor
         //游戏服务器的网关地址列表 json
         JSONObject gameServerJson = JSONObject.parseObject(db.get("GameServer"));
         JSONObject rspdJson = new JSONObject();
+        rspdJson.put("action", Action.LOGIN_ACCOUNT);
         rspdJson.put("aid", account_id);
         rspdJson.put("token", JwtHelper.createJWT(account_id, expiresSecond));
         rspdJson.put("srvList", gameServerJson);

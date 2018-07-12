@@ -1,5 +1,7 @@
 package server.common;
 
+import org.apache.log4j.Logger;
+import server.game.GameServer;
 import server.redis.RedisClient;
 import utils.IdGenerator;
 import utils.NetUtils;
@@ -12,6 +14,8 @@ import utils.NetUtils;
  */
 public abstract class BaseServer
 {
+    private Logger logger = Logger.getLogger(BaseServer.class);
+
     protected int port;
 
     protected String serverName;
@@ -23,8 +27,9 @@ public abstract class BaseServer
         this.serverName = serverName;
         this.port = port;
         this.localHost = NetUtils.GetLocalHostAddress();
+        logger.info("localhost " +  this.localHost + ":" +  this.port);
         //连接数据库
-        RedisClient.getInstance().connectDB(this.localHost);
+        RedisClient.getInstance().connectDB("127.0.0.1");
         //Id生成器
         IdGenerator.init(Thread.currentThread().getId());
     }
