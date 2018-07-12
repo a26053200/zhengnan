@@ -70,9 +70,7 @@ public class ModulesGenerater : EditorWindow
                 }
             }
         }
-        EditorGUILayout.Space();
-        EditorGUILayout.Space();
-        
+        EditorUtils.DrawHorizontalSplitter();
         EditorGUILayout.BeginHorizontal();
         moduleName = EditorGUILayout.TextField("新增模块 模块名:", moduleName);
         if (GUILayout.Button("生成新模块", endButtonWidth))
@@ -147,87 +145,104 @@ public class ModulesGenerater : EditorWindow
     {
         for (int i = 0; i < moduleInfoList.Count; i++)
         {
-            LuaModuleInfo moduleInfo = moduleInfoList[i];
-            EditorGUILayout.LabelField("模块:", moduleInfo.moduleName);
             EditorGUI.indentLevel++;
-            EditorGUILayout.LabelField("Views:");
-            EditorGUI.indentLevel++;
-            for (int j = 0; j < moduleInfo.viewList.Count; j++)
-            {
+            { 
+                LuaModuleInfo moduleInfo = moduleInfoList[i];
+                EditorGUILayout.LabelField("模块:", moduleInfo.moduleName);
                 EditorGUI.indentLevel++;
-                LuaViewInfo viewInfo = moduleInfo.viewList[j];
+                EditorGUILayout.LabelField("Views:");
+                EditorGUI.indentLevel++;
+                for (int j = 0; j < moduleInfo.viewList.Count; j++)
+                {
+                    EditorGUI.indentLevel++;
+                    LuaViewInfo viewInfo = moduleInfo.viewList[j];
                 
-                if (luaTable.HasTable(viewInfo.viewName))
-                {//已经存在配置
-                    Dictionary<string, object> table = luaTable.GetTable(viewInfo.viewName);
-                    EditorGUILayout.LabelField("View name:", viewInfo.viewName);
-                    if(string.IsNullOrEmpty(viewInfo.prefabUrl))
-                        viewInfo.prefabUrl = luaTable.GetString(viewInfo.viewName, "prefab");
-                    oldString = viewInfo.prefabUrl;
-                    FetchPrefabUrl(viewInfo);
-                    if (oldString != viewInfo.prefabUrl)
-                        luaTable.SetHashTable(viewInfo.viewName, "prefab", viewInfo.prefabUrl);
+                    if (luaTable.HasTable(viewInfo.viewName))
+                    {//已经存在配置
+                        Dictionary<string, object> table = luaTable.GetTable(viewInfo.viewName);
+                        EditorGUILayout.LabelField("View name:", viewInfo.viewName);
+                        if(string.IsNullOrEmpty(viewInfo.prefabUrl))
+                            viewInfo.prefabUrl = luaTable.GetString(viewInfo.viewName, "prefab");
+                        oldString = viewInfo.prefabUrl;
+                        FetchPrefabUrl(viewInfo);
+                        if (oldString != viewInfo.prefabUrl)
+                            luaTable.SetHashTable(viewInfo.viewName, "prefab", viewInfo.prefabUrl);
+                    }
+                    else
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField("搜索到新的View:" + viewInfo.viewName + "是否新建?");
+                        if (GUILayout.Button("新建", endButtonWidth))
+                        {
+                            luaTable.SetTable(viewInfo.viewName);
+                            luaTable.SetHashTable(viewInfo.viewName, "name", viewInfo.viewName);
+                        }
+                        EditorGUILayout.EndHorizontal();
+                    }
+                    EditorGUILayout.BeginHorizontal();
+                    {
+                        LuaFileStatus status = ToLuaGenerater.GetFileStatus(moduleInfo.moduleDirPath, LuaFolder.Mdr, viewInfo.viewName);
+                        if (status == LuaFileStatus.Folder_Only || status == LuaFileStatus.Folder_And_LuaFile)
+                        {
+                            EditorGUILayout.LabelField("Mdr文件:");
+                            if (GUILayout.Button("生成 " + viewInfo.viewName + " 的 Mediator 文件"))
+                                ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName, viewInfo.viewName, LuaFolder.Mdr);
+                        }
+                        else if (status == LuaFileStatus.Folder_And_TagLuaFile)
+                            EditorGUILayout.LabelField("Mdr文件:", viewInfo.viewName + LuaFolder.Mdr + ".lua 文件已经生成");
+                        else
+                            EditorGUILayout.LabelField("Mdr文件:", status.ToString());
+                    }
+                    EditorGUILayout.EndHorizontal();
+
+                    EditorGUI.indentLevel--;
+                    EditorGUILayout.Space();
+                }
+                EditorGUI.indentLevel--;
+
+                //Vos
+                EditorGUI.indentLevel++;
+                if (moduleInfo.voList.Count > 0)
+                {
+                    EditorGUILayout.LabelField("Value Objects:");
+                    for (int j = 0; j < moduleInfo.voList.Count; j++)
+                        EditorGUILayout.LabelField((j + 1).ToString(), moduleInfo.voList[j] + ".lua");
                 }
                 else
                 {
                     EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("搜索到新的View:" + viewInfo.viewName + "是否新建?");
-                    if (GUILayout.Button("新建", endButtonWidth))
-                    {
-                        luaTable.SetTable(viewInfo.viewName);
-                        luaTable.SetHashTable(viewInfo.viewName, "name", viewInfo.viewName);
-                    }
+                    EditorGUILayout.LabelField("Value Objects:");
+                    EditFolder(moduleInfo, LuaFolder.Vo);
                     EditorGUILayout.EndHorizontal();
+
                 }
+                EditorGUI.indentLevel--;
+
+
+                EditorGUILayout.Space();
+                EditFolder(moduleInfo, LuaFolder.Model);
+                EditFolder(moduleInfo, LuaFolder.Service);
+
+                EditorGUILayout.Space();
+            
                 EditorGUILayout.BeginHorizontal();
+                moduleInfo.newViewMdrName = EditorGUILayout.TextField("新View 名称:", moduleInfo.newViewMdrName);
+                if (GUILayout.Button("新增", endButtonWidth))
                 {
-                    LuaFileStatus status = ToLuaGenerater.GetFileStatus(moduleInfo.moduleDirPath, LuaFolder.Mdr);
-                    if (status == LuaFileStatus.Folder_Only)
-                    {
-                        EditorGUILayout.LabelField("Mdr文件:");
-                        if (GUILayout.Button("生成 " + viewInfo.viewName + " 的 Mediator 文件"))
-                            ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName, viewInfo.viewName, LuaFolder.Mdr);
-                    }
-                    else if (status == LuaFileStatus.Folder_And_LuaFile)
-                        EditorGUILayout.LabelField("Mdr文件:", viewInfo.viewName + LuaFolder.Mdr + ".lua 文件已经生成");
-                    else
-                        EditorGUILayout.LabelField("Mdr文件:", status.ToString());
+                    if (!ToLuaGenerater.FileNameValid(moduleInfo.newViewMdrName, this))
+                        return;
+                    LuaViewInfo viewInfo = new LuaViewInfo(moduleInfo.newViewMdrName);
+                    viewInfo.viewName = moduleInfo.newViewMdrName;
+                    viewInfo.viewDirPath = moduleInfo.viewDirPath;
+                    luaTable.SetTable(viewInfo.viewName);
+                    luaTable.SetHashTable(viewInfo.viewName, "name", viewInfo.viewName);
+                    moduleInfo.viewList.Add(viewInfo);
+                    moduleInfo.newViewMdrName = "";
                 }
                 EditorGUILayout.EndHorizontal();
-
+                EditorUtils.DrawHorizontalSplitter();
                 EditorGUI.indentLevel--;
-                EditorGUILayout.Space();
             }
-            EditorGUI.indentLevel--;
-            EditorGUILayout.LabelField("Value Objects:");
-            EditorGUI.indentLevel++;
-            //Vos
-            for (int j = 0; j < moduleInfo.voList.Count; j++)
-                EditorGUILayout.LabelField((j + 1).ToString(), moduleInfo.voList[j] + ".lua");
-            EditFolder(moduleInfo, LuaFolder.Vo);
-            EditorGUI.indentLevel--;
-
-            EditorGUILayout.Space();
-            EditFolder(moduleInfo, LuaFolder.Model);
-            EditFolder(moduleInfo, LuaFolder.Service);
-
-            EditorGUILayout.BeginHorizontal();
-            moduleInfo.newViewMdrName = EditorGUILayout.TextField("新View 名称:", moduleInfo.newViewMdrName);
-            if (GUILayout.Button("新增", endButtonWidth))
-            {
-                if (!ToLuaGenerater.FileNameValid(moduleInfo.newViewMdrName, this))
-                    return;
-                LuaViewInfo viewInfo = new LuaViewInfo(moduleInfo.newViewMdrName);
-                viewInfo.viewName = moduleInfo.newViewMdrName;
-                viewInfo.viewDirPath = moduleInfo.viewDirPath;
-                luaTable.SetTable(viewInfo.viewName);
-                luaTable.SetHashTable(viewInfo.viewName, "name", viewInfo.viewName);
-                moduleInfo.viewList.Add(viewInfo);
-                moduleInfo.newViewMdrName = "";
-            }
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.Separator();
             EditorGUI.indentLevel--;
         }
     }

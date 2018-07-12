@@ -4,6 +4,8 @@
 --- DateTime: 2018-06-19-16:04:56
 ---
 
+LoginAction = {}
+LoginAction.LoginAccount = "login_account"
 ---@class Modules.Login.Service.LoginService : Core.Ioc.BaseService
 local BaseService = require("Core.Ioc.BaseService")
 local LoginService = class("LoginService",BaseService)

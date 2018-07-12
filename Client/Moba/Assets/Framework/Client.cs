@@ -46,7 +46,8 @@ public class Client : MonoBehaviour
     }
     private void OnApplicationQuit()
     {
-        logger.Dispose();
+        if(logger != null)
+            logger.Dispose();
     }
     
     private IEnumerator testHttpLogin(JsonData json)

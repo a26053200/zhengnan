@@ -237,21 +237,34 @@ return $CLASS_NAME$Vo
         if(!Directory.Exists(folderPath))
             Directory.CreateDirectory(folderPath);
     }
-    public static LuaFileStatus GetFileStatus(string moduleDirPath, LuaFolder folder)
+    public static LuaFileStatus GetFileStatus(string moduleDirPath, LuaFolder folder, string fileName = null)
     {
         LuaFolder moduleFolder = folder == LuaFolder.Mdr ? LuaFolder.View : folder;
         moduleDirPath = moduleDirPath + Folder2Directory(moduleFolder);
         if (Directory.Exists(moduleDirPath))
         {
             string[] lusFiles = Directory.GetFiles(moduleDirPath, "*.lua");
-            for (int i = 0; i < lusFiles.Length; i++)
+            if(lusFiles.Length == 0)
+                return LuaFileStatus.Folder_Only;
+            else
             {
+                bool hasFolderFile = false;
+                for (int i = 0; i < lusFiles.Length; i++)
                 if (lusFiles[i].LastIndexOf(folder.ToString()) != -1)
                 {
-                    return LuaFileStatus.Folder_And_LuaFile;
+                    hasFolderFile = true; break;
                 }
+                if (fileName != null)
+                {
+                    for (int i = 0; i < lusFiles.Length; i++)
+                        if (lusFiles[i].LastIndexOf(fileName) != -1)
+                            return LuaFileStatus.Folder_And_TagLuaFile;
+                }
+                if (hasFolderFile)
+                    return LuaFileStatus.Folder_And_LuaFile;
+                else
+                    return LuaFileStatus.Nothing;
             }
-            return LuaFileStatus.Folder_Only;
         }
         return LuaFileStatus.Nothing;
     }
@@ -275,7 +288,7 @@ return $CLASS_NAME$Vo
 
     public static bool FileNameValid(string fileName,EditorWindow wnd = null)
     {
-        Regex regex = new Regex("[0-9]*");
+        Regex regex = new Regex("^[0-9]");
         if (string.IsNullOrEmpty(fileName))
         {
             if (wnd)
@@ -306,8 +319,9 @@ public enum LuaFolder
 
 public enum LuaFileStatus
 {
-    Nothing,            //什么都没有
-    Folder_Only,        //只有目录
-    Folder_And_LuaFile, //目录和目标文件都存在
+    Nothing,                    //什么都没有
+    Folder_Only,                //只有目录
+    Folder_And_LuaFile,         //目录和目标文件都存在
+    Folder_And_TagLuaFile,      //目录和目标文件都存在
 }
 

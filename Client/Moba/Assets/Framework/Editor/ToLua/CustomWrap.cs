@@ -19,6 +19,13 @@ public static class CustomWrap
     public static BindType[] typeList =
     {
         //================
+        // UnityEngine
+        //================
+        _GT(typeof(PlayerPrefs)),
+
+        //================
+        // FrameWork Core
+        //================
         _GT(typeof(Logger)),
         _GT(typeof(AssetsManager)),
         _GT(typeof(SceneManager)),
@@ -27,6 +34,16 @@ public static class CustomWrap
         _GT(typeof(NetworkManager)),
 
         _GT(typeof(LuaHelper)),
+        _GT(typeof(StringUtils)),
+
+        //================
+        // UI
+        //================
+        // List View
+        _GT(typeof(ListView)),
+        _GT(typeof(ListView.Item)),
+        _GT(typeof(ListView.Direction)),
+
     };
 }
 

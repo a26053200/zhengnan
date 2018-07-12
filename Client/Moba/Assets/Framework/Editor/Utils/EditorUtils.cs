@@ -29,5 +29,24 @@ public class EditorUtils
         }
         EditorUtility.ClearProgressBar();
     }
+
+    //横向分割线
+    public static void DrawHorizontalSplitter(float height = 5)
+    {
+        GUILayout.Box("",
+        GUILayout.Height(height),
+        GUILayout.MaxHeight(height),
+        GUILayout.MinHeight(height),
+        GUILayout.ExpandWidth(true));
+    }
+    //纵向向分割线
+    public static void DrawVerticalSplitter(float width = 5)
+    {
+        GUILayout.Box("",
+        GUILayout.Width(width),
+        GUILayout.MaxWidth(width),
+        GUILayout.MinWidth(width),
+        GUILayout.ExpandHeight(true));
+    }
 }
 

@@ -8,21 +8,42 @@
 local BaseMediator = require("Core.Ioc.BaseMediator")
 local LoginMdr = class("LoginMdr",BaseMediator)
 
+local USERNAME = "username"
+local PASSWORD = "password"
+local AID = "aid"
+local TOKEN = "token"
+
 function LoginMdr:OnInit()
     --vmgr:LoadView(ViewConfig.Notice)
+    self.path = StringUtils.EncryptWithMD5(Application.dataPath)
+    self.username = PlayerPrefs.GetString(self.path .. USERNAME, "")
+    self.password = PlayerPrefs.GetString(self.path .. PASSWORD, "")
+
+    self.gameObject:SetText("V/H1/InputField/Text", self.username)
+    self.gameObject:SetText("V/H2/InputField/Text", self.password)
 end
 
 function LoginMdr:On_Click_BtnLogin()
-    local json = {}
-    json["server"] = "AccountServer";
-    json["action"] = "login_account";
-    json["username"] = "123456";
-    json["password"] = "123";
-    nmgr:HttpRqst("http://127.0.0.1:8080","login_account", json, handler(self,self.OnHttpLogin))
+    self.username = self.gameObject:GetText("V/H1/InputField/Text")
+    self.password = self.gameObject:GetText("V/H2/InputField/Text")
+
+    if string.isNullOrEmpty(self.username) or string.isNullOrEmpty(self.password) then
+        print("Please input id and pw")
+    else
+        local json = {}
+        json["server"] = ServerName.AccountServer;
+        json["action"] = LoginAction.LoginAccount;
+        json[USERNAME] = self.username
+        json[PASSWORD] = self.password
+        nmgr:HttpRqst("http://127.0.0.1:8080",LoginAction.LoginAccount, json, handler(self,self.OnHttpLogin))
+    end
 end
 
 function LoginMdr:OnHttpLogin(data)
-    log("aid:{0} token:", data.aid)
+    log("aid:{0} token:{1}", data.aid, data.token)
+
+    PlayerPrefs.SetString(self.path .. USERNAME, self.username)
+    PlayerPrefs.SetString(self.path .. PASSWORD, self.password)
 end
 
 return LoginMdr

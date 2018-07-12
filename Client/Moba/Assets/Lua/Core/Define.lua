@@ -6,6 +6,8 @@
 
 ---UnityEngine
 GameObject = UnityEngine.GameObject;
+Application = UnityEngine.Application;
+PlayerPrefs = UnityEngine.PlayerPrefs;
 
 ---Framework
 logger = Logger

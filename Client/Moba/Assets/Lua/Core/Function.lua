@@ -75,6 +75,15 @@ function handler(obj,method)
     end
 end
 
+---是否为Unity空对象
+function isUnityNullObj(obj)
+    if obj == nil then
+        return true
+    else
+        return LuaHelper.isNullObj(obj)
+    end
+end
+
 ---异步销毁
 function destroy(obj,delay)
     delay = delay or 0

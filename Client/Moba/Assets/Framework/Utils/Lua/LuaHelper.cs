@@ -14,6 +14,11 @@ namespace Framework
 {
     public static class LuaHelper
     {
+        public static bool isNullObj(UnityEngine.Object obj)
+        {
+            return !obj;
+        }
+
         public static void AddButtonClick(GameObject go, LuaFunction func)
         {
             Button btn = go.GetComponent<Button>();

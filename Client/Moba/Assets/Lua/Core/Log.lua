@@ -12,13 +12,59 @@ logger.GetInstance().LogInfoTraceStack = false;
 logger.GetInstance().WriteToFile = true;
 
 function log(msg,...)
-    local arg = ...
-    logger.Info(msg,arg)
+    local args = Tools.GetArgs(...)
+    local argNum = #args
+    if argNum == 1 then
+        logger.Info(msg,args[1])
+    elseif argNum == 2 then
+        logger.Info(msg,args[1],args[2])
+    elseif argNum == 3 then
+        logger.Info(msg,args[1],args[2],args[3])
+    elseif argNum == 4 then
+        logger.Info(msg,args[1],args[2],args[3],args[4])
+    elseif argNum == 5 then
+        logger.Info(msg,args[1],args[2],args[3],args[4],args[5])
+    elseif argNum == 6 then
+        logger.Info(msg,args[1],args[2],args[3],args[4],args[5],args[6])
+    elseif argNum == 7 then
+        logger.Info(msg,args[1],args[2],args[3],args[4],args[5],args[6],args[7])
+    elseif argNum == 8 then
+        logger.Info(msg,args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8])
+    elseif argNum == 9 then
+        logger.Info(msg,args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8],args[9])
+    elseif argNum == 10 then
+        logger.Info(msg,args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8],args[9],args[10])
+    else
+        logger.Info(msg,args)
+    end
 end
 
 function logError(msg,...)
-    local arg = ...
-    logger.Error(msg,arg)
+    local args = Tools.GetArgs(...)
+    local argNum = #args
+    if argNum == 1 then
+        logger.Error(msg,args[1])
+    elseif argNum == 2 then
+        logger.Error(msg,args[1],args[2])
+    elseif argNum == 3 then
+        logger.Error(msg,args[1],args[2],args[3])
+    elseif argNum == 4 then
+        logger.Error(msg,args[1],args[2],args[3],args[4])
+    elseif argNum == 5 then
+        logger.Error(msg,args[1],args[2],args[3],args[4],args[5])
+    elseif argNum == 6 then
+        logger.Error(msg,args[1],args[2],args[3],args[4],args[5],args[6])
+    elseif argNum == 7 then
+        logger.Error(msg,args[1],args[2],args[3],args[4],args[5],args[6],args[7])
+    elseif argNum == 8 then
+        logger.Error(msg,args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8])
+    elseif argNum == 9 then
+        logger.Error(msg,args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8],args[9])
+    elseif argNum == 10 then
+        logger.Error(msg,args[1],args[2],args[3],args[4],args[5],args[6],args[7],args[8],args[9],args[10])
+    else
+        logger.Error(msg)
+    end
 end
 
 function err(msg,...)
