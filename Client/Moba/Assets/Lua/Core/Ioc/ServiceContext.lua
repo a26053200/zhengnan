@@ -14,7 +14,6 @@ end
 function ServiceContext:Launch()
     --TODO
 	self.binder:Bind(require("Modules.Login.Service.LoginService")):ToSingleton()
-	self.binder:Bind(require("Modules.Notice.Service.NoticeService")):ToSingleton()
     --TODO
 end
 

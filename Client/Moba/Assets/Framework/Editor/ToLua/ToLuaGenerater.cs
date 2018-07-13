@@ -216,11 +216,11 @@ return $CLASS_NAME$Vo
     const string Format_Shingleton_Line = "\tself.binder:Bind(require(\"{0}\")):ToSingleton()";
 
     //生成lua mvc line
-    public static string GetMdrLuaLine(string filePath, LuaFolder folder)
+    public static string GetMdrLuaLine(string filePath, string moduleName, LuaFolder folder)
     {
         string fileName = Path.GetFileNameWithoutExtension(filePath);
         string viewName = fileName.Replace(folder.ToString(), "");
-        string packName = string.Format("Modules.{0}.View.{1}", viewName, fileName);
+        string packName = string.Format("Modules.{0}.View.{1}", moduleName, fileName);
         return string.Format(Format_Mdr_Line, packName, viewName);
     }
     //生成lua mvc line

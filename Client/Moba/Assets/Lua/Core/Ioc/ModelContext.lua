@@ -14,7 +14,6 @@ end
 function ModelContext:Launch()
     --TODO
 	self.binder:Bind(require("Modules.Login.Model.LoginModel")):ToSingleton()
-	self.binder:Bind(require("Modules.Notice.Model.NoticeModel")):ToSingleton()
     --TODO
 end
 

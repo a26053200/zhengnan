@@ -20,8 +20,8 @@ ViewStatus.Unloaded = "Unloaded"
 
 function ViewManager:Ctor()
     IocBootstrap:Launch()
-    --self.viewCache = {}
-    --self.viewList = List.New()
+    self.viewCache = {}
+    self.viewList = List.New()
 end
 
 ---@param scene Modules.World.Scenes.BaseScene
@@ -57,6 +57,20 @@ function ViewManager:DoLoadViewCo(viewInfo)
 end
 
 ---@param viewInfo Core.ViewInfo
+function ViewManager:UnloadView(viewInfo)
+    if viewInfo.status == ViewStatus.Loaded then
+        local mdr = self.viewCache[viewInfo.name]
+        if mdr then
+            self.viewCache[viewInfo.name] = nil
+            self.viewList:Remove(mdr)
+            destroy(mdr.gameObject)
+        end
+    else
+        logError("View {0} status is {1} ,you can't unload this view",viewInfo.name, viewInfo.status)
+    end
+end
+
+---@param viewInfo Core.ViewInfo
 ---@param callback function
 function ViewManager:LoadViewPrefab(viewInfo,callback)
     local prefab = self:LoadAsset(viewInfo.prefab)
@@ -80,6 +94,7 @@ function ViewManager:CreateView(viewInfo,go)
         mdr.uiCanvas = self.scene.uiCanvas
         go.transform:SetParent(self.scene.uiCanvas.transform)
     end
+    mdr.viewInfo = viewInfo
     mdr.gameObject = go
     go.name = viewInfo.name .. " - " ..go.name
     go.transform.transform.localPosition = Vector3.zero
@@ -89,6 +104,8 @@ function ViewManager:CreateView(viewInfo,go)
     mdr:AddLuaMonoBehaviour(go,"Mediator")
 
     log("View has loaded {0}", viewInfo.name)
+    self.viewCache[viewInfo.name] = mdr
+    self.viewList:Add(mdr)
 end
 
 return ViewManager

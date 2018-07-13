@@ -34,7 +34,7 @@ function BaseMediator:OnAutoRegisterEvent()
 end
 
 function BaseMediator:OnDestroy()
-    --print("OnDestroy")
+    print("OnDestroy view: "..self.viewInfo.name)
     self:OnRemove()
 end
 

@@ -15,12 +15,14 @@ local TOKEN = "token"
 
 function LoginMdr:OnInit()
     --vmgr:LoadView(ViewConfig.Notice)
-    self.path = StringUtils.EncryptWithMD5(Application.dataPath)
-    self.username = PlayerPrefs.GetString(self.path .. USERNAME, "")
-    self.password = PlayerPrefs.GetString(self.path .. PASSWORD, "")
+    self.PlayerPrefs_Username = StringUtils.EncryptWithMD5(Application.dataPath .. USERNAME)
+    self.PlayerPrefs_Password = StringUtils.EncryptWithMD5(Application.dataPath .. PASSWORD)
 
-    self.gameObject:SetText("V/H1/InputField/Text", self.username)
-    self.gameObject:SetText("V/H2/InputField/Text", self.password)
+    self.username = PlayerPrefs.GetString(self.PlayerPrefs_Username, "")
+    self.password = PlayerPrefs.GetString(self.PlayerPrefs_Password, "")
+
+    self.gameObject:SetInputField("V/H1/InputField", self.username)
+    self.gameObject:SetInputField("V/H2/InputField", self.password)
 end
 
 function LoginMdr:On_Click_BtnLogin()
@@ -41,9 +43,11 @@ end
 
 function LoginMdr:OnHttpLogin(data)
     log("aid:{0} token:{1}", data.aid, data.token)
+    PlayerPrefs.SetString(self.PlayerPrefs_Username, self.username)
+    PlayerPrefs.SetString(self.PlayerPrefs_Password, self.password)
 
-    PlayerPrefs.SetString(self.path .. USERNAME, self.username)
-    PlayerPrefs.SetString(self.path .. PASSWORD, self.password)
+    vmgr:UnloadView(ViewConfig.Login)
+    vmgr:LoadView(ViewConfig.ServerList)
 end
 
 return LoginMdr

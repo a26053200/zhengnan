@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 using BindType = ToLuaMenu.BindType;
 using Framework;
+using UnityEngine.UI;
 /// <summary>
 /// <para>Class Introduce</para>
 /// <para>Author: zhengnan</para>
@@ -21,7 +22,10 @@ public static class CustomWrap
         //================
         // UnityEngine
         //================
+        _GT(typeof(Rect)),
         _GT(typeof(PlayerPrefs)),
+        _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
+        _GT(typeof(UnityEngine.SceneManagement.Scene)),
 
         //================
         // FrameWork Core
@@ -32,13 +36,21 @@ public static class CustomWrap
         _GT(typeof(GameManager)),
         _GT(typeof(MonoBehaviourManager)),
         _GT(typeof(NetworkManager)),
-
         _GT(typeof(LuaHelper)),
+        _GT(typeof(LuaMonoBehaviour)),
         _GT(typeof(StringUtils)),
 
         //================
         // UI
         //================
+        _GT(typeof(RectTransform)),
+        _GT(typeof(Button)),
+        _GT(typeof(Toggle)),
+        _GT(typeof(Text)),
+        _GT(typeof(Image)),
+        _GT(typeof(Slider)),
+        _GT(typeof(ContentSizeFitter)),
+        _GT(typeof(ContentSizeFitter.FitMode)),
         // List View
         _GT(typeof(ListView)),
         _GT(typeof(ListView.Item)),

@@ -47,6 +47,14 @@ public static class GameObjectExt
             child.GetComponent<Text>().text = text;
     }
 
+    //设置输入组件文本
+    public static void SetInputField(this GameObject gameObject, string path, string text)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+            child.GetComponent<InputField>().text = text;
+    }
+
     //获取组件Sprite
     public static Sprite GetSprite(this GameObject gameObject, string path)
     {

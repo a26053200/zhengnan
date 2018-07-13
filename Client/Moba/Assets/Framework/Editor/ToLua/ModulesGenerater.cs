@@ -332,7 +332,7 @@ public class ModulesGenerater : EditorWindow
             {
                 string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
                 for (int j = 0; j < mdrFiles.Length; j++)
-                    mdrSb.AppendLine(ToLuaGenerater.GetMdrLuaLine(mdrFiles[j], LuaFolder.Mdr));
+                    mdrSb.AppendLine(ToLuaGenerater.GetMdrLuaLine(mdrFiles[j], moduleInfo.moduleName, LuaFolder.Mdr));
             }
 
             if (Directory.Exists(moduleInfo.modelDirPath))
