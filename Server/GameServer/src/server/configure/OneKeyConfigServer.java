@@ -6,12 +6,12 @@ import redis.clients.jedis.Jedis;
 import server.redis.RedisClient;
 
 /**
- * @ClassName: OnKeyConfigServer
+ * @ClassName: OneKeyConfigServer
  * @Description: 一键配置服务器
  * @Author: zhengnan
  * @Date: 2018/6/7 23:59
  */
-public class OnKeyConfigServer
+public class OneKeyConfigServer
 {
     public static void main(String[] args)
     {
