@@ -75,6 +75,16 @@ function handler(obj,method)
     end
 end
 
+---回调
+function newObj(obj)
+    if obj == nil then
+        logError("obj is nil")
+        return nil
+    else
+        return GameObject.Instantiate(obj)
+    end
+end
+
 ---是否为Unity空对象
 function isUnityNullObj(obj)
     if obj == nil then

@@ -19,7 +19,7 @@ end
 function IocBinder:ToSingleton()
     local singleton = self.type.New()
     table.insert(self.singleList,singleton)
-    log("[Bind singleton] -- {0}",self.type__cname)
+    log("[Bind singleton] -- {0}",self.type.__cname)
     return singleton
 end
 

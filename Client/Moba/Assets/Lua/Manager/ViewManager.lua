@@ -101,6 +101,7 @@ function ViewManager:CreateView(viewInfo,go)
     go.transform.transform.localEulerAngles = Vector3.zero
     go.transform.transform.localScale = Vector3.one
 
+    IocBootstrap.binder:InjectSingle(mdr)
     mdr:AddLuaMonoBehaviour(go,"Mediator")
 
     log("View has loaded {0}", viewInfo.name)

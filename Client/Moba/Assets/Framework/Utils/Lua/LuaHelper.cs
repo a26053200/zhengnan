@@ -19,6 +19,14 @@ namespace Framework
             return !obj;
         }
 
+        public static void AddScrollListOnItemRender(ScrollList list, LuaFunction OnItemRender)
+        {
+            list.onItemRender = delegate (int index, Transform item)
+            {
+                OnItemRender.Call(index, item);
+            };
+        }
+
         public static void AddButtonClick(GameObject go, LuaFunction func)
         {
             Button btn = go.GetComponent<Button>();

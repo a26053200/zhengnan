@@ -37,7 +37,7 @@ function LoginMdr:On_Click_BtnLogin()
         json["action"] = LoginAction.LoginAccount;
         json[USERNAME] = self.username
         json[PASSWORD] = self.password
-        nmgr:HttpRqst("http://127.0.0.1:8080",LoginAction.LoginAccount, json, handler(self,self.OnHttpLogin))
+        self.loginService:HttpLogin(json, handler(self,self.OnHttpLogin))
     end
 end
 
@@ -47,7 +47,7 @@ function LoginMdr:OnHttpLogin(data)
     PlayerPrefs.SetString(self.PlayerPrefs_Password, self.password)
 
     vmgr:UnloadView(ViewConfig.Login)
-    vmgr:LoadView(ViewConfig.ServerList)
+    vmgr:LoadView(ViewConfig.Notice)
 end
 
 return LoginMdr

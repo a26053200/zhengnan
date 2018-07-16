@@ -12,4 +12,12 @@ function NoticeMdr:OnInit()
     
 end
 
+function NoticeMdr:OnRemove()
+    vmgr:LoadView(ViewConfig.ServerList)
+end
+
+function NoticeMdr:On_Click_BtnClose()
+    vmgr:UnloadView(ViewConfig.Notice)
+end
+
 return NoticeMdr

@@ -41,9 +41,10 @@ public class Logger
     private Action logged;
     private object locker = new object();
     private bool isRunning = false;
-    private FileStream fileStream;
-    private StreamWriter sw;
-    private string logFilePath;
+    private StreamWriter currSW;
+#if UNITY_EDITOR
+    private StreamWriter editorSW;
+#endif
 
     public static Logger GetInstance()
     {
@@ -59,14 +60,14 @@ public class Logger
     {
         if (instance != null)
             throw new Exception("no more instance");
-
-        string time = DateTime.Now.ToString(FileTimeFormat);
-        logFilePath = Path.Combine(path, time + ".log");
-        if (File.Exists(logFilePath))
-            fileStream = new FileStream(logFilePath, FileMode.Append);
-        else
-            fileStream = new FileStream(logFilePath, FileMode.Create);
-        sw = new StreamWriter(fileStream, Encoding.UTF8);
+        string currLogFilePath = Path.Combine(path, "game.log");
+        if (File.Exists(currLogFilePath))
+            File.Delete(currLogFilePath);// fileStream = new FileStream(logFilePath, FileMode.Append);
+        currSW = new StreamWriter(new FileStream(currLogFilePath, FileMode.Create), Encoding.UTF8);
+#if UNITY_EDITOR
+        string editlogFilePath = Path.Combine(path + "Editor/", DateTime.Now.ToString(FileTimeFormat) + ".log");
+        editorSW = new StreamWriter(new FileStream(editlogFilePath, FileMode.Create), Encoding.UTF8);
+#endif
         Application.logMessageReceived += OnApplicationLogMessageReceived;
     }
 
@@ -84,7 +85,10 @@ public class Logger
         {
             isRunning = false;
             Application.logMessageReceived -= OnApplicationLogMessageReceived;
-            sw.Close();
+            currSW.Close();
+#if UNITY_EDITOR
+            editorSW.Close();
+#endif
             instance = null;
         }catch(Exception ex)
         {
@@ -108,9 +112,19 @@ public class Logger
                 contentList.Clear();
             }
             for (int i = 0; i < writeList.Count; i++)
-                sw.WriteLine(writeList[i]);
-            if(writeList.Count > 0)
-                sw.Flush();
+            {
+                currSW.WriteLine(writeList[i]);
+#if UNITY_EDITOR
+                editorSW.WriteLine(writeList[i]);
+#endif
+            }
+            if (writeList.Count > 0)
+            {
+                currSW.Flush();
+#if UNITY_EDITOR
+                editorSW.Flush();
+#endif
+            }
             writeList.Clear();
         }
     }
@@ -203,6 +217,7 @@ public class Logger
     }
     private string AddLog(string tag, string message)
     {
+        string logContent = "";
         string time = DateTime.Now.ToString(TimeFormat);
         string trace = "";
         bool showStack = LogInfoTraceStack || tag == LogType.Error.ToString() || tag == LogType.Exception.ToString();
@@ -215,8 +230,13 @@ public class Logger
                 System.Reflection.MethodBase mb = sfs[u].GetMethod();
                 trace += "  " + mb.DeclaringType.FullName + ":" + mb.Name + "() (at " + mb.DeclaringType.FullName.Replace(".", "/") + ".cs: " + sfs[u].GetFileLineNumber() + ")\r\n";
             }
+            logContent = string.Format("{0} [{1}] {2}\r\n{3}", time, tag, message, (showStack ? trace : ""));
         }
-        string logContent = string.Format("{0} [{1}] {2}\r\n{3}", time, tag, message, (showStack ? trace : ""));
+        else
+        {
+            logContent = string.Format("{0} [{1}] {2}", time, tag, message);
+        }
+        
         lock (locker)
         {
             contentList.Add(logContent);

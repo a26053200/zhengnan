@@ -14,4 +14,11 @@ function LoginService:Ctor()
     
 end
 
+function LoginService:HttpLogin(json,callback)
+    nmgr:HttpRqst("http://127.0.0.1:8080",LoginAction.LoginAccount, json, function (data)
+        self.loginModel.serverList = data.srvList.list
+        callback(data)
+    end)
+end
+
 return LoginService

@@ -55,6 +55,7 @@ public static class CustomWrap
         _GT(typeof(ListView)),
         _GT(typeof(ListView.Item)),
         _GT(typeof(ListView.Direction)),
+        _GT(typeof(ScrollList)),
 
     };
 }
