@@ -126,15 +126,6 @@ public class ScrollList : MonoBehaviour
     public float marginRight = 0;
 
     /// <summary>
-    /// 渲染子节点
-    /// </summary>
-    public GameObject Child
-    {
-        get { return item; }
-        set { SetItem(value); }
-    }
-
-    /// <summary>
     /// 总个数
     /// </summary>
     public int ChildCount
@@ -152,7 +143,11 @@ public class ScrollList : MonoBehaviour
         set { SetViewPort(value); }
     }
 
-    GameObject item;
+    /// <summary>
+    /// 渲染子节点
+    /// </summary>
+    public GameObject item;
+
     ScrollRect scrollRect;
     Vector2 viewPort;
     RectTransform content;
@@ -187,6 +182,12 @@ public class ScrollList : MonoBehaviour
         content.anchorMax = new Vector2(0, 1);
         content.anchorMin = new Vector2(0, 1);
         content.pivot = new Vector2(0, 1);
+
+        RectTransform itemTrans = item.transform as RectTransform;
+        itemTrans.pivot = new Vector2(0, 1);
+        itemSize = itemTrans.sizeDelta;
+        item.SetActive(false);
+
         ReBuild();
     }
 
@@ -332,7 +333,6 @@ public class ScrollList : MonoBehaviour
     {
         if (curLineIndex < 0)
             return;
-        Debug.Log("UpdateRectItem: " + (scrollLineIndex - curLineIndex));
         //Debug.Log(SystemUtils.GetDebugStackTrace());
         startIndex = curLineIndex * maxPerLine;
         endIndex = (curLineIndex + totalCount) * maxPerLine;
@@ -418,25 +418,12 @@ public class ScrollList : MonoBehaviour
             obj.transform.SetParent(content);
             obj.transform.localScale = Vector3.one;
             child = obj.transform;
+            obj.SetActive(true);
         }
         child.gameObject.name = index.ToString();
         items.Add(child);
 
         return child as RectTransform;
-    }
-
-    /// <summary>
-    /// 设置资源
-    /// </summary>
-    /// <param name="child"></param>
-    public void SetItem(GameObject child)
-    {
-        if (child == null) return;
-        this.item = child;
-        RectTransform itemTrans = child.transform as RectTransform;
-        itemTrans.pivot = new Vector2(0, 1);
-        itemSize = itemTrans.sizeDelta;
-        ReBuild();
     }
 
     /// <summary>

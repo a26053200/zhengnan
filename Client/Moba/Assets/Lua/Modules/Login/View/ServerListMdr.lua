@@ -9,30 +9,19 @@ local BaseMediator = require("Core.Ioc.BaseMediator")
 local ServerListMdr = class("ServerListMdr",BaseMediator)
 
 function ServerListMdr:OnInit()
-    self.srvList = self.gameObject:FindChild("ScrollList"):GetCom("ScrollList")
-    self.SrvItem = self.gameObject:FindChild("SrvItem")
-    self.SrvItem:SetActive(false)
     self:InitSrvList()
 end
 
 function ServerListMdr:InitSrvList()
-    LuaHelper.AddScrollListOnItemRender(self.srvList,function(index, item)
-        local server = self.loginModel.serverList[(index + 1) % 2 + 1]
-        local itemObj = item.gameObject
-        itemObj:SetText("Text", server.name)
-        itemObj:SetText("Toggle/Label", server.host)
-        itemObj:SetActive(true)
-    end)
-    LuaHelper.AddScrollListOnScrollOver(self.srvList,function(index)
-        self.srvList.gameObject:GetCom("ScrollRect").horizontal = false
-    end)
-    self.srvList:SetItem(self.SrvItem)
-    self.srvList.ChildCount = 100 * #self.loginModel.serverList
-    --self.srvList.gameObject:GetCom("ScrollRect").horizontal = false
-    coroutine.start(function ()
-        coroutine.step(1)
-        self.srvList.MaxPerLine = 1
-    end)
+    self.srvList = UITools.CreateVScrollList(self.gameObject,"ScrollList",
+            function(index, item)
+                local server = self.loginModel.serverList[(index + 1)]
+                local itemObj = item.gameObject
+                itemObj:SetText("Text", (index + 1).."服 " .. server.name)
+                itemObj:SetText("Toggle/Label", server.host)
+            end
+    )
+    self.srvList.ChildCount = #self.loginModel.serverList
 end
 
 return ServerListMdr

@@ -15,7 +15,7 @@ public class TestList : MonoBehaviour
         //scrollList.ReBuild();
         GameObject orgItem = GameObject.Find("SrvItem");
         orgItem.SetActive(false);
-        scrollList.SetItem(orgItem);
+        //scrollList.SetItem(orgItem);
         StartCoroutine(InitList());
 
     }

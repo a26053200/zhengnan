@@ -86,11 +86,8 @@ public class ScrollListEditor : Editor
 
         GUILayout.Space(5);
         EditorGUILayout.BeginHorizontal();
-        EditorGUILayout.PrefixLabel("子节点");
-        //GameObject oldItem = script.Child;
-        //script.Child = (GameObject)EditorGUILayout.ObjectField(script.Child, typeof(GameObject), true);
-        //if (oldItem != script.Child)
-            //script.SetItem(script.Child);
+        EditorGUILayout.PrefixLabel("ItenRender");
+        script.item = (GameObject)EditorGUILayout.ObjectField(script.item, typeof(GameObject), true);
         EditorGUILayout.EndHorizontal();
 
         if (GUI.changed)

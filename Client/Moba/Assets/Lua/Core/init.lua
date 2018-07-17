@@ -8,6 +8,7 @@ require "Core.string"
 require "Core.Define"
 require "Core.Function"
 require "Core.Tools"
+require "Core.UITools"
 require "Core.GlobalConsts"
 require "Core.Log"
 
