@@ -3,7 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
- 
+
+
 /// <summary>
 /// Introduction: 无限列表
 ///             Content上禁止挂载ContentSizeFilter和LayOutGroup之类组件
@@ -16,8 +17,11 @@ public class ScrollList : MonoBehaviour
 {
     public delegate void OnItemRender(int index, Transform child);
 
+    public delegate void OnScrollOver(int index);//滚动结束,返回第一行索引
+
     public OnItemRender onItemRender;
 
+    public OnScrollOver onScrollOver;
     /// <summary>
     /// 排序方式
     /// </summary>
@@ -163,6 +167,7 @@ public class ScrollList : MonoBehaviour
     int startIndex; //当前渲染起始坐标
     int endIndex; //当前渲染结束坐标
     int maxPerLine;
+    bool scrolling = false;//正在滚动
 
     void Start()
     {
@@ -284,7 +289,18 @@ public class ScrollList : MonoBehaviour
 
         int curLineIndex = GetCurLineIndex();
         if (curLineIndex != scrollLineIndex)
+        {
+            scrolling = true;
             UpdateRectItem(curLineIndex, false);
+        }
+        else
+        {
+            if(scrolling)
+            {
+                scrolling = false;
+                onScrollOver(curLineIndex);
+            }
+        }
     }
 
     /// <summary>
@@ -316,6 +332,8 @@ public class ScrollList : MonoBehaviour
     {
         if (curLineIndex < 0)
             return;
+        Debug.Log("UpdateRectItem: " + (scrollLineIndex - curLineIndex));
+        //Debug.Log(SystemUtils.GetDebugStackTrace());
         startIndex = curLineIndex * maxPerLine;
         endIndex = (curLineIndex + totalCount) * maxPerLine;
         if (endIndex >= childCount)

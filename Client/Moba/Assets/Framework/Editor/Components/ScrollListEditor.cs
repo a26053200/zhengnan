@@ -12,7 +12,6 @@ using UnityEngine;
 public class ScrollListEditor : Editor
 {
     ScrollList script;
-
     void OnEnable()
     {
         script = (ScrollList)target;
@@ -88,7 +87,10 @@ public class ScrollListEditor : Editor
         GUILayout.Space(5);
         EditorGUILayout.BeginHorizontal();
         EditorGUILayout.PrefixLabel("子节点");
-        //script.Item = (GameObject)EditorGUILayout.ObjectField(script.Item, typeof(GameObject), true);
+        //GameObject oldItem = script.Child;
+        //script.Child = (GameObject)EditorGUILayout.ObjectField(script.Child, typeof(GameObject), true);
+        //if (oldItem != script.Child)
+            //script.SetItem(script.Child);
         EditorGUILayout.EndHorizontal();
 
         if (GUI.changed)

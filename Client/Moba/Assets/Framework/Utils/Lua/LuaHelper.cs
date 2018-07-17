@@ -27,6 +27,13 @@ namespace Framework
             };
         }
 
+        public static void AddScrollListOnScrollOver(ScrollList list, LuaFunction onScrollOver)
+        {
+            list.onScrollOver = delegate (int index)
+            {
+                onScrollOver.Call(index);
+            };
+        }
         public static void AddButtonClick(GameObject go, LuaFunction func)
         {
             Button btn = go.GetComponent<Button>();

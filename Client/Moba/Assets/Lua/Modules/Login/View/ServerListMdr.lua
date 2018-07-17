@@ -23,8 +23,16 @@ function ServerListMdr:InitSrvList()
         itemObj:SetText("Toggle/Label", server.host)
         itemObj:SetActive(true)
     end)
-    self.srvList.ChildCount = 10 * #self.loginModel.serverList
+    LuaHelper.AddScrollListOnScrollOver(self.srvList,function(index)
+        self.srvList.gameObject:GetCom("ScrollRect").horizontal = false
+    end)
     self.srvList:SetItem(self.SrvItem)
+    self.srvList.ChildCount = 100 * #self.loginModel.serverList
+    --self.srvList.gameObject:GetCom("ScrollRect").horizontal = false
+    coroutine.start(function ()
+        coroutine.step(1)
+        self.srvList.MaxPerLine = 1
+    end)
 end
 
 return ServerListMdr

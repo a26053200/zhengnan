@@ -44,6 +44,7 @@ public static class CustomWrap
         // UI
         //================
         _GT(typeof(RectTransform)),
+        _GT(typeof(ScrollRect)),
         _GT(typeof(Button)),
         _GT(typeof(Toggle)),
         _GT(typeof(Text)),
