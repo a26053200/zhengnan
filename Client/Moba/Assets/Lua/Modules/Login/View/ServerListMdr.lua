@@ -18,10 +18,29 @@ function ServerListMdr:InitSrvList()
                 local server = self.loginModel.serverList[(index + 1)]
                 local itemObj = item.gameObject
                 itemObj:SetText("Text", (index + 1).."服 " .. server.name)
-                itemObj:SetText("Toggle/Label", server.host)
+                itemObj:SetText("Toggle/Label", server.host..":"..server.port)
+                self:RegisterClick(itemObj:FindChild("Button"),function ()
+                    nmgr:Connect(server.host, tonumber(server.port),
+                            handler(self,self.onConnectSuccess),
+                            handler(self,self.onConnectFail))
+                end)
             end
     )
     self.srvList.ChildCount = #self.loginModel.serverList
+end
+
+function ServerListMdr:onConnectSuccess()
+    print("onConnectSuccess")
+
+    self.loginService:LoginGameServer(self.loginModel.aid, self.loginModel.token, handler(self,self.onLoginGameSuccess))
+end
+
+function ServerListMdr:onConnectFail()
+    print("onConnectFail")
+end
+
+function ServerListMdr:onLoginGameSuccess()
+    print("onLoginGameSuccess")
 end
 
 return ServerListMdr

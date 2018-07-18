@@ -32,12 +32,7 @@ function LoginMdr:On_Click_BtnLogin()
     if string.isNullOrEmpty(self.username) or string.isNullOrEmpty(self.password) then
         print("Please input id and pw")
     else
-        local json = {}
-        json["server"] = ServerName.AccountServer;
-        json["action"] = LoginAction.LoginAccount;
-        json[USERNAME] = self.username
-        json[PASSWORD] = self.password
-        self.loginService:HttpLogin(json, handler(self,self.OnHttpLogin))
+        self.loginService:HttpLogin(self.username, self.password, handler(self,self.OnHttpLogin))
     end
 end
 

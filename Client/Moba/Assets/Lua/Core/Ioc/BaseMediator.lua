@@ -33,6 +33,10 @@ function BaseMediator:OnAutoRegisterEvent()
     end
 end
 
+function BaseMediator:RegisterClick(go, clickFun)
+    LuaHelper.AddButtonClick(go,handler(self,clickFun))
+end
+
 function BaseMediator:OnDestroy()
     print("OnDestroy view: "..self.viewInfo.name)
     self:OnRemove()

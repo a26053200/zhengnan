@@ -15,8 +15,7 @@ function NetworkManager:Ctor()
     self.respondMap = {} --同步响应回调
     self.pushMap = {} --异步推送回调
 
-    netMgr:SetLuaFun("OnConnect", handler(self,self.OnConnect))
-    netMgr:SetLuaFun("OnConnectFail", handler(self,self.OnConnectFail))
+
     netMgr:SetLuaFun("OnReConnect", handler(self,self.OnReConnect))
     netMgr:SetLuaFun("OnHttpRspd", handler(self,self.OnHttpRspd))
     netMgr:SetLuaFun("OnJsonRspd", handler(self,self.OnJsonRspd))
@@ -30,12 +29,13 @@ function NetworkManager:AddPush(action, callback)
 end
 
 --添加Http请求
-function NetworkManager:HttpRqst(url, action, data, callback)
+function NetworkManager:HttpRqst(url, data, callback,...)
     if callback ~= nil then
-        self:addCallback(action, callback)
+        self:addCallback(data.action, callback)
     end
+    data.data = string.format(data.data,...)
     local jsonStr = json.encode(data)
-    print("[Send]"..jsonStr)
+    print("[HttpRqst]"..jsonStr)
     netMgr:HttpRequest(url, jsonStr)
 end
 
@@ -45,15 +45,20 @@ function NetworkManager:Send(json)
 end
 
 --同步请求
-function NetworkManager:Request(action, json, callback)
+function NetworkManager:Request(data, callback, ...)
     if callback ~= nil then
-        self:addCallback(action, callback)
+        self:addCallback(data.action, callback)
     end
-    netMgr:SendJson(json)
+    data.data = string.format(data.data,...)
+    local jsonStr = json.encode(data)
+    print("[Send]"..jsonStr)
+    netMgr:SendJson(jsonStr)
 end
 
-function NetworkManager:OnConnect()
-    print("OnConnect ")
+function NetworkManager:Connect(host, port,onConnectSuccess,onConnectFail)
+    netMgr:SetLuaFun("OnConnect", onConnectSuccess)
+    netMgr:SetLuaFun("OnConnectFail", onConnectFail)
+    netMgr:Connect(host, port)
 end
 
 function NetworkManager:OnConnectFail()
