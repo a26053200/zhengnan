@@ -64,8 +64,9 @@ public class AccountMonitor extends Monitor
 
     private void login(ChannelHandlerContext ctx, JSONObject recvJson)
     {
-        String username = recvJson.get("username").toString();
-        String password = recvJson.get("password").toString();
+        String[] params = getParams(recvJson);
+        String username = params[0];
+        String password = params[1];
 
         String account_id = db.hget(username, RedisKeys.account_id);
         //帐号存在就验证密码
@@ -86,10 +87,10 @@ public class AccountMonitor extends Monitor
                     onLoginSuccess(ctx, account_id);
                 } catch (Exception ex) {
                     ex.printStackTrace();
-                    onLoginFail(ctx, recvJson, ReturnCode.Code.FETCH_GAME_SERVER_LIST_ERROR);
+                    onLoginFail(ctx, username, ReturnCode.Code.FETCH_GAME_SERVER_LIST_ERROR);
                 }
             } else {//密码错误，登陆失败
-                onLoginFail(ctx, recvJson, ReturnCode.Code.WRONG_PASSWORD);
+                onLoginFail(ctx, username, ReturnCode.Code.WRONG_PASSWORD);
             }
         }
     }
@@ -106,9 +107,9 @@ public class AccountMonitor extends Monitor
         httpResponse(ctx, rspdJson.toString());
     }
 
-    private void onLoginFail(ChannelHandlerContext ctx, JSONObject jsonObject, ReturnCode.Code code)
+    private void onLoginFail(ChannelHandlerContext ctx, String username, ReturnCode.Code code)
     {
-        logger.info(String.format("用户:%s 登陆失败. 原因:%s", jsonObject.get("username"), ReturnCode.getMsg(code)));
+        logger.info(String.format("用户:%s 登陆失败. 原因:%s", username, ReturnCode.getMsg(code)));
         httpResponse(ctx, ReturnCode.getMsg(code));
     }
 

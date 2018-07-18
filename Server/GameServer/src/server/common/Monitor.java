@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import redis.clients.jedis.Jedis;
 import server.redis.RedisClient;
 import utils.BytesUtils;
+import utils.StringUtils;
 
 /**
  * @ClassName: Monitor
@@ -107,8 +108,10 @@ public abstract class Monitor
         ctx.channel().write(BytesUtils.string2Bytes(msg));
     }
 
-    protected void sendReturnCode(ChannelHandlerContext ctx, ReturnCode.Code code)
+    protected String[] getParams(JSONObject jsonObject)
     {
-        sendString(ctx, ReturnCode.getMsg(code));
+        String dataStr = jsonObject.getString("data");
+        String[] params = dataStr.split("&");
+        return  params;
     }
 }

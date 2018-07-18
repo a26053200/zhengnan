@@ -44,7 +44,9 @@ public class GameMonitor extends Monitor
     //处理登录游戏服务器
     private void login(ChannelHandlerContext ctx, JSONObject recvJson)
     {
-        String token = recvJson.getString("token");
-        logger.info(String.format("User login game server success{0}",token));
+        String[] params = getParams(recvJson);
+        String aid = params[0];
+        String token = params[1];
+        logger.info(String.format("User login game server success aid:%s token:%s",aid, token));
     }
 }
