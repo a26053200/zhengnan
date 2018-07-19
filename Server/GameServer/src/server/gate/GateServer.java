@@ -63,6 +63,8 @@ public class GateServer extends BaseServer
             bossGroup.shutdownGracefully();
         }
     }
+
+
     public static void main(String[] args) throws Exception {
         Debug.initLog("["+ServerName+"]","log4j_gate_server.properties");
         int port;

@@ -62,11 +62,11 @@ public class GateClientHandler extends SimpleChannelInboundHandler<Monitor>
             {
                 if (future.isSuccess())
                 {
-                    logger.info("[LoginServer]异常关闭成功");
+                    logger.info("[GameServer]异常关闭成功");
                 }
                 else
                 {
-                    logger.info("[LoginServer]异常关闭失败");
+                    logger.info("[GameServer]异常关闭失败");
                 }
             }
         });

@@ -8,9 +8,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.codec.serialization.ClassResolvers;
-import io.netty.handler.codec.serialization.ObjectDecoder;
-import io.netty.handler.codec.serialization.ObjectEncoder;
 import org.apache.log4j.Logger;
 
 /**
@@ -29,6 +26,8 @@ public class GateClient
     private GateMonitor monitor;
 
     private Channel channel;
+
+    public boolean isDead = true;
 
     public GateClient(String host, int port, GateMonitor monitor, String serverName)
     {
@@ -63,13 +62,13 @@ public class GateClient
             channel = f.channel();
             logger.info("GateClient connect " + this.serverName + " successful!!!");
             monitor.SetGameServerClient(this);
-
             f.channel().closeFuture().sync();
-            logger.info("GateClient disconnect from " + this.serverName);
         }
         finally
         {
             group.shutdownGracefully();
+            isDead = true;
+            logger.info("GateClient disconnect from " + this.serverName);
         }
     }
 
@@ -82,16 +81,40 @@ public class GateClient
     {
         new Thread(new Runnable()
         {
+            int clientNum = 1;
             @Override
             public void run()
             {
+                while(true)
+                {
+                    if(clientNum > 1)
+                        logger.info("网关客户端重新连接服务器:" + serverName + " " + clientNum++);
+                    GateClient client = null;
+                    try
+                    {
+                        client = new GateClient( host, port, monitor, serverName);
+                        client.run();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    while (client != null && !client.isDead)
+                    {
+                        logger.info("wait dead ");
+                        WaitForSecond();
+                    }
+                    WaitForSecond();
+                }
+            }
+            private void WaitForSecond()
+            {
                 try
                 {
-                    new GateClient(host, port, monitor, serverName).run();
+                    Thread.sleep(10000);
                 }
-                catch (Exception e)
+                catch (InterruptedException e)
                 {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
             }
