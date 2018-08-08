@@ -17,32 +17,35 @@ public class JwtHelper
 {
     //明文Token,用于测试 以后有时间再做加密的
 
+    //Token 密钥
+    public final static String tokenSecretKey = "emhlbmduYW50YW5naHVpanVhbnpoZW5neWk==";
+    //Token 过期时间
+    public final static int expiresSecond = 5 * 60 * 60 * 1000;
 
     /**
      * @param id
-     * @param ttlMillis
      * @return Token
      */
-    public static String createJWT(String id,long ttlMillis)
+    public static String createJWT(String id)
     {
         JSONObject json = new JSONObject();
         json.put("id",id);
-        json.put("ttlMillis",ttlMillis);
+        json.put("secretKey",tokenSecretKey);
+        json.put("ttlMillis",expiresSecond);
         return Base64.getEncoder().encodeToString(BytesUtils.string2Bytes(json.toString()));
     }
 
     /**
      * @param jwt
-     * @param limit
      * @return 是否验证通过
      */
-    public static boolean parseJWT(String jwt, long limit)
+    public static boolean parseJWT(String jwt)
     {
-        JSONObject json = JSONObject.parseObject(jwt);
+        byte[] jsonBytes = Base64.getDecoder().decode(jwt);
+        JSONObject json = JSONObject.parseObject(BytesUtils.readString(jsonBytes));
         long ttlMillis = json.getLong("ttlMillis");
-        Date date = new Date(ttlMillis);
         long now = new Date().getTime();
-        return now - ttlMillis < limit;
+        return now - ttlMillis < expiresSecond;
     }
     //Sample method to validate and read the JWT
     //public static void parseJWT(String jwt, String secretKey)

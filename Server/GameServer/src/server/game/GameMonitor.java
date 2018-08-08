@@ -3,9 +3,13 @@ package server.game;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.log4j.Logger;
-import server.common.Action;
-import server.common.Monitor;
+import server.common.*;
+import server.game.modules.Player.PlayerMonitor;
+import server.game.modules.Player.PlayerVo;
+import server.game.modules.Role.RoleMonitor;
 import server.redis.RedisClient;
+import utils.IdGenerator;
+import utils.JwtHelper;
 
 /**
  * @ClassName: GateMonitor
@@ -20,6 +24,8 @@ public class GameMonitor extends Monitor
     public GameMonitor()
     {
         super();
+        subMonitorMap.put(ModuleNames.Player, new PlayerMonitor(this));
+        subMonitorMap.put(ModuleNames.Role, new RoleMonitor(this));
     }
 
     @Override
@@ -32,21 +38,13 @@ public class GameMonitor extends Monitor
     @Override
     protected void RespondJson(ChannelHandlerContext ctx, JSONObject jsonObject)
     {
-        String action = jsonObject.get("action").toString();
-
-        switch (action) {
-            case Action.LOGIN_GAME_SEVER:
-                login(ctx, jsonObject);
-                break;
+        String[] actions = jsonObject.get("action").toString().split("@");
+        String moduleName = actions[0];
+        String subAction = actions.length > 1 ? actions[1] : Action.NONE;
+        SubMonitor subMnt = subMonitorMap.get(moduleName);
+        if (subMnt != null)
+        {
+            subMnt.ActionHandler(ctx, jsonObject, subAction);
         }
-    }
-
-    //处理登录游戏服务器
-    private void login(ChannelHandlerContext ctx, JSONObject recvJson)
-    {
-        String[] params = getParams(recvJson);
-        String aid = params[0];
-        String token = params[1];
-        logger.info(String.format("User login game server success aid:%s token:%s",aid, token));
     }
 }

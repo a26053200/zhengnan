@@ -117,9 +117,9 @@ final public class Adler32 implements Checksum {
 
 /*
   private java.util.zip.Adler32 adler=new java.util.zip.Adler32();
-  public void update(byte[] buf, int index, int len){
+  public void writeDB(byte[] buf, int index, int len){
     if(buf==null) {adler.reset();}
-    else{adler.update(buf, index, len);}
+    else{adler.writeDB(buf, index, len);}
   }
   public void reset(){
     adler.reset();

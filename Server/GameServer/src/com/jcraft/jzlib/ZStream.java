@@ -239,7 +239,7 @@ public class ZStream{
     }
   }
 
-  // Read a new buffer from the current input stream, update the adler32
+  // Read a new buffer from the current input stream, writeDB the adler32
   // and total number of bytes read.  All deflate() input goes through
   // this function so some applications may wish to modify it to avoid
   // allocating a large strm->next_in buffer and copying from it.

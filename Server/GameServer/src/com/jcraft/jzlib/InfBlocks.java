@@ -563,11 +563,11 @@ final class InfBlocks{
     if(n > z.avail_out) n = z.avail_out;
     if(n!=0 && r == Z_BUF_ERROR) r = Z_OK;
 
-    // update counters
+    // writeDB counters
     z.avail_out -= n;
     z.total_out += n;
 
-    // update check information
+    // writeDB check information
     if(check && n>0){
       z.adler.update(window, q, n);
     }
@@ -589,11 +589,11 @@ final class InfBlocks{
       if (n > z.avail_out) n = z.avail_out;
       if (n!=0 && r == Z_BUF_ERROR) r = Z_OK;
 
-      // update counters
+      // writeDB counters
       z.avail_out -= n;
       z.total_out += n;
 
-      // update check information
+      // writeDB check information
       if(check && n>0){
 	z.adler.update(window, q, n);
       }
@@ -604,7 +604,7 @@ final class InfBlocks{
       q += n;
     }
 
-    // update pointers
+    // writeDB pointers
     z.next_out_index = p;
     read = q;
 

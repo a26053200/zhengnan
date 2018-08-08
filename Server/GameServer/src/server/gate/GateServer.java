@@ -11,7 +11,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
 import server.common.BaseServer;
-import server.common.ServerConsts;
+import server.common.ServerConstant;
 
 /**
  * @ClassName: GateServer
@@ -54,7 +54,7 @@ public class GateServer extends BaseServer
             ChannelFuture f = b.bind(port).sync(); // (7)
             logger.info(ServerName + " startup successful!!!");
             //网关客户端连接游戏服务器
-            GateClient.start(ServerConsts.Name.GAME_SERVER,"",8090,monitor);
+            GateClient.start(ServerConstant.ServerName.GAME_SERVER,"",8090,monitor);
             f.channel().closeFuture().sync();
 
             logger.info(ServerName + " close up...");

@@ -52,7 +52,7 @@ public class AccountServerInboundHandler extends ChannelInboundHandlerAdapter
             catch (Exception e)
             {//处理出错，返回错误信息
                 e.printStackTrace();
-                responseError(ctx, "Account Server Error");
+                responseError(ctx, "Account SERVER Error");
             }
         }
         if (msg instanceof HttpContent)
@@ -76,7 +76,7 @@ public class AccountServerInboundHandler extends ChannelInboundHandlerAdapter
             catch (Exception e)
             {//处理出错，返回错误信息
                 e.printStackTrace();
-                responseError(ctx,"Account Server Error");
+                responseError(ctx,"Account SERVER Error");
             }
         }
     }

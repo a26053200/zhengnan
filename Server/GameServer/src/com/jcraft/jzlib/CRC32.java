@@ -146,9 +146,9 @@ final public class CRC32 implements Checksum {
   /*
   private java.util.zip.CRC32 crc32 = new java.util.zip.CRC32();
 
-  public void update(byte[] buf, int index, int len){
+  public void writeDB(byte[] buf, int index, int len){
     if(buf==null) {crc32.reset();}
-    else{crc32.update(buf, index, len);}
+    else{crc32.writeDB(buf, index, len);}
   }
   public void reset(){
     crc32.reset();

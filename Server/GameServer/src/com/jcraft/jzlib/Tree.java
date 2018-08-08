@@ -153,7 +153,7 @@ final class Tree{
   int     max_code;      // largest code with non zero frequency
   StaticTree stat_desc;  // the corresponding static tree
 
-  // Compute the optimal bit lengths for a tree and update the total bit length
+  // Compute the optimal bit lengths for a tree and writeDB the total bit length
   // for the current block.
   // IN assertion: the fields freq and dad are set, heap[heap_max] and
   //    above are the tree nodes sorted by increasing frequency.

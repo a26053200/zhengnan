@@ -17,6 +17,8 @@ import server.redis.RedisClient;
 import utils.BytesUtils;
 import utils.StringUtils;
 
+import java.util.HashMap;
+
 /**
  * @ClassName: Monitor
  * @Description: 负责解析指令, 之后执行转发到其他服务或者回给客户端
@@ -32,9 +34,17 @@ public abstract class Monitor
      */
     protected ChannelGroup channelGroup;
     /**
+     * 子Monitor
+     */
+    protected HashMap<String, ChannelHandlerContext> contextMap;
+    /**
      * 数据库
      */
     protected Jedis db;
+    /**
+     * 子Monitor
+     */
+    protected HashMap<String, SubMonitor> subMonitorMap;
 
     public ChannelGroup getChannelGroup()
     {
@@ -46,10 +56,25 @@ public abstract class Monitor
         return channelGroup.find(channelId);
     }
 
+    public ChannelHandlerContext getContext(String channelId)
+    {
+        return contextMap.get(channelId);
+    }
+
+    public ChannelHandlerContext regContext(ChannelHandlerContext ctx)
+    {
+        String chId = ctx.channel().id().asLongText();
+        if(!contextMap.containsKey(chId))
+            contextMap.put(chId,ctx);
+        return ctx;
+    }
+
     public Monitor()
     {
         //所有已经链接的通道,用于广播
         channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+        contextMap = new HashMap<>();
+        subMonitorMap = new HashMap<>();
         //初始化数据库
         initDB();
     }

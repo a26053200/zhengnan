@@ -33,10 +33,7 @@ public class AccountMonitor extends Monitor
 {
     final static Logger logger = Logger.getLogger(LoginMonitor.class);
 
-    //Token 密钥
-    public final static String tokenSecretKey = "emhlbmduYW56aGVuZ3lpdGFuZ2h1aWp1YW4=";
-    //Token 过期时间
-    public final static int expiresSecond = 5 * 60 * 60 * 1000;
+
 
     public AccountMonitor()
     {
@@ -102,7 +99,7 @@ public class AccountMonitor extends Monitor
         JSONObject rspdJson = new JSONObject();
         rspdJson.put("action", Action.LOGIN_ACCOUNT);
         rspdJson.put("aid", account_id);
-        rspdJson.put("token", JwtHelper.createJWT(account_id, expiresSecond));
+        rspdJson.put("token", JwtHelper.createJWT(account_id));
         rspdJson.put("srvList", gameServerJson);
         httpResponse(ctx, rspdJson.toString());
     }

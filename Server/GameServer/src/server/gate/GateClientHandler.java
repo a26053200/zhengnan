@@ -61,13 +61,7 @@ public class GateClientHandler extends SimpleChannelInboundHandler<Monitor>
                     throws Exception
             {
                 if (future.isSuccess())
-                {
-                    logger.info("[GameServer]异常关闭成功");
-                }
-                else
-                {
-                    logger.info("[GameServer]异常关闭失败");
-                }
+                    logger.info("[GateClient] 到 []GameServer]的连接已经断开");
             }
         });
     }

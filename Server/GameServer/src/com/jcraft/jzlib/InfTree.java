@@ -406,7 +406,7 @@ final class InfTree{
 	// backup over finished tables
         mask = (1 << w) - 1;      // needed on HP, cc -O bug
         while ((i & mask) != x[h]){
-          h--;                    // don't need to update q
+          h--;                    // don't need to writeDB q
           w -= l;
           mask = (1 << w) - 1;
         }

@@ -3,10 +3,8 @@ package server.gate;
 import com.alibaba.fastjson.JSONObject;
 import io.netty.channel.ChannelHandlerContext;
 import org.apache.log4j.Logger;
-import server.common.Action;
 import server.common.Monitor;
-import server.common.ServerConsts;
-import server.game.GameServer;
+import server.common.ServerConstant;
 import utils.BytesUtils;
 
 /**
@@ -24,29 +22,35 @@ public class GateMonitor extends Monitor
         super();
     }
 
-    private GateClient gameServerClinet;
+    private GateClient gameServerClient;
 
     public void SetGameServerClient(GateClient gameServerClinet)
     {
-        this.gameServerClinet = gameServerClinet;
+        this.gameServerClient = gameServerClinet;
     }
 
     @Override
     protected void RespondJson(ChannelHandlerContext ctx, JSONObject jsonObject)
     {
-        String server = jsonObject.get("server").toString();
-
+        String server = jsonObject.get(ServerConstant.SERVER).toString();
         switch (server)
         {
             //转发给游戏服务器
-            case ServerConsts.Name.GAME_SERVER:
+            case ServerConstant.ServerName.GAME_SERVER:
+                jsonObject.put(ServerConstant.CHANNEL_ID,ctx.channel().id().asLongText());
+                regContext(ctx);
                 forwardToGameServer(jsonObject);
                 break;
             //直接转发给客户端
-            case ServerConsts.Name.CLIENT:
+            case ServerConstant.ServerName.CLIENT:
+                ChannelHandlerContext clientCtx = getContext(jsonObject.getString(ServerConstant.CHANNEL_ID));
+                if(clientCtx != null)
+                    forwardToClient(clientCtx, jsonObject);
+                else
+                    logger.info("Client has not ChannelHandlerContext");
                 break;
             //网关服务器的消息直接处理
-            case ServerConsts.Name.GATE_SERVER:
+            case ServerConstant.ServerName.GATE_SERVER:
                 break;
         }
     }
@@ -61,12 +65,13 @@ public class GateMonitor extends Monitor
     private void forwardToGameServer(JSONObject jsonObject)
     {
         byte[] bytes = BytesUtils.string2Bytes(jsonObject.toString());
-        this.gameServerClinet.GetChanel().writeAndFlush(bytes);
+        this.gameServerClient.GetChanel().writeAndFlush(bytes);
     }
-    //转发给游戏服务器
-    private void forwardToClient(JSONObject jsonObject)
+    //直接转发给客户端
+    private void forwardToClient(ChannelHandlerContext clientCtx, JSONObject jsonObject)
     {
-
+        byte[] bytes = BytesUtils.packBytes(BytesUtils.string2Bytes(jsonObject.toString()));
+        clientCtx.channel().writeAndFlush(bytes);
     }
 
 }

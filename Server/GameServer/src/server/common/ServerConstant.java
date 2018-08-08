@@ -1,14 +1,18 @@
 package server.common;
 
 /**
- * @ClassName: ServerConsts
+ * @ClassName: ServerConstant
  * @Description: TODO
  * @Author: zhengnan
  * @Date: 2018/6/9 0:04
  */
-public class ServerConsts
+public class ServerConstant
 {
-    public class Name
+    public static final String SERVER = "server";
+
+    public static final String CHANNEL_ID = "channelId";
+
+    public class ServerName
     {
         public static final String CLIENT = "client";
 
