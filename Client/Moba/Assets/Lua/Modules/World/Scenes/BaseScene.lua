@@ -20,4 +20,8 @@ function BaseScene:Init()
     vmgr:SetScene(self)
 end
 
+function BaseScene:OnEnterScene()
+
+end
+
 return BaseScene

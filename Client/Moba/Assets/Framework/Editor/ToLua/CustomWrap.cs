@@ -22,6 +22,7 @@ public static class CustomWrap
         //================
         // UnityEngine
         //================
+        _GT(typeof(DateTime)),
         _GT(typeof(Rect)),
         _GT(typeof(PlayerPrefs)),
         _GT(typeof(UnityEngine.SceneManagement.SceneManager)),

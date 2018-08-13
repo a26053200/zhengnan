@@ -5,9 +5,16 @@
 ---
 
 
+List = {}
+
+---@return Core.List
+function List.New()
+    return require ("Core.List").New()
+end
+
 ---@class Core.List : Core.LuaObject
 local LuaObject = require("Core.LuaObject")
-local List = class("List",LuaObject)
+local _List = class("_List",LuaObject)
 
 local function Operator(list)
     local mt = getmetatable(list).__index
@@ -19,21 +26,21 @@ local function Operator(list)
     end})
 end
 
-function List:Ctor()
+function _List:Ctor()
     Operator(self)
     self._array = {}
 end
 
-function List:Clear()
+function _List:Clear()
     self._array = nil
     self._array = {}
 end
 
-function List:Size()
+function _List:Size()
     return  #self._array
 end
 
-function List:Insert(item,pos)
+function _List:Insert(item,pos)
     if pos <= 0 then
         logError("List out of range")
     elseif pos >= #self._array then
@@ -43,27 +50,27 @@ function List:Insert(item,pos)
     end
 end
 
-function List:RemoveAt(idx)
+function _List:RemoveAt(idx)
     return table.remove(self._array,idx)
 end
 
 --在列表末尾添加一个数据项，
 -- UnShift() Push()的等价操作
-function List:Add(item)
+function _List:Add(item)
     table.insert(self._array,item)
 end
 
 --列表删除列表首位数据项
-function List:Shift()
+function _List:Shift()
     return table.remove(self._array,1)
 end
 
 --
-function List:Pop()
+function _List:Pop()
     return table.remove(self._array,#self._array)
 end
 
-function List:Remove(item)
+function _List:Remove(item)
     if nil == item then
         logError("List remove a item that is not nil")
     else
@@ -76,7 +83,7 @@ function List:Remove(item)
     end
 end
 
-function List:Contain(item)
+function _List:Contain(item)
     if nil == item then
         logError("List contain a item that is not nil")
         return false
@@ -89,7 +96,7 @@ function List:Contain(item)
     end
 end
 
-function List:At(idx)
+function _List:At(idx)
     if idx <= 0 or idx > #self._array then
         logError("Index out of range. index")
         return false
@@ -97,7 +104,7 @@ function List:At(idx)
     return self._array[idx]
 end
 
-function List:Concat(other)
+function _List:Concat(other)
     if nil == other then
         logError("List Concat a other is not nil")
     else
@@ -107,10 +114,11 @@ function List:Concat(other)
     end
 end
 
-function List:Clone()
-    local newList = List.New()
+function _List:Clone()
+    local newList = _List.New()
     newList:Concat(self)
     return newList
 end
 
-return List
+return _List
+

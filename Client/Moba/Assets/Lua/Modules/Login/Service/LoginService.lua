@@ -6,32 +6,63 @@
 
 LoginAction = {}
 
-LoginAction.LoginAccount = {server = "AccountServer",action = "login_account", data = "%s&%s"}
+LoginAction.LoginAccount = { server = "AccountServer", action = "login_account", data = "%s&%s" }
 
-LoginAction.LoginGameServer = {server = "GameServer",action = "login_game_server", data = "%s&%s"}
+LoginAction.LoginGameServer = { server = "GameServer", action = "Player@login_game_server", data = "%s&%s" }
+
+LoginAction.PlayerInfo = "push@player_info"
+
+LoginAction.FetchRandomName = { server = "GameServer", action = "Role@role_random_name", data = "" }
+
+LoginAction.CreateRole = { server = "GameServer", action = "Role@role_create", data = "%s" }
+
+LoginAction.SelectRoleEnterGame = { server = "GameServer", action = "Role@select_role_enter_game", data = "%d" }
 
 ---@class Modules.Login.Service.LoginService : Core.Ioc.BaseService
 local BaseService = require("Core.Ioc.BaseService")
-local LoginService = class("LoginService",BaseService)
+local LoginService = class("LoginService", BaseService)
 
 function LoginService:Ctor()
-    
+    nmgr:AddPush(LoginAction.PlayerInfo, handler(self,self.OnPlayerInfo))
 end
 
-function LoginService:HttpLogin(username,password,callback)
-    nmgr:HttpRqst("http://127.0.0.1:8080",LoginAction.LoginAccount,  function (data)
+function LoginService:HttpLogin(username, password, callback)
+    nmgr:HttpRqst("http://127.0.0.1:8080", LoginAction.LoginAccount, function(data)
         self.loginModel.serverList = data.srvList.list
         self.loginModel.aid = data.aid
         self.loginModel.token = data.token
         callback(data)
-    end, username,password)
+    end, username, password)
 end
 
-function LoginService:LoginGameServer(aid,token,callback)
-    nmgr:Request(LoginAction.LoginGameServer, function (data)
-        self.loginModel.serverList = data.srvList.list
+function LoginService:LoginGameServer(aid, token, callback)
+    nmgr:Request(LoginAction.LoginGameServer, function(data)
+        --self.loginModel.serverList = data.srvList.list
         callback(data)
     end, aid, token)
+end
+
+function LoginService:FetchRandomName(callback)
+    nmgr:Request(LoginAction.FetchRandomName, function(data)
+        callback(data)
+    end)
+end
+
+function LoginService:CreateRole(roleName, callback)
+    nmgr:Request(LoginAction.CreateRole, function(data)
+        callback(data)
+    end,roleName)
+end
+
+function LoginService:SelectRoleEnterGame(roleIndex, callback)
+    nmgr:Request(LoginAction.SelectRoleEnterGame, function(data)
+        callback(data)
+    end,roleIndex)
+end
+
+---push
+function LoginService:OnPlayerInfo(response)
+    self.loginModel.roleList = response.roleList
 end
 
 return LoginService

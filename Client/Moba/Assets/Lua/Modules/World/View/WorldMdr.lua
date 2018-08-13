@@ -23,9 +23,7 @@ end
 
 function WorldMdr:OnInit()
     dontDestroyOnLoad(self.gameObject)
-    World.EnterScene(WorldConfig.Login,function()
-        vmgr:LoadView(ViewConfig.Login)
-    end)
+    World.EnterScene(WorldConfig.Login)
 end
 
 function WorldMdr:GetTempLevel()
@@ -58,6 +56,8 @@ function WorldMdr:LoadLevel(level,sceneInfo, callback)
             return
         end
         local scene = sceneType.New()
+        log("进入场景:"..sceneInfo.debugName)
+        scene:OnEnterScene()
         self.currScene = scene
         self.currLevel = level
         if callback ~= nil then

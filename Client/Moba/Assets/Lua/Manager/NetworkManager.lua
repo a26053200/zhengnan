@@ -8,34 +8,63 @@
 ---@class Manager.NetworkManager : Core.LuaMonoBehaviour
 ---@field public scene Modules.World.Scenes.BaseScene
 local LuaMonoBehaviour = require('Core.LuaMonoBehaviour')
-local NetworkManager = class("NetworkManager",LuaMonoBehaviour)
-local json = require ("cjson")
+local NetworkManager = class("NetworkManager", LuaMonoBehaviour)
+local json = require("cjson")
+local NetworkListener = require("Manager.NetworkListener")
 
 function NetworkManager:Ctor()
-    self.respondMap = {} --同步响应回调
-    self.pushMap = {} --异步推送回调
+    self.listenerList = List.New() ---@type Core.List
+    self.listener = NetworkListener.New(true)
+    self.listenerList:Add(self.listener)
 
+    netMgr:SetLuaFun("OnReConnect", handler(self, self.OnReConnect))
+    netMgr:SetLuaFun("OnHttpRspd", handler(self, self.OnHttpRspd))
+    netMgr:SetLuaFun("OnJsonRspd", handler(self, self.OnJsonRspd))
+end
 
-    netMgr:SetLuaFun("OnReConnect", handler(self,self.OnReConnect))
-    netMgr:SetLuaFun("OnHttpRspd", handler(self,self.OnHttpRspd))
-    netMgr:SetLuaFun("OnJsonRspd", handler(self,self.OnJsonRspd))
+function NetworkManager:Connect(host, port, onConnectSuccess, onConnectFail)
+    netMgr:SetLuaFun("OnConnect", onConnectSuccess)
+    netMgr:SetLuaFun("OnConnectFail", onConnectFail)
+    netMgr:Connect(host, port)
+end
+
+function NetworkManager:OnConnectFail()
+    print("OnConnectFail ")
+end
+
+function NetworkManager:OnReConnect(data)
+    print("OnReConnect " .. json)
+end
+
+--添加监听器
+function NetworkManager:AddListener(listener)
+    if not self.listenerList:Contain(listener) then
+        self.listenerList:Add(listener)
+    end
+end
+
+--移除监听器
+function NetworkManager:RemoveListener(listener)
+    if self.listenerList:Contain(listener) then
+        self.listenerList:Remove(listener)
+    end
 end
 
 --添加推送监听
 function NetworkManager:AddPush(action, callback)
     if callback ~= nil then
-        self:addCallback(action, callback)
+        self.listener:addPushCallback(action, callback)
     end
 end
 
 --添加Http请求
-function NetworkManager:HttpRqst(url, data, callback,...)
+function NetworkManager:HttpRqst(url, data, callback, ...)
     if callback ~= nil then
-        self:addCallback(data.action, callback)
+        self.listener:addCallback(data.action, callback)
     end
-    data.data = string.format(data.data,...)
+    data.data = string.format(data.data, ...)
     local jsonStr = json.encode(data)
-    print("[HttpRqst]"..jsonStr)
+    print("[HttpRqst]" .. jsonStr)
     netMgr:HttpRequest(url, jsonStr)
 end
 
@@ -47,77 +76,32 @@ end
 --同步请求
 function NetworkManager:Request(data, callback, ...)
     if callback ~= nil then
-        self:addCallback(data.action, callback)
+        self.listener:addCallback(data.action, callback)
     end
-    data.data = string.format(data.data,...)
+    data.data = string.format(data.data, ...)
     local jsonStr = json.encode(data)
-    print("[Send]"..jsonStr)
+    --print("[Send]" .. jsonStr)
     netMgr:SendJson(jsonStr)
-end
-
-function NetworkManager:Connect(host, port,onConnectSuccess,onConnectFail)
-    netMgr:SetLuaFun("OnConnect", onConnectSuccess)
-    netMgr:SetLuaFun("OnConnectFail", onConnectFail)
-    netMgr:Connect(host, port)
-end
-
-function NetworkManager:OnConnectFail()
-    print("OnConnectFail ")
-end
-
-function NetworkManager:OnReConnect(data)
-    print("OnReConnect "..json)
 end
 
 function NetworkManager:OnHttpRspd(jsonStr)
     local jsonData = json.decode(jsonStr)
-    self:handlerCallback(jsonData.action, jsonData)
-end
-
-function NetworkManager:OnJsonRspd(data)
-    local jsonStr = json.encode(data)
-    print("OnJsonRspd "..jsonStr)
-end
-
-function NetworkManager:addCallback(action,handler)
-    local callbackList = self.respondMap[action]
-    if callbackList == nil then
-        callbackList = List.New()
-        self.respondMap[action] = callbackList;
-    end
-    if not callbackList:Contain(handler) then
-        callbackList:Add(handler)
+    for i = 1, self.listenerList:Size() do
+        self.listenerList[i]:handlerRqstCallback(jsonData.action, jsonData)
     end
 end
 
-
-function NetworkManager:addPushCallback(action,handler)
-    local callbackList = self.pushMap[action]
-    if callbackList == nil then
-        callbackList = List.New()
-        self.pushMap[action] = callbackList;
-    end
-    if not callbackList:Contain(handler) then
-        callbackList:Add(handler)
-    end
-end
-
-function NetworkManager:handlerCallback(action,json)
-    if action == nil then
-        logError("action is nil")
-        return
-    end
-    local callbackList = self.respondMap[action]
-    if callbackList ~= nil then
-        for i = 1, callbackList:Size() do
-            local callback = callbackList[i]
-            if callback then
-                callback(json)
-            end
+function NetworkManager:OnJsonRspd(jsonStr)
+    local jsonData = json.decode(jsonStr)
+    --print("OnJsonRspd " .. jsonStr)
+    for i = 1, self.listenerList:Size() do
+        if string.find(jsonData.action,"push@") ~= nil then
+            self.listenerList[i]:handlerPushCallback(jsonData.action, jsonData.data)
+        else
+            self.listenerList[i]:handlerRqstCallback(jsonData.action, jsonData.data)
         end
-    else
-        logError("there is no callback with action {0}",action)
     end
 end
+
 
 return NetworkManager

@@ -62,19 +62,19 @@ namespace Framework
         public void RemoveUpdateFun(LuaFunction func)
         {
             if (updateList.Contains(func))
-                updateList.Add(func);
+                updateList.Remove(func);
         }
 
         public void RemoveLateUpdateFun(LuaFunction func)
         {
             if (lateUpdateList.Contains(func))
-                lateUpdateList.Add(func);
+                lateUpdateList.Remove(func);
         }
 
         public void RemoveFixedUpdateFun(LuaFunction func)
         {
             if (fixedUpdateList.Contains(func))
-                fixedUpdateList.Add(func);
+                fixedUpdateList.Remove(func);
         }
     }
 }

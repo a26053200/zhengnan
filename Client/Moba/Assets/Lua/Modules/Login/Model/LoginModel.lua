@@ -9,7 +9,10 @@ local BaseModel = require("Core.Ioc.BaseModel")
 local LoginModel = class("LoginModel",BaseModel)
 
 function LoginModel:Ctor()
-    
+    self.serverList = nil
+    self.aid = ""
+    self.token = ""
+    self.roleList = nil
 end
 
 return LoginModel

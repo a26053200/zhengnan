@@ -16,13 +16,13 @@ function LuaMonoBehaviour:Ctor()
 end
 
 function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
-    local behaviour = nil
+    self.behaviour = nil
     for k, v in pairs(BehaviourFun) do
         if self[v] then
             behaviour = LuaHelper.AddLuaMonoBehaviour(go,name,v,handler(self,self[v]))
         end
     end
-    return behaviour
+    return self.behaviour
 end
 
 function LuaMonoBehaviour:LoadAsset(assetName)
@@ -31,6 +31,10 @@ function LuaMonoBehaviour:LoadAsset(assetName)
         logStack()
     end
     return prefab
+end
+
+function LuaMonoBehaviour:OnDestroy()
+    destroy(self.behaviour)
 end
 
 return LuaMonoBehaviour

@@ -68,7 +68,7 @@ public class Logger
         string editlogFilePath = Path.Combine(path + "Editor/", DateTime.Now.ToString(FileTimeFormat) + ".log");
         editorSW = new StreamWriter(new FileStream(editlogFilePath, FileMode.Create), Encoding.UTF8);
 #endif
-        Application.logMessageReceived += OnApplicationLogMessageReceived;
+        //Application.logMessageReceived += OnApplicationLogMessageReceived;
     }
 
     public void Start(bool write = true)
@@ -84,7 +84,7 @@ public class Logger
         try
         {
             isRunning = false;
-            Application.logMessageReceived -= OnApplicationLogMessageReceived;
+            //Application.logMessageReceived -= OnApplicationLogMessageReceived;
             currSW.Close();
 #if UNITY_EDITOR
             editorSW.Close();

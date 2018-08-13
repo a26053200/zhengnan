@@ -7,18 +7,11 @@
 require "Core.string"
 require "Core.Define"
 require "Core.Function"
+require "Core.List"
 require "Core.Tools"
 require "Core.UITools"
 require "Core.GlobalConsts"
 require "Core.Log"
 
-
-List = {}
-local _List = require ("Core.List")
-
----@return Core.List
-function List.New()
-    return _List.New()
-end
 
 log("Global define has all require")

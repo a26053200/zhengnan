@@ -7,18 +7,35 @@
 ---@class Core.Ioc.BaseMediator : Core.LuaMonoBehaviour
 local LuaMonoBehaviour = require('Core.LuaMonoBehaviour')
 local BaseMediator = class("BaseMediator",LuaMonoBehaviour)
+local NetworkListener = require("Manager.NetworkListener")
 
 function BaseMediator:Ctor()
     LuaMonoBehaviour.Ctor(self)
+
+    self.listener = NetworkListener.New()
+    self.removeCallback = nil
 end
 
 function BaseMediator:Start()
     self:OnInit()
     self:OnAutoRegisterEvent()
+    self:RegisterListeners()
+
+    nmgr:AddListener(self.listener)
 end
 
 function BaseMediator:OnInit()
 
+end
+
+function BaseMediator:RegisterListeners()
+
+end
+
+function BaseMediator:AddPush(action, callback)
+    if callback ~= nil then
+        self.listener:addPushCallback(action, callback)
+    end
 end
 
 --自动注册事件
@@ -37,9 +54,18 @@ function BaseMediator:RegisterClick(go, clickFun)
     LuaHelper.AddButtonClick(go,handler(self,clickFun))
 end
 
+function BaseMediator:DoRemove(callback)
+    self.removeCallback = callback
+end
+
 function BaseMediator:OnDestroy()
     print("OnDestroy view: "..self.viewInfo.name)
+    destroy(self.behaviour)
+    nmgr:RemoveListener(self.listener)
     self:OnRemove()
+    if self.removeCallback ~= nil then
+        self.removeCallback(self)
+    end
 end
 
 function BaseMediator:OnRemove()

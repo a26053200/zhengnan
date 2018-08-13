@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using LitJson;
+using System.Text.RegularExpressions;
 //
 // Class Introduce
 // Author: zhengnan
@@ -30,6 +31,8 @@ public class JsonClient :  ClientBase
 
     protected MethodInfo JsonCodeMethod;
 
+    private Regex reg;
+
     protected override void Awake()
     {
         base.Awake();
@@ -41,6 +44,8 @@ public class JsonClient :  ClientBase
         _rcvDataQueue = new Queue<RcvData>();
 
         JsonCodeMethod = typeof(JCode).GetMethod("Decode", BindingFlags.Static | BindingFlags.Public);
+
+        reg = new Regex("^.*action\":\"(.*)\\s+"); /* 提取action字段 **/
     }
     protected override void Update()
     {
@@ -149,18 +154,24 @@ public class JsonClient :  ClientBase
     }
     private void doReceive(RcvData rcvData)
     {
+        /*
         if (GlobalConsts.EnableLogNetwork)
         {
-#if UNITY_EDITOR
-            if (rcvData.cmdId != 19999)
+            #if UNITY_EDITOR
                 MyDebug.Log(string.Format("[Socket] <color=#1fac75ff>recv json</color>:{0}\t{1}\n{2}", rcvData.cmdId, (NetCmd)rcvData.cmdId, JCode.ToFormart(rcvData.json.ToString())));
-#else
-            if (rcvData.cmdId != 19999) 
+            #else
                 MyDebug.Log(string.Format("[Socket] recv json:{0}\t{1}\n{2}", rcvData.cmdId, (NetCmd)rcvData.cmdId, JCode.ToFormart(rcvData.json.ToString())));
-#endif
+            #endif
+        }*/
+        if (GlobalConsts.EnableLogNetwork)
+        {
+            String jsonStr = rcvData.json.ToString();
+            Match match = reg.Match(jsonStr);
+            MyDebug.Log(string.Format("[Socket] <color=#1fac75ff>recv json</color>:{0} {1}", match.Groups[0], jsonStr));
         }
         if (jsonCallback != null)
             jsonCallback(rcvData.json);
+        /*
         //默认监听对象
         RspdType rspdType = null;
         NetData obj = null;
@@ -201,6 +212,7 @@ public class JsonClient :  ClientBase
                 //rspdJsonList[i](rcvData.json.ToString());
             }
         }
+        */
     }
     /*
     protected void showErrorCodeTip(int cmdId)

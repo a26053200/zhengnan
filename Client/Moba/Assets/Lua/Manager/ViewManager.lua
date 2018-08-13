@@ -11,7 +11,7 @@ local LuaMonoBehaviour = require('Core.LuaMonoBehaviour')
 local ViewManager = class("ViewManager",LuaMonoBehaviour)
 
 require("Config.ViewConfig")
-local IocBootstrap = require("Core.Ioc.IocBootstrap").New()
+
 local ViewStatus = {}
 ViewStatus.Loading = "Loading"
 ViewStatus.Loaded = "Loaded"
@@ -19,7 +19,6 @@ ViewStatus.Unloading = "Unloading"
 ViewStatus.Unloaded = "Unloaded"
 
 function ViewManager:Ctor()
-    IocBootstrap:Launch()
     self.viewCache = {}
     self.viewList = List.New()
 end
@@ -64,6 +63,9 @@ function ViewManager:UnloadView(viewInfo)
             self.viewCache[viewInfo.name] = nil
             self.viewList:Remove(mdr)
             destroy(mdr.gameObject)
+            mdr:DoRemove(function ()
+                viewInfo.status = ViewStatus.Unloaded
+            end)
         end
     else
         logError("View {0} status is {1} ,you can't unload this view",viewInfo.name, viewInfo.status)
@@ -83,7 +85,7 @@ end
 ---@param viewInfo Core.ViewInfo
 ---@param go UnityEngine.GameObject
 function ViewManager:CreateView(viewInfo,go)
-    local mdrType = IocBootstrap.mediatorContext:GetMediator(viewInfo.name)
+    local mdrType = Ioc.ins.mediatorContext:GetMediator(viewInfo.name)
     if mdrType == nil then
         logError("view:'{0}' has not register", viewInfo.name)
         return
@@ -97,11 +99,12 @@ function ViewManager:CreateView(viewInfo,go)
     mdr.viewInfo = viewInfo
     mdr.gameObject = go
     go.name = viewInfo.name .. " - " ..go.name
-    go.transform.transform.localPosition = Vector3.zero
-    go.transform.transform.localEulerAngles = Vector3.zero
-    go.transform.transform.localScale = Vector3.one
+    go.transform.localPosition = Vector3.zero
+    go.transform.localEulerAngles = Vector3.zero
+    --go.transform.sizeDelta = Vector2.zero
+    go.transform.localScale = Vector3.one
 
-    IocBootstrap.binder:InjectSingle(mdr)
+    Ioc.ins.binder:InjectSingle(mdr)
     mdr:AddLuaMonoBehaviour(go,"Mediator")
 
     log("View has loaded {0}", viewInfo.name)

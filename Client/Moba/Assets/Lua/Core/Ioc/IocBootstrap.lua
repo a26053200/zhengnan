@@ -5,6 +5,8 @@
 ---
 
 ---@class Core.Ioc.IocBootstrap
+Ioc = {}
+Ioc.ins = nil
 local IocBootstrap = class("IocBootstrap")
 local IocBinder = require("Core.Ioc.IocBinder")
 local MediatorContext = require("Core.Ioc.MediatorContext")
@@ -13,6 +15,7 @@ local ServiceContext = require("Core.Ioc.ServiceContext")
 
 function IocBootstrap:Ctor()
     self.binder = IocBinder.New()
+    Ioc.ins = self
 end
 
 function IocBootstrap:Launch()
