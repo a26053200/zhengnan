@@ -265,6 +265,17 @@ public class TimeUtils
     }
 
     /**
+     * 将本机的当前时间Date类型转为时间字符串
+     * <p>格式为yyyy-MM-dd HH:mm:ss</p>
+     *
+     * @return 时间字符串
+     */
+    public static String new2String()
+    {
+        return date2String(new Date(), DEFAULT_PATTERN);
+    }
+
+    /**
      * 将Date类型转为时间字符串
      * <p>格式为yyyy-MM-dd HH:mm:ss</p>
      *

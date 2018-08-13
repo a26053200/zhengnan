@@ -3,6 +3,7 @@ package server.game.modules.Role;
 import com.alibaba.fastjson.JSONObject;
 import redis.clients.jedis.Jedis;
 import server.common.BaseVo;
+import server.common.interfaces.IDataBaseVo;
 import server.redis.RedisKeys;
 
 
@@ -12,20 +13,27 @@ import server.redis.RedisKeys;
  * @Author: zhengnan
  * @Date: 2018/7/31 21:51
  */
-public class RoleVo extends BaseVo
+public class RoleVo extends BaseVo implements IDataBaseVo
 {
+    private final static String ID = "id";
+    private final static String PLAYER_ID = "playerId";
+    private final static String ROLE_NAME = "roleName";
+    private final static String ONLINE_TIME = "onlineTime";
+
     private String id;
     private String playerId;
     private String roleName;
+    private long onlineTime;  //最后一次上线时间
 
+    public RoleVo(RoleSimpleVo simpleRole)
+    {
+        id = simpleRole.getId();
+        playerId = simpleRole.getPlayerId();
+        roleName = simpleRole.getRoleName();
+    }
     public String getId()
     {
         return id;
-    }
-
-    public void setId(String id)
-    {
-        this.id = id;
     }
 
     public String getPlayerId()
@@ -33,45 +41,41 @@ public class RoleVo extends BaseVo
         return playerId;
     }
 
-    public void setPlayerId(String playerId)
-    {
-        this.playerId = playerId;
-    }
-
     public String getRoleName()
     {
         return roleName;
     }
 
-    public void setRoleName(String roleName)
+    public long getOnlineTime()
     {
-        this.roleName = roleName;
+        return onlineTime;
+    }
+
+    public void setOnlineTime(long onlineTime)
+    {
+        this.onlineTime = onlineTime;
     }
 
     @Override
-    public void fromDB(Jedis db, String key)
+    public void fromDB(Jedis db)
     {
-        if(db.hgetAll(key) == null)
-            isEmpty = true;
-        else
-        {
-            id = db.hget(key, RedisKeys.role_id);
-            playerId = key;
-            roleName = db.hget(key,RedisKeys.role_name);
-        }
+
     }
 
     @Override
     public void writeDB(Jedis db)
     {
-        db.hset(playerId, RedisKeys.role_id, id);
-        db.hset(playerId, RedisKeys.role_player_id, playerId);
-        isEmpty = false;
+
     }
 
     @Override
     public JSONObject toJson()
     {
-        return null;
+        JSONObject json = new JSONObject();
+        json.put(ID, id);
+        json.put(PLAYER_ID, playerId);
+        json.put(ROLE_NAME, roleName);
+        json.put(ONLINE_TIME, onlineTime);
+        return json;
     }
 }

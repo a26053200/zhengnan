@@ -3,11 +3,8 @@ package server.gate;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.util.concurrent.Future;
 import io.netty.util.concurrent.GenericFutureListener;
-import io.netty.util.concurrent.GlobalEventExecutor;
 import org.apache.log4j.Logger;
 import server.common.Monitor;
 
@@ -51,7 +48,7 @@ public class GateServerHandler extends SimpleChannelInboundHandler<Monitor>
     {
         super.channelReadComplete(ctx);
         Channel incoming = ctx.channel();
-        logger.info("Client ip:" + incoming.remoteAddress() + " read msg over");
+        logger.info("Client ip:" + incoming.remoteAddress() + " channel has flush over");
         ctx.flush();
     }
 
@@ -66,7 +63,15 @@ public class GateServerHandler extends SimpleChannelInboundHandler<Monitor>
     public void channelInactive(ChannelHandlerContext ctx) throws Exception
     { // (6)
         Channel incoming = ctx.channel();
-        logger.info("Client ip:" + incoming.remoteAddress() + " is offline");
+        String ra1 = incoming.remoteAddress().toString();
+        String ra2 = monitor.getGameServerContext().channel().remoteAddress().toString();
+        if(ra1.equals(ra2))
+        {
+            logger.info("GameServer Client ip:" + incoming.remoteAddress() + " is offline");
+        }else{
+            logger.info("Client ip:" + incoming.remoteAddress() + " is offline");
+            monitor.notifyGameServerClientOffline(ctx);//通知游戏服务器:玩家客户端已经离线
+        }
         monitor.getChannelGroup().remove(ctx.channel());
     }
 
@@ -76,7 +81,7 @@ public class GateServerHandler extends SimpleChannelInboundHandler<Monitor>
         Channel incoming = ctx.channel();
         logger.error("Client ip:" + incoming.remoteAddress() + " is exception");
         // 当出现异常就关闭连接
-        cause.printStackTrace();
+        //cause.printStackTrace();
         logger.info(String.format("[GateServer] 远程IP:%s 的链接出现异常,其通道即将关闭", incoming.remoteAddress()));
         ctx.close().addListener(new GenericFutureListener<Future<? super Void>>()
         {

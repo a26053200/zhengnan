@@ -117,6 +117,11 @@ public abstract class Monitor
         recvJson(ctx,json);
     }
 
+    public SubMonitor getSubMonitor(String mntName)
+    {
+        return subMonitorMap.get(mntName);
+    }
+
     /**
      * @param ctx
      * @param jsonObject

@@ -61,7 +61,7 @@ public class GateClient
             ChannelFuture f = b.connect(host, port).sync();
             channel = f.channel();
             logger.info("GateClient connect " + this.serverName + " successful!!!");
-            monitor.SetGameServerClient(this);
+            //monitor.SetGameServerClient(this);
             f.channel().closeFuture().sync();
         }
         finally

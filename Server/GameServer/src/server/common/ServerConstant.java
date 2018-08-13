@@ -8,9 +8,7 @@ package server.common;
  */
 public class ServerConstant
 {
-    public static final String SERVER = "server";
 
-    public static final String CHANNEL_ID = "channelId";
 
     public class ServerName
     {

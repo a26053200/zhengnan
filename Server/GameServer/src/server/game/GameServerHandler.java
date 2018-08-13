@@ -45,7 +45,7 @@ public class GameServerHandler extends SimpleChannelInboundHandler<Monitor>
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         super.channelReadComplete(ctx);
         Channel incoming = ctx.channel();
-        logger.info("GameServer Client ip:" + incoming.remoteAddress() + " read msg over");
+        logger.info("GameServer Client ip:" + incoming.remoteAddress() + " channel has flush over");
         ctx.flush();
     }
     @Override

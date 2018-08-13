@@ -1,5 +1,10 @@
 package utils;
 
+import com.alibaba.fastjson.JSONArray;
+import server.redis.RedisKeys;
+
+import java.util.List;
+
 /**
  * @ClassName: JsonUtils
  * @Description: TODO
@@ -62,6 +67,14 @@ public class JsonUtils
             }
         }
         return jsonForMatStr.toString();
+    }
+
+    public static JSONArray list2jsonArray(List<String> list)
+    {
+        JSONArray jsonArray = new JSONArray();
+        for (int i = 0; i < list.size(); i++)
+            jsonArray.add(list.get(i));
+        return jsonArray;
     }
 
 }

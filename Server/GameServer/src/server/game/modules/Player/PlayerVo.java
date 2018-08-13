@@ -1,13 +1,16 @@
 package server.game.modules.Player;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import redis.clients.jedis.Jedis;
 import server.common.BaseVo;
+import server.common.interfaces.IDataBaseVo;
+import server.game.modules.Role.RoleSimpleVo;
 import server.redis.RedisKeys;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @ClassName: PlayerVo
@@ -15,18 +18,23 @@ import java.util.List;
  * @Author: zhengnan
  * @Date: 2018/7/31 21:47
  */
-public class PlayerVo extends BaseVo
+public class PlayerVo extends BaseVo implements IDataBaseVo
 {
+    private final static String ID = "id";
+    private final static String ROLE_LIST = "roleList";
+
     private String id;
     private String accountId;
-    private List<String> roleIdList; //玩家所创建的角色列表
+    private List<RoleSimpleVo> roleList; //玩家所创建的角色列表
     private String registerTime; //玩家第一次登陆游戏时间,即玩家在该服务器的注册时间
     private String lastLoginTime;//最后一次登陆时间
     private String lastLogoutTime;//最后一次登出时间
 
-    public PlayerVo()
+    public PlayerVo(String key)
     {
-        roleIdList = new ArrayList<String>();
+        super(key);
+        roleList = new ArrayList<>();
+        primaryKey = RedisKeys.player + ":" + key;
     }
 
     public String getId()
@@ -47,16 +55,6 @@ public class PlayerVo extends BaseVo
     public void setAccountId(String accountId)
     {
         this.accountId = accountId;
-    }
-
-    public List<String> getRoleIdList()
-    {
-        return roleIdList;
-    }
-
-    public void addRoleId(String roleId)
-    {
-        this.roleIdList.add(roleId);
     }
 
     public String getRegisterTime()
@@ -89,19 +87,36 @@ public class PlayerVo extends BaseVo
         this.lastLogoutTime = lastLogoutTime;
     }
 
-    @Override
-    public void fromDB(Jedis db, String key)
+    public List<RoleSimpleVo> getRoleList()
     {
-        if (db.hgetAll(key).isEmpty())
+        return roleList;
+    }
+
+    @Override
+    public void fromDB(Jedis db)
+    {
+        this.db = db;
+        if (db.hgetAll(primaryKey).isEmpty())
             isEmpty = true;
         else
         {
-            accountId = key;
-            id = db.hget(key, RedisKeys.player_id);
-            registerTime = db.hget(key, RedisKeys.player_register_time);
-            lastLoginTime = db.hget(key, RedisKeys.player_login_time);
-            lastLogoutTime = db.hget(key, RedisKeys.player_logout_time);
-            roleIdList = db.lrange(id,0, -1);
+            id              = db.hget(primaryKey, RedisKeys.player_id);
+            registerTime    = db.hget(primaryKey, RedisKeys.player_register_time);
+            lastLoginTime   = db.hget(primaryKey, RedisKeys.player_login_time);
+            lastLogoutTime  = db.hget(primaryKey, RedisKeys.player_logout_time);
+            //已经创建好的角色
+            String rolePrimaryKey = RedisKeys.role + ":" + id+"*";
+            Set<String> keys = db.keys(rolePrimaryKey);
+            Iterator<String> it = keys.iterator() ;
+            while(it.hasNext())
+            {
+                String key = it.next();
+                System.out.println(key);
+                RoleSimpleVo role = new RoleSimpleVo();
+                role.setPrimaryKey(key);
+                role.fromDB(db);
+                roleList.add(role);
+            }
         }
     }
 
@@ -109,29 +124,20 @@ public class PlayerVo extends BaseVo
     public void writeDB(Jedis db)
     {
         isEmpty = false;
-        db.hset(accountId, RedisKeys.player_id,             id);
-        db.hset(accountId, RedisKeys.player_account_id,     accountId);
-        db.hset(accountId, RedisKeys.player_register_time,  registerTime);
-        db.hset(accountId, RedisKeys.player_login_time,     lastLoginTime);
+        db.hset(primaryKey, RedisKeys.player_id,             id);
+        db.hset(primaryKey, RedisKeys.player_account_id,     accountId);
+        db.hset(primaryKey, RedisKeys.player_register_time,  registerTime);
+        db.hset(primaryKey, RedisKeys.player_login_time,     lastLoginTime);
         if(lastLogoutTime != null)
-            db.hset(accountId, RedisKeys.player_logout_time, lastLogoutTime);
-        for (int i = 0; i < roleIdList.size(); i++)
-            db.lpush(id,roleIdList.get(i));
+            db.hset(primaryKey, RedisKeys.player_logout_time, lastLogoutTime);
     }
 
     @Override
     public JSONObject toJson()
     {
         JSONObject json = new JSONObject();
-        json.put(RedisKeys.player_id, id);
-        //json.put("aid", account_id);
-        //json.put("token", JwtHelper.createJWT(account_id));
-        JSONArray srvList = new JSONArray();
-        for (int i = 0; i < roleIdList.size(); i++)
-        {
-            srvList.add(roleIdList.get(i));
-        }
-        json.put("srvList", srvList);
+        json.put(ID, id);
+        json.put(ROLE_LIST, list2jsonArray(roleList));
         return json;
     }
 }

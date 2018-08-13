@@ -22,10 +22,12 @@ import server.common.ServerConstant;
 public class GateServer extends BaseServer
 {
     public static final String ServerName = "GateServer";
+
     public GateServer(int port)
     {
         super(ServerName, port);
     }
+
     @Override
     public void run() throws Exception
     {
@@ -33,7 +35,8 @@ public class GateServer extends BaseServer
         EventLoopGroup bossGroup = new NioEventLoopGroup(); // (1)
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         GateMonitor monitor = new GateMonitor();
-        try {
+        try
+        {
             ServerBootstrap b = new ServerBootstrap(); // (2)
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class) // (3)
@@ -50,27 +53,32 @@ public class GateServer extends BaseServer
                     .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
 
 
-
             ChannelFuture f = b.bind(port).sync(); // (7)
             logger.info(ServerName + " startup successful!!!");
             //网关客户端连接游戏服务器
-            GateClient.start(ServerConstant.ServerName.GAME_SERVER,"",8090,monitor);
+            //GateClient.start(ServerConstant.ServerName.GAME_SERVER,"",8090,monitor);
             f.channel().closeFuture().sync();
 
             logger.info(ServerName + " close up...");
-        } finally {
+        }
+        finally
+        {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
     }
 
 
-    public static void main(String[] args) throws Exception {
-        Debug.initLog("["+ServerName+"]","log4j_gate_server.properties");
+    public static void main(String[] args) throws Exception
+    {
+        Debug.initLog("[" + ServerName + "]", "log4j_gate_server.properties");
         int port;
-        if (args.length > 0) {
+        if (args.length > 0)
+        {
             port = Integer.parseInt(args[0]);
-        } else {
+        }
+        else
+        {
             port = 8081;
         }
         new GateServer(port).run();

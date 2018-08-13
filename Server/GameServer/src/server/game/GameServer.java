@@ -11,6 +11,7 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import org.apache.log4j.Logger;
 import server.common.BaseServer;
+import server.common.ServerConstant;
 import server.gate.*;
 
 /**
@@ -55,7 +56,8 @@ public class GameServer extends BaseServer
 
             ChannelFuture f = b.bind(port).sync(); // (7)
             logger.info(ServerName + " startup successful!!!");
-
+            //游戏服务器客户端连接网关服务器
+            GameClient.start(ServerConstant.ServerName.GATE_SERVER,"127.0.0.1",8081,monitor);
             f.channel().closeFuture().sync();
             logger.info(ServerName + " close up...");
         }
@@ -65,6 +67,8 @@ public class GameServer extends BaseServer
             bossGroup.shutdownGracefully();
         }
     }
+
+
 
     public static void main(String[] args) throws Exception
     {
