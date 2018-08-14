@@ -5,18 +5,18 @@
 --- 视图管理d
 ---
 
+ViewStatus = {}
+ViewStatus.Loading = "Loading"
+ViewStatus.Loaded = "Loaded"
+ViewStatus.Unloading = "Unloading"
+ViewStatus.Unloaded = "Unloaded"
+
 ---@class Manager.ViewManager : Core.LuaMonoBehaviour
 ---@field public scene Modules.World.Scenes.BaseScene
 local LuaMonoBehaviour = require('Core.LuaMonoBehaviour')
 local ViewManager = class("ViewManager",LuaMonoBehaviour)
 
 require("Config.ViewConfig")
-
-local ViewStatus = {}
-ViewStatus.Loading = "Loading"
-ViewStatus.Loaded = "Loaded"
-ViewStatus.Unloading = "Unloading"
-ViewStatus.Unloaded = "Unloaded"
 
 function ViewManager:Ctor()
     self.viewCache = {}

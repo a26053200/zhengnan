@@ -4,13 +4,17 @@ WorldConfig.TempA = {
     debugName = "临时场景A",
     level = "TempA",
     levelUrl = "",
-    needLoading = false
 }
 WorldConfig.TempB = {
     debugName = "临时场景B",
     level = "TempB",
     levelUrl = "",
-    needLoading = false
+}
+WorldConfig.Loading = {
+    debugName = "加载场景",
+    level = "Loading",
+    sceneName = "Loading",
+    levelUrl = "",
 }
 WorldConfig.Login = {
     debugName = "登陆场景",
@@ -24,12 +28,12 @@ WorldConfig.GuideScene = {
     level = "GuideNewbie",
     sceneName = "GuideNewbie",
     levelUrl = "BundleScenes/GuideNewbie.unity",
-    needLoading = false
+    needLoading = true
 }
 WorldConfig.Lobby = {
     debugName = "游戏大厅",
     level = "Lobby",
     sceneName = "Lobby",
     levelUrl = "BundleScenes/Lobby.unity",
-    needLoading = false
+    needLoading = true
 }

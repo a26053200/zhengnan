@@ -33,8 +33,28 @@ function LuaMonoBehaviour:LoadAsset(assetName)
     return prefab
 end
 
-function LuaMonoBehaviour:OnDestroy()
+function LuaMonoBehaviour:StartCoroutine(coFun)
+    if self.coMap == nil then
+        self.coMap = {}
+    end
+    self.coMap[coFun] = coroutine.start(function ()
+        coFun()
+    end)
+    return self.coMap[coFun]
+end
+
+function LuaMonoBehaviour:Dispose()
     destroy(self.behaviour)
+    if self.coMap then
+        for _, co in pairs(self.coMap) do
+            coroutine.stop(co)
+        end
+    end
+    self.coMap = nil
+end
+
+function LuaMonoBehaviour:OnDestroy()
+    self:Dispose()
 end
 
 return LuaMonoBehaviour

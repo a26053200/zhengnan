@@ -75,6 +75,24 @@ public static class GameObjectExt
             child.GetComponent<Image>().sprite = sprite;
     }
 
+    //设置组件Slider
+    public static void SetSlider(this GameObject gameObject, string path, float value)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+            child.GetComponent<Slider>().value = value;
+    }
+
+    //获取组件Slider值
+    public static float GetSlider(this GameObject gameObject, string path)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+            return child.GetComponent<Slider>().value;
+        else
+            return 0;
+    }
+
     //按节点路径查找子节点
     public static GameObject FindChild(this GameObject gameObject, string path)
     {

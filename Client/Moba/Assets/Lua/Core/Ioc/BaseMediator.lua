@@ -60,12 +60,13 @@ end
 
 function BaseMediator:OnDestroy()
     print("OnDestroy view: "..self.viewInfo.name)
-    destroy(self.behaviour)
+    self:Dispose()
     nmgr:RemoveListener(self.listener)
     self:OnRemove()
     if self.removeCallback ~= nil then
         self.removeCallback(self)
     end
+    self.viewInfo.status = ViewStatus.Unloaded
 end
 
 function BaseMediator:OnRemove()

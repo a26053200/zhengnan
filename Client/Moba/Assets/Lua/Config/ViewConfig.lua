@@ -8,3 +8,4 @@ ViewConfig.RoleCreate={name="RoleCreate",prefab="Prefabs/UI/Login/RoleCreate.pre
 ViewConfig.RoleSelect={name="RoleSelect",prefab="Prefabs/UI/Login/RoleSelectWnd.prefab",}
 ViewConfig.NewbieWelcome={name="NewbieWelcome",prefab="Prefabs/UI/Newbie/NewbieWelcome.prefab",}
 ViewConfig.RoleInfo={name="RoleInfo",prefab="Prefabs/UI/Role/RoleInfo.prefab",}
+ViewConfig.Loading={name="Loading",prefab="Prefabs/UI/Common/LoadingWnd.prefab",}

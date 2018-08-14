@@ -17,6 +17,7 @@ function WorldMdr:Ctor()
     self.tempLevel = nil;
     self.currLevel = "";
     self.currScene = nil;
+    self.nextScene = nil;
 
     World.ins = self
 end
@@ -36,15 +37,27 @@ end
 
 function WorldMdr:EnterScene(sceneInfo, callback)
     if string.isValid(sceneInfo.level) then
+        log("Will enter "..sceneInfo.level)
         if self.currLevel == sceneInfo.level then
             logError("you can not load then same scene - " .. sceneInfo.level)
         elseif sceneInfo.level == "Temp" then
             self.tempLevel = self:GetTempLevel()
             self:LoadLevel(self.tempLevel, sceneInfo, callback)
+        elseif sceneInfo.needLoading then
+            self.nextScene = sceneInfo
+            self:EnterScene(WorldConfig.Loading)
         else
             self:LoadLevel(sceneInfo.level,sceneInfo, callback)
         end
     end
+end
+
+function WorldMdr:EnterNextScene()
+    self.nextScene.needLoading = false --临时关闭加载需求
+    self:EnterScene(self.nextScene,function ()
+        self.nextScene.needLoading = true
+        self.nextScene = nil
+    end)
 end
 
 function WorldMdr:LoadLevel(level,sceneInfo, callback)
@@ -57,9 +70,9 @@ function WorldMdr:LoadLevel(level,sceneInfo, callback)
         end
         local scene = sceneType.New()
         log("进入场景:"..sceneInfo.debugName)
-        scene:OnEnterScene()
         self.currScene = scene
         self.currLevel = level
+        scene:OnEnterScene()
         if callback ~= nil then
             callback()
         end

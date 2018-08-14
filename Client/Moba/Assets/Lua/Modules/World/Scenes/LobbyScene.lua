@@ -13,7 +13,7 @@ function LobbyScene:Ctor()
 end
 
 function LobbyScene:OnEnterScene()
-    --vmgr:LoadView(ViewConfig.RoleInfo)
+    vmgr:LoadView(ViewConfig.RoleInfo)
     --vmgr:LoadView(ViewConfig.NewbieWelcome)
 end
 
