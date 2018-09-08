@@ -31,7 +31,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  */
 public class AccountMonitor extends Monitor
 {
-    final static Logger logger = Logger.getLogger(LoginMonitor.class);
+    final static Logger logger = Logger.getLogger(AccountMonitor.class);
 
 
 

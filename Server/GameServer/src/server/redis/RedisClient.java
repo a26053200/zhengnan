@@ -13,7 +13,7 @@ import server.gate.GateClientHandler;
 
 public class RedisClient
 {
-    private static final Logger logger = Logger.getLogger(GateClientHandler.class);
+    private static final Logger logger = Logger.getLogger(RedisClient.class);
 
     private static RedisClient s_instance = null;
 
