@@ -25,15 +25,28 @@ function LoginMdr:OnInit()
     self.gameObject:SetInputField("V/H2/InputField", self.password)
 end
 
+function LoginMdr:On_Click_BtnRegister()
+    self.username = self.gameObject:GetText("V/H1/InputField/Text")
+    self.password = self.gameObject:GetText("V/H2/InputField/Text")
+    if string.isNullOrEmpty(self.username) or string.isNullOrEmpty(self.password) then
+        print("Please input id and pw")
+    else
+        self.loginService:HttpRegister(self.username, self.password, handler(self,self.OnHttpRegister))
+    end
+end
+
 function LoginMdr:On_Click_BtnLogin()
     self.username = self.gameObject:GetText("V/H1/InputField/Text")
     self.password = self.gameObject:GetText("V/H2/InputField/Text")
-
     if string.isNullOrEmpty(self.username) or string.isNullOrEmpty(self.password) then
         print("Please input id and pw")
     else
         self.loginService:HttpLogin(self.username, self.password, handler(self,self.OnHttpLogin))
     end
+end
+
+function LoginMdr:OnHttpRegister(data)
+
 end
 
 function LoginMdr:OnHttpLogin(data)

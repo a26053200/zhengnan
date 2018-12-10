@@ -6,7 +6,9 @@
 
 LoginAction = {}
 
-LoginAction.LoginAccount = { server = "AccountServer", action = "login_account", data = "%s&%s" }
+LoginAction.LoginAccount = { server = "AccountServer", action = "account@account_login", fields = "username,password" }
+
+LoginAction.LoginRegister = { server = "AccountServer", action = "account@account_register", fields = "username,password" }
 
 LoginAction.LoginGameServer = { server = "GameServer", action = "Player@login_game_server", data = "%s&%s" }
 
@@ -21,18 +23,28 @@ LoginAction.SelectRoleEnterGame = { server = "GameServer", action = "Role@select
 ---@class Modules.Login.Service.LoginService : Core.Ioc.BaseService
 local BaseService = require("Core.Ioc.BaseService")
 local LoginService = class("LoginService", BaseService)
+local Url = "http://127.0.0.1:8081"
 
 function LoginService:Ctor()
     nmgr:AddPush(LoginAction.PlayerInfo, handler(self,self.OnPlayerInfo))
 end
 
-function LoginService:HttpLogin(username, password, callback)
-    nmgr:HttpRqst("http://127.0.0.1:8080", LoginAction.LoginAccount, function(data)
+function LoginService:HttpRegister(username, password, callback)
+    nmgr:HttpRqst(Url, LoginAction.LoginRegister, {username, password},function(data)
         self.loginModel.serverList = data.srvList.list
         self.loginModel.aid = data.aid
         self.loginModel.token = data.token
         callback(data)
-    end, username, password)
+    end)
+end
+
+function LoginService:HttpLogin(username, password, callback)
+    nmgr:HttpRqst(Url, LoginAction.LoginAccount, {username, password},function(data)
+        self.loginModel.serverList = data.srvList.list
+        self.loginModel.aid = data.aid
+        self.loginModel.token = data.token
+        callback(data)
+    end)
 end
 
 function LoginService:LoginGameServer(aid, token, callback)
