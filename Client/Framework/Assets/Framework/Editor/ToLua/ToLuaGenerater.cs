@@ -28,8 +28,8 @@ public class ToLuaGenerater
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$ : Core.LuaObject
-local LuaObject = require('Core.LuaObject')
+---@class $CLASS_PACKER$.$CLASS_NAME$ : Betel.LuaObject
+local LuaObject = require('Betel.LuaObject')
 local $CLASS_NAME$ = class('$CLASS_NAME$',LuaObject)
 
 function $CLASS_NAME$:Ctor()
@@ -64,8 +64,8 @@ return $CLASS_NAME$
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$Mdr : Core.Ioc.BaseMediator
-local BaseMediator = require('Core.Ioc.BaseMediator')
+---@class $CLASS_PACKER$.$CLASS_NAME$Mdr : Game.Core.Ioc.BaseMediator
+local BaseMediator = require('Game.Core.Ioc.BaseMediator')
 local $CLASS_NAME$Mdr = class('$CLASS_NAME$Mdr',BaseMediator)
 
 function $CLASS_NAME$Mdr:OnInit()
@@ -83,8 +83,8 @@ return $CLASS_NAME$Mdr
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$Model : Core.Ioc.BaseModel
-local BaseModel = require('Core.Ioc.BaseModel')
+---@class $CLASS_PACKER$.$CLASS_NAME$Model : Game.Core.Ioc.BaseModel
+local BaseModel = require('Game.Core.Ioc.BaseModel')
 local $CLASS_NAME$Model = class('$CLASS_NAME$Model',BaseModel)
 
 function $CLASS_NAME$Model:Ctor()
@@ -101,8 +101,8 @@ return $CLASS_NAME$Model
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$Service : Core.Ioc.BaseService
-local BaseService = require('Core.Ioc.BaseService')
+---@class $CLASS_PACKER$.$CLASS_NAME$Service : Game.Core.Ioc.BaseService
+local BaseService = require('Game.Core.Ioc.BaseService')
 local $CLASS_NAME$Service = class('$CLASS_NAME$Service',BaseService)
 
 function $CLASS_NAME$Service:Ctor()
@@ -119,8 +119,8 @@ return $CLASS_NAME$Service
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$Vo : Core.Ioc.BaseVo
-local BaseVo = require('Core.Ioc.BaseVo')
+---@class $CLASS_PACKER$.$CLASS_NAME$Vo : Game.Core.Ioc.BaseVo
+local BaseVo = require('Game.Core.Ioc.BaseVo')
 local $CLASS_NAME$Vo = class('$CLASS_NAME$Vo',BaseVo)
 
 function $CLASS_NAME$Vo:Ctor()

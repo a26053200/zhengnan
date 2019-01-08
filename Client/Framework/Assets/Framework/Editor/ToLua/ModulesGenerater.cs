@@ -13,13 +13,13 @@ using System.Text;
 
 public class ModulesGenerater : EditorWindow
 {
-    private const string ViewConfigPath = "Assets/Lua/Config/ViewConfig.lua";
-    private const string LuaModulesDir = "Lua/Modules/";
+    private const string ViewConfigPath = "Assets/Lua/Game/Config/ViewConfig.lua";
+    private const string LuaModulesDir = "Lua/Game/Modules/";
     private const string PrefabsDir = "Assets/Res/Prefabs/UI/";
     private const string PrefabsRootDir = "Res/Prefabs/UI/";
-    private const string MediatorContextPath = "Assets/Lua/Core/Ioc/MediatorContext.lua";
-    private const string ModelContextPath = "Assets/Lua/Core/Ioc/ModelContext.lua";
-    private const string ServiceContextPath = "Assets/Lua/Core/Ioc/ServiceContext.lua";
+    private const string MediatorContextPath = "Assets/Lua/Game/Core/Ioc/MediatorContext.lua";
+    private const string ModelContextPath = "Assets/Lua/Game/Core/Ioc/ModelContext.lua";
+    private const string ServiceContextPath = "Assets/Lua/Game/Core/Ioc/ServiceContext.lua";
     [MenuItem("Tools/OpenModuelsWnd")]
     static void OpenModuelsWnd()
     {
@@ -61,7 +61,7 @@ public class ModulesGenerater : EditorWindow
                 scrollPos = EditorGUILayout.BeginScrollView(scrollPos, GUILayout.Height(position.height * 0.8f));
                 EditModulelist();
                 EditorGUILayout.EndScrollView();
-                if (GUILayout.Button("重新生成 Mvc 文件"))
+                if (GUILayout.Button("重新生成 Mvc Context 文件"))
                 {
                     string fileText = luaTable.ToString();
                     FileUtils.SaveTextFile(ViewConfigPath, fileText);
