@@ -10,6 +10,6 @@ require "Betel.Function"
 require "Betel.List"
 require "Betel.Tools"
 require "Betel.Log"
-
+require "Betel.Res"
 
 log("Global define has all require")
