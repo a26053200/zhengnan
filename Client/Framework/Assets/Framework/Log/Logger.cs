@@ -14,15 +14,15 @@ using System.Threading;
 public class Logger
 {
 #if UNITY_EDITOR
-    private static string path = Application.dataPath + "/../Log/";
+    private static string logDir = Application.dataPath + "/../Logs/";
 #elif UNITY_STANDALONE_WIN
-    private static string path = Application.dataPath + "/../Log/";
+    private static string logDir = Application.dataPath + "/../Logs/";
 #elif UNITY_STANDALONE_OSX
-    private static string path = Application.dataPath + "/Log/";
+    private static string logDir = Application.dataPath + "/Logs/";
 #else
-    private static string path = Application.persistentDataPath + "/Log/";
+    private static string logDir = Application.persistentDataPath + "/Logs/";
 #endif
-    
+
     static string TimeFormat = "yyyy-MM-dd-HH:mm:ss";
     static string FileTimeFormat = "yyyy-MM-dd-HH.mm.ss";
     //private static bool writeDown;
@@ -60,12 +60,17 @@ public class Logger
     {
         if (instance != null)
             throw new Exception("no more instance");
-        string currLogFilePath = Path.Combine(path, "game.log");
+        if (!Directory.Exists(logDir))
+            Directory.CreateDirectory(logDir);
+        string currLogFilePath = Path.Combine(logDir, "game.log");
         if (File.Exists(currLogFilePath))
             File.Delete(currLogFilePath);// fileStream = new FileStream(logFilePath, FileMode.Append);
         currSW = new StreamWriter(new FileStream(currLogFilePath, FileMode.Create), Encoding.UTF8);
 #if UNITY_EDITOR
-        string editlogFilePath = Path.Combine(path + "Editor/", DateTime.Now.ToString(FileTimeFormat) + ".log");
+        string edirlogDir = logDir + "Editor/";
+        if (!Directory.Exists(edirlogDir))
+            Directory.CreateDirectory(edirlogDir);
+        string editlogFilePath = Path.Combine(logDir + "Editor/", DateTime.Now.ToString(FileTimeFormat) + ".log");
         editorSW = new StreamWriter(new FileStream(editlogFilePath, FileMode.Create), Encoding.UTF8);
 #endif
         //Application.logMessageReceived += OnApplicationLogMessageReceived;
