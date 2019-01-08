@@ -2,7 +2,7 @@
 
 function Main()
     print("toLua logic start" .. Time.timeSinceLevelLoad)
-    local LuaClient = require ("LuaClient")
+    local LuaClient = require ("Game.LuaClient")
     if LuaClient then
         LuaClient.Start()
     end
