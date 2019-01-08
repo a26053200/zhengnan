@@ -2,8 +2,10 @@
 
 function Main()
     print("toLua logic start" .. Time.timeSinceLevelLoad)
-
-    require ("LuaClient").Start();
+    local LuaClient = require ("LuaClient")
+    if LuaClient then
+        LuaClient.Start()
+    end
 end
 
 --场景切换通知
