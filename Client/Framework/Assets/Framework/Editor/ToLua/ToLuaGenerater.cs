@@ -220,7 +220,7 @@ return $CLASS_NAME$Vo
     {
         string fileName = Path.GetFileNameWithoutExtension(filePath);
         string viewName = fileName.Replace(folder.ToString(), "");
-        string packName = string.Format("Modules.{0}.View.{1}", moduleName, fileName);
+        string packName = string.Format("Game.Modules.{0}.View.{1}", moduleName, fileName);
         return string.Format(Format_Mdr_Line, packName, viewName);
     }
     //生成lua mvc line
@@ -228,7 +228,7 @@ return $CLASS_NAME$Vo
     {
         string fileName = Path.GetFileNameWithoutExtension(filePath);
         string viewName = fileName.Replace(folder.ToString(), "");
-        string packName = string.Format("Modules.{0}.{1}.{2}", viewName, folder.ToString(), fileName);
+        string packName = string.Format("Game.Modules.{0}.{1}.{2}", viewName, folder.ToString(), fileName);
         return string.Format(Format_Shingleton_Line, packName);
     }
     //生成文件夹
