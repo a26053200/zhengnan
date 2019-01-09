@@ -11,3 +11,9 @@ PlayerPrefs = UnityEngine.PlayerPrefs;
 
 ---Framework
 logger = Logger
+
+List = {}
+---@return Betel.List
+function List.New()
+    return require ("Betel.List").New()
+end

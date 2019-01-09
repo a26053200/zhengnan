@@ -3,7 +3,7 @@
 --- Created by zheng.
 --- DateTime: 2018/6/10 21:15
 ---
-
+--[[
 function class(className, super)
     local superType = type(super)
     local cls
@@ -62,6 +62,36 @@ function class(className, super)
         end
     end
 
+    return cls
+end
+]]--
+
+---Lua class
+--- 父类的方法调用 Class.super.Func(self,...) 错误使用 Class.super:Func(...)
+---@param className string
+---@param optional super table
+---@return table
+function class(className, super)
+    local cls = {}
+    cls.__cname = className
+    cls.__class = cls
+    cls.__index = cls
+
+    if super ~= nil then
+        setmetatable(cls, super)
+        cls.super = super
+    else
+        cls.Ctor = function()
+            --Do nothing
+        end
+    end
+
+    function cls.New(...)
+        local instance = setmetatable({}, cls)
+        for k,v in pairs(cls) do instance[k] = v end
+        instance:Ctor(...)
+        return instance
+    end
     return cls
 end
 

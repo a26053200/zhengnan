@@ -5,12 +5,7 @@
 ---
 
 
-List = {}
 
----@return Betel.List
-function List.New()
-    return require ("Betel.List").New()
-end
 
 ---@class Betel.List : Betel.LuaObject
 local LuaObject = require("Betel.LuaObject")
