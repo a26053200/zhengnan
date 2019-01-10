@@ -6,7 +6,7 @@
 ---
 
 ---@class Betel.Net.NetworkManager : Betel.LuaMonoBehaviour
----@field public scene Game.Modules.World.Scenes.BaseScene
+---@field public listenerList Game.Modules.World.Scenes.BaseScene
 local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
 local NetworkManager = class("NetworkManager", LuaMonoBehaviour)
 local json = require("cjson")
@@ -58,13 +58,13 @@ function NetworkManager:AddPush(action, callback)
 end
 
 --添加Http请求
-function NetworkManager:HttpRqst(url, data, callback, ...)
+function NetworkManager:HttpRqst(url, data, params, callback)
     if callback ~= nil then
         self.listener:addCallback(data.action, callback)
     end
-    data.data = string.format(data.data, ...)
+    data = self:parseParams(data,params)
     local jsonStr = json.encode(data)
-    print("[HttpRqst]" .. jsonStr)
+    print("[Http Rqst]" .. jsonStr)
     netMgr:HttpRequest(url, jsonStr)
 end
 
@@ -74,13 +74,13 @@ function NetworkManager:Send(json)
 end
 
 --同步请求
-function NetworkManager:Request(data, callback, ...)
+function NetworkManager:Request(data, params, callback)
     if callback ~= nil then
         self.listener:addCallback(data.action, callback)
     end
-    data.data = string.format(data.data, ...)
+    data = self:parseParams(data,params)
     local jsonStr = json.encode(data)
-    --print("[Send]" .. jsonStr)
+    print("[Send]" .. jsonStr)
     netMgr:SendJson(jsonStr)
 end
 
@@ -103,5 +103,15 @@ function NetworkManager:OnJsonRspd(jsonStr)
     end
 end
 
+function NetworkManager:parseParams(data,values)
+    if values then
+        local fields = string.split(data.fields,",")
+        for i=1, #fields do
+            data[fields[i]] = values[i]
+        end
+    end
+    data.client = "Unity"
+    return data
+end
 
 return NetworkManager
