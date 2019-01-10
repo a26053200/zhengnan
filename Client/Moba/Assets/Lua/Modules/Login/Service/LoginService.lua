@@ -24,6 +24,7 @@ LoginAction.SelectRoleEnterGame = { server = "GameServer", action = "Role@select
 local BaseService = require("Core.Ioc.BaseService")
 local LoginService = class("LoginService", BaseService)
 local Url = "http://127.0.0.1:8081"
+--local Url = "http://118.31.3.216:8081"
 
 function LoginService:Ctor()
     nmgr:AddPush(LoginAction.PlayerInfo, handler(self,self.OnPlayerInfo))
