@@ -214,9 +214,9 @@ public class Logger
                 break;
             case LogType.Error:
             case LogType.Exception:
-                Application.logMessageReceived -= OnApplicationLogMessageReceived;
+                //Application.logMessageReceived -= OnApplicationLogMessageReceived;
                 Debug.LogError(logContent);
-                Application.logMessageReceived += OnApplicationLogMessageReceived;
+                //Application.logMessageReceived += OnApplicationLogMessageReceived;
                 break;
         }
     }

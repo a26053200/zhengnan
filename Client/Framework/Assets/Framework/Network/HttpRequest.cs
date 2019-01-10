@@ -34,7 +34,8 @@ public class HttpRequest : MonoBehaviour
             {
                 //去掉结尾的 '\0' 字符 要不然会解析不出json  这个查了很多资料 
                 //最终通过打印2进制数组一个一个字节对比才发现的 - -!
-                string json = Encoding.UTF8.GetString(www.bytes,0, www.bytes.Length - 1);
+                //string json = Encoding.UTF8.GetString(www.bytes,0, www.bytes.Length - 1);
+                string json = Encoding.UTF8.GetString(www.bytes, 0, www.bytes.Length);
                 MyDebug.Log("[Http recv] " + json);
                 JsonData netData = JsonMapper.ToObject(json);
                 SendMessage(callback, netData);
