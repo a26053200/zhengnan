@@ -93,24 +93,41 @@ public static class GameObjectExt
             return 0;
     }
 
+    //获取组件CanvasGroup
+    public static CanvasGroup GetCanvasGroup(this GameObject gameObject, string path)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+        {
+            CanvasGroup canvasGroup = child.GetComponent<CanvasGroup>();
+            return canvasGroup;
+        }
+        return null;
+    }
+
     //按节点路径查找子节点
     public static GameObject FindChild(this GameObject gameObject, string path)
     {
-        Queue<string> childQueue = new Queue<string>(path.Split('/'));
-        Transform findChild = null;
-        foreach (Transform child in gameObject.GetComponentsInChildren<Transform>())
+        if (string.IsNullOrEmpty(path))
+            return gameObject;
+        else
         {
-            if (childQueue.Peek() == child.name)
+            Queue<string> childQueue = new Queue<string>(path.Split('/'));
+            Transform findChild = null;
+            foreach (Transform child in gameObject.GetComponentsInChildren<Transform>())
             {
-                childQueue.Dequeue();
-                if (childQueue.Count == 0)
+                if (childQueue.Peek() == child.name)
                 {
-                    findChild = child;
-                    break;
+                    childQueue.Dequeue();
+                    if (childQueue.Count == 0)
+                    {
+                        findChild = child;
+                        break;
+                    }
                 }
             }
+            return findChild ? findChild.gameObject : null;
         }
-        return findChild ? findChild.gameObject : null;
     }
 
     //获取当前节点的完整路径

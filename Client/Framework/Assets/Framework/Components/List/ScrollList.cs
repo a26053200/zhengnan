@@ -22,6 +22,7 @@ public class ScrollList : MonoBehaviour
     public OnItemRender onItemRender;
 
     public OnScrollOver onScrollOver;
+
     /// <summary>
     /// 排序方式
     /// </summary>
@@ -80,28 +81,6 @@ public class ScrollList : MonoBehaviour
         Bottom,
     }
 
-    /// <summary>
-    /// 项目状态
-    /// </summary>
-    public enum ListItemStatus
-    {
-        /// <summary>
-        /// 新建
-        /// </summary>
-        New,
-        /// <summary>
-        /// 就位
-        /// </summary>
-        Standby,
-        /// <summary>
-        /// 将要被重置
-        /// </summary>
-        WillReset,
-        /// <summary>
-        /// 已重置
-        /// </summary>
-        Reset,
-    }
 
     public Arrangement arrangement = Arrangement.Vertical;
 
@@ -148,6 +127,15 @@ public class ScrollList : MonoBehaviour
     public float marginRight = 0;
 
     /// <summary>
+    /// 渲染子节点
+    /// </summary>
+    public GameObject Child
+    {
+        get { return item; }
+        set { SetItem(value); }
+    }
+
+    /// <summary>
     /// 总个数
     /// </summary>
     public int ChildCount
@@ -165,11 +153,7 @@ public class ScrollList : MonoBehaviour
         set { SetViewPort(value); }
     }
 
-    /// <summary>
-    /// 渲染子节点
-    /// </summary>
     public GameObject item;
-
     ScrollRect scrollRect;
     Vector2 viewPort;
     RectTransform content;
@@ -184,7 +168,6 @@ public class ScrollList : MonoBehaviour
     int startIndex; //当前渲染起始坐标
     int endIndex; //当前渲染结束坐标
     int maxPerLine;
-    bool scrolling = false;//正在滚动
 
     void Start()
     {
@@ -204,12 +187,6 @@ public class ScrollList : MonoBehaviour
         content.anchorMax = new Vector2(0, 1);
         content.anchorMin = new Vector2(0, 1);
         content.pivot = new Vector2(0, 1);
-
-        RectTransform itemTrans = item.transform as RectTransform;
-        itemTrans.pivot = new Vector2(0, 1);
-        itemSize = itemTrans.sizeDelta;
-        item.SetActive(false);
-
         ReBuild();
     }
 
@@ -312,18 +289,7 @@ public class ScrollList : MonoBehaviour
 
         int curLineIndex = GetCurLineIndex();
         if (curLineIndex != scrollLineIndex)
-        {
-            scrolling = true;
             UpdateRectItem(curLineIndex, false);
-        }
-        else
-        {
-            if(scrolling)
-            {
-                scrolling = false;
-                onScrollOver(curLineIndex);
-            }
-        }
     }
 
     /// <summary>
@@ -355,7 +321,6 @@ public class ScrollList : MonoBehaviour
     {
         if (curLineIndex < 0)
             return;
-        //Debug.Log(SystemUtils.GetDebugStackTrace());
         startIndex = curLineIndex * maxPerLine;
         endIndex = (curLineIndex + totalCount) * maxPerLine;
         if (endIndex >= childCount)
@@ -365,8 +330,7 @@ public class ScrollList : MonoBehaviour
         outOfContains.Clear(); //items的索引
         for (int i = 0; i < items.Count; i++)//如果当前已渲染的item中包含
         {
-            string result = System.Text.RegularExpressions.Regex.Replace(items[i].gameObject.name, @"[^0-9]+", "");
-            int index = int.Parse(result);
+            int index = int.Parse(items[i].gameObject.name);
             if (index < startIndex || index >= endIndex)
             {
                 outOfContains.Add(i);
@@ -397,9 +361,7 @@ public class ScrollList : MonoBehaviour
                     child.localPosition = startPos +
                                             new Vector2(row * itemSize.x + (row) * columuSpace,
                                                 -col * itemSize.y - (col) * rowSpace);
-                child.gameObject.name = i.ToString() + ListItemStatus.Reset;
-                Debug.Log(child.name + " child.localPosition:" + child.localPosition);
-                Debug.Log("content.localPosition:" + content.transform.localPosition);
+                child.gameObject.name = i.ToString();
                 if (onItemRender != null)
                     onItemRender(i, child);
             }
@@ -436,7 +398,6 @@ public class ScrollList : MonoBehaviour
         if (content.childCount > index)
         {
             child = content.GetChild(index);
-            child.gameObject.name = index.ToString() + ListItemStatus.WillReset;
         }
         else
         {
@@ -444,13 +405,25 @@ public class ScrollList : MonoBehaviour
             obj.transform.SetParent(content);
             obj.transform.localScale = Vector3.one;
             child = obj.transform;
-            obj.SetActive(true);
-            child.gameObject.name = index.ToString() + ListItemStatus.New;
         }
-        
+        child.gameObject.name = index.ToString();
         items.Add(child);
 
         return child as RectTransform;
+    }
+
+    /// <summary>
+    /// 设置资源
+    /// </summary>
+    /// <param name="child"></param>
+    public void SetItem(GameObject child)
+    {
+        if (child == null) return;
+        this.item = child;
+        RectTransform itemTrans = child.transform as RectTransform;
+        itemTrans.pivot = new Vector2(0, 1);
+        itemSize = itemTrans.sizeDelta;
+        ReBuild();
     }
 
     /// <summary>
@@ -482,8 +455,6 @@ public class ScrollList : MonoBehaviour
                     child.localPosition = startPos +
                                             new Vector2(row * itemSize.x + (row) * columuSpace,
                                                 -col * itemSize.y - (col) * rowSpace);
-                //Debug.Log(child.name + " child.localPosition:" + child.localPosition);
-                //Debug.Log("content.localPosition:" + content.transform.localPosition);
             }
         }
 

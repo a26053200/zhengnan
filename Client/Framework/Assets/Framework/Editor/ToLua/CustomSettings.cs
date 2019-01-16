@@ -72,6 +72,7 @@ public static class CustomSettings
         _GT(typeof(DG.Tweening.PathMode)),
         _GT(typeof(DG.Tweening.PathType)),
         _GT(typeof(DG.Tweening.RotateMode)),
+        _GT(typeof(DG.Tweening.Ease)),
         _GT(typeof(Component)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
         _GT(typeof(Transform)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),
         _GT(typeof(Light)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions)),

@@ -29,6 +29,14 @@ public static class CustomWrap
         _GT(typeof(UnityEngine.SceneManagement.Scene)),
 
         //================
+        // DoTween
+        //================
+        _GT(typeof(RectTransform)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions46)),
+        _GT(typeof(Image)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions46)),
+        _GT(typeof(Text)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions46)),
+        _GT(typeof(Slider)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions46)),
+        _GT(typeof(CanvasGroup)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions46)),
+        //================
         // FrameWork Core
         //================
         _GT(typeof(Logger)),
@@ -40,23 +48,21 @@ public static class CustomWrap
         _GT(typeof(LuaHelper)),
         _GT(typeof(LuaMonoBehaviour)),
         _GT(typeof(StringUtils)),
-
+        _GT(typeof(SystemUtils)),
         //================
         // UI
         //================
-        _GT(typeof(RectTransform)),
+        //_GT(typeof(RectTransform)),
+        //_GT(typeof(Text)),
+        //_GT(typeof(Image)),
+        //_GT(typeof(Slider)),
+        //_GT(typeof(CanvasGroup)),
         _GT(typeof(ScrollRect)),
         _GT(typeof(Button)),
         _GT(typeof(Toggle)),
-        _GT(typeof(Text)),
-        _GT(typeof(Image)),
-        _GT(typeof(Slider)),
         _GT(typeof(ContentSizeFitter)),
         _GT(typeof(ContentSizeFitter.FitMode)),
-        // List View
-        _GT(typeof(ListView)),
-        _GT(typeof(ListView.Item)),
-        _GT(typeof(ListView.Direction)),
+        /// Custom Components
         _GT(typeof(ScrollList)),
 
     };

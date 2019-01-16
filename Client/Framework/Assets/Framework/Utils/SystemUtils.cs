@@ -27,5 +27,58 @@ public class SystemUtils
         }
         return sb.ToString();
     }
+
+    /// <summary>
+    /// 获取保存到本地的预设字符串
+    /// 该函数区分了本地不同项目路径
+    /// </summary>
+    /// <param name="key">预设的key</param>
+    /// <returns></returns>
+    public static string GetPlayerPrefsString(string key,string defaultValue = "")
+    {
+        string md5Key = StringUtils.EncryptWithMD5(Application.dataPath + key);
+        return PlayerPrefs.GetString(md5Key, defaultValue);
+    }
+
+    public static void SavePlayerPrefsString(string key, string value)
+    {
+        string md5Key = StringUtils.EncryptWithMD5(Application.dataPath + key);
+        PlayerPrefs.SetString(md5Key, value);
+    }
+
+    /// <summary>
+    /// 获取保存到本地的预设整数值
+    /// 该函数区分了本地不同项目路径
+    /// </summary>
+    /// <param name="key">预设的key</param>
+    /// <returns></returns>
+    public static int GetPlayerPrefsInt(string key,int defaultValue = 0)
+    {
+        string md5Key = StringUtils.EncryptWithMD5(Application.dataPath + key);
+        return PlayerPrefs.GetInt(md5Key, defaultValue);
+    }
+
+    public static void SavePlayerPrefsInt(string key, int value)
+    {
+        string md5Key = StringUtils.EncryptWithMD5(Application.dataPath + key);
+        PlayerPrefs.SetInt(md5Key, value);
+    }
+    /// <summary>
+    /// 获取保存到本地的预设浮点值
+    /// 该函数区分了本地不同项目路径
+    /// </summary>
+    /// <param name="key">预设的key</param>
+    /// <returns></returns>
+    public static float GetPlayerPrefsFloat(string key, float defaultValue = 0)
+    {
+        string md5Key = StringUtils.EncryptWithMD5(Application.dataPath + key);
+        return PlayerPrefs.GetFloat(md5Key, defaultValue);
+    }
+
+    public static void SavePlayerPrefsFloat(string key, float value)
+    {
+        string md5Key = StringUtils.EncryptWithMD5(Application.dataPath + key);
+        PlayerPrefs.SetFloat(md5Key, value);
+    }
 }
 
