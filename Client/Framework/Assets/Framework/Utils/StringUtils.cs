@@ -10,6 +10,13 @@ using System.Security.Cryptography;
 // 
 public class StringUtils
 {
+    /// <summary>
+    /// 替换字符串中所有出现的字符
+    /// </summary>
+    /// <param name="src"></param>
+    /// <param name="oldStr"></param>
+    /// <param name="newStr"></param>
+    /// <returns></returns>
     public static string ReplaceAll(string src, string oldStr, string newStr)
     {
         int index = -1;
@@ -20,6 +27,32 @@ public class StringUtils
                 src = src.Replace(oldStr, newStr);
         } while (index != -1);
         return src;
+    }
+
+    /// <summary>
+    /// 首字母小写
+    /// </summary>
+    /// <param name="src"></param>
+    /// <returns></returns>
+    public static string FirstToLower(string src)
+    {
+        StringBuilder sb = new StringBuilder(src);
+        string first = sb[0].ToString();
+        sb[0] = first.ToLower().ToCharArray()[0];
+        return sb.ToString();
+    }
+
+    /// <summary>
+    /// 首字母小写
+    /// </summary>
+    /// <param name="src"></param>
+    /// <returns></returns>
+    public static string FirstToUpper(string src)
+    {
+        StringBuilder sb = new StringBuilder(src);
+        string first = sb[0].ToString();
+        sb[0] = first.ToUpper().ToCharArray()[0];
+        return sb.ToString();
     }
 
     public static string Trim(string src)

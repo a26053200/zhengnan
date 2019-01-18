@@ -82,6 +82,7 @@ public class ListView : MonoBehaviour
     {
         if (Application.isPlaying && this.Adapter != null && !isManualFill)
         {
+            ClearAllCell();
             Adapter.Initialize();
             Initialize();
         }
@@ -169,7 +170,8 @@ public class ListView : MonoBehaviour
 
         for (int i = 0; i < childCount; i++)
         {
-            GameObject.Destroy(this.transform.GetChild(i).gameObject);
+            if (i < this.transform.childCount)
+                GameObject.Destroy(this.transform.GetChild(i).gameObject);
         }
     }
 

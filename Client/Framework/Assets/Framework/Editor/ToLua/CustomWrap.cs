@@ -63,8 +63,9 @@ public static class CustomWrap
         _GT(typeof(ContentSizeFitter)),
         _GT(typeof(ContentSizeFitter.FitMode)),
         /// Custom Components
-        _GT(typeof(ScrollList)),
-
+        _GT(typeof(ListView)),
+        _GT(typeof(LuaListViewAdapter)),
+        _GT(typeof(LuaListViewCell)),
     };
 }
 

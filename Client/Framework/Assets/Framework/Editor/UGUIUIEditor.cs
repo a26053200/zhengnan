@@ -13,10 +13,33 @@ public class UGUIUIEditor
     [MenuItem("GameObject/UI/List View")]
 	static void CreateListView()
     {
-        GameObject listViewObj = new GameObject("ListView",typeof(ListView));
-        if(Selection.activeObject)
+        GameObject listViewObj = new GameObject("ListView", typeof(RectTransform));
+        RectTransform rect = listViewObj.GetComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(200, 200);
+        Image img = listViewObj.AddComponent<Image>();
+        Mask mask = listViewObj.AddComponent<Mask>();
+        mask.showMaskGraphic = false;
+        GameObject contentObj = new GameObject("Content",typeof(RectTransform));
+        RectTransform contentRect = contentObj.GetComponent<RectTransform>();
+        contentObj.transform.SetParent(listViewObj.transform);
+        contentObj.transform.localScale = Vector3.one;
+        contentRect.anchorMax = new Vector2(0.5f, 0.5f);
+        contentRect.anchorMin = new Vector2(0.5f, 0.5f);
+        contentRect.pivot = new Vector2(0.5f, 0.5f);
+        contentRect.sizeDelta = new Vector2(200, 200);
+        ListView listView = contentObj.AddComponent<ListView>();
+        ScrollRect scroll = listViewObj.AddComponent<ScrollRect>();
+        scroll.horizontal = false;
+        scroll.vertical = true;
+        scroll.content = listView.GetComponent<RectTransform>();
+        scroll.viewport = listViewObj.GetComponent<RectTransform>();
+        if (Selection.activeObject)
+        {
             listViewObj.transform.SetParent((Selection.activeObject as GameObject).transform);
+            listViewObj.transform.localScale = Vector3.one;
+        }
     }
+
     [MenuItem("GameObject/UI/Scroll List")]
     static void CreateScrollList()
     {
@@ -44,7 +67,7 @@ public class UGUIUIEditor
         Image btnImg = btnObj.GetComponent<Image>();
         btnImg.color = color;
         Button btn = btnObj.AddComponent<Button>();
-        GameObject btnText = new GameObject("Text", typeof(Text));
+        Text btnText = CreateText(Color.white, "button");
         btnText.transform.SetParent(btnObj.transform);
         if (Selection.activeObject)
             btnObj.transform.SetParent((Selection.activeObject as GameObject).transform);
@@ -52,16 +75,21 @@ public class UGUIUIEditor
         btnRect.sizeDelta = size;
         btn.gameObject.transform.localScale = Vector3.one;
 
-        Text text = btnText.GetComponent<Text>();
-        RectTransform textRect = text.GetComponent<RectTransform>();
-        text.alignment = TextAnchor.MiddleCenter;
+        RectTransform textRect = btnText.GetComponent<RectTransform>();
+        btnText.alignment = TextAnchor.MiddleCenter;
         textRect.sizeDelta = Vector2.zero;
         textRect.anchorMax = Vector3.one;
         textRect.anchorMin = Vector2.zero;
         textRect.pivot = new Vector2(0.5f, 0.5f);
-        text.text = "button";
-        text.fontSize = 24;
-        text.color = Color.white;
     }
-
+    static Text CreateText(Color color, string content = "new text", int size = 24)
+    {
+        GameObject textObj = new GameObject("Text", typeof(Text));
+        Text text = textObj.GetComponent<Text>();
+        //text.alignment = TextAnchor.MiddleCenter;
+        text.text = content;
+        text.fontSize = size;
+        text.color = color;
+        return text;
+    }
 }

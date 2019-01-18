@@ -14,6 +14,8 @@ public class ToLuaGenerater
 {
     readonly static string CLASS_NAME = "$CLASS_NAME$";
 
+    readonly static string INSTANCE_NAME = "$INSTANCE_NAME$";
+
     readonly static string CLASS_PACKER = "$CLASS_PACKER$";
 
     readonly static string SUPER_CLASS_NAME = "$SUPER_CLASS_NAME$";
@@ -64,8 +66,10 @@ return $CLASS_NAME$
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$Mdr : Game.Core.Ioc.BaseMediator
 local BaseMediator = require('Game.Core.Ioc.BaseMediator')
+---@class $CLASS_PACKER$.$CLASS_NAME$Mdr : Game.Core.Ioc.BaseMediator
+---@class $INSTANCE_NAME$Model
+---@class $INSTANCE_NAME$Service
 local $CLASS_NAME$Mdr = class('$CLASS_NAME$Mdr',BaseMediator)
 
 function $CLASS_NAME$Mdr:OnInit()
@@ -83,8 +87,9 @@ return $CLASS_NAME$Mdr
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$Model : Game.Core.Ioc.BaseModel
 local BaseModel = require('Game.Core.Ioc.BaseModel')
+---@class $CLASS_PACKER$.$CLASS_NAME$Model : Game.Core.Ioc.BaseModel
+---@class $INSTANCE_NAME$Service
 local $CLASS_NAME$Model = class('$CLASS_NAME$Model',BaseModel)
 
 function $CLASS_NAME$Model:Ctor()
@@ -101,8 +106,9 @@ return $CLASS_NAME$Model
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$Service : Game.Core.Ioc.BaseService
 local BaseService = require('Game.Core.Ioc.BaseService')
+---@class $CLASS_PACKER$.$CLASS_NAME$Service : Game.Core.Ioc.BaseService
+---@class $INSTANCE_NAME$Model
 local $CLASS_NAME$Service = class('$CLASS_NAME$Service',BaseService)
 
 function $CLASS_NAME$Service:Ctor()
@@ -119,8 +125,8 @@ return $CLASS_NAME$Service
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$Vo : Game.Core.Ioc.BaseVo
 local BaseVo = require('Game.Core.Ioc.BaseVo')
+---@class $CLASS_PACKER$.$CLASS_NAME$Vo : Game.Core.Ioc.BaseVo
 local $CLASS_NAME$Vo = class('$CLASS_NAME$Vo',BaseVo)
 
 function $CLASS_NAME$Vo:Ctor()
@@ -155,11 +161,13 @@ return $CLASS_NAME$Vo
                 luaFileText = LuaVoClassFile;
                 break;
         }
+        string instanceName = StringUtils.FirstToLower(className);
         luaFileText = string.Format(luaFileText, SystemUtils.GetSystemUserName(), TimeUtils.NowString());
         LuaFolder moduleFolder = folder == LuaFolder.Mdr ? LuaFolder.View : folder;
         string packerName = GetLuaPackerNameByPath(path + Folder2Directory(moduleFolder));//包名
         luaFileText = StringUtils.ReplaceAll(luaFileText, CLASS_PACKER, packerName);
         luaFileText = StringUtils.ReplaceAll(luaFileText, CLASS_NAME, className);
+        luaFileText = StringUtils.ReplaceAll(luaFileText, INSTANCE_NAME, instanceName);
         luaFileText = StringUtils.ReplaceAll(luaFileText, "'", "\"");
         //Debug.Log(mdrFileText);
         string mdrFilePath = path + Folder2Directory(moduleFolder) + className + folder + ".lua";

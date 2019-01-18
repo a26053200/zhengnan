@@ -116,7 +116,7 @@ public class ListViewCell : MonoBehaviour
         }
     }
 
-    public void Recycle()
+    public virtual void Recycle()
     {
         cellInfo.linkedListviewCell = null;
         gameObject.SetActive(false);
@@ -134,7 +134,7 @@ public class ListViewCell : MonoBehaviour
 
     public virtual void FillData(params object[] data)
     {
-
+        
     }
 }
 
