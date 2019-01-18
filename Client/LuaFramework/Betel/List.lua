@@ -4,11 +4,8 @@
 --- DateTime: 2018/6/20 16:29
 ---
 
-
-
-
----@class Betel.List : Betel.LuaObject
 local LuaObject = require("Betel.LuaObject")
+---@class Betel.List : Betel.LuaObject
 local _List = class("_List",LuaObject)
 
 local function Operator(list)
@@ -21,9 +18,9 @@ local function Operator(list)
     end})
 end
 
-function _List:Ctor()
+function _List:Ctor(table)
     Operator(self)
-    self._array = {}
+    self._array = table and table or {}
 end
 
 function _List:Clear()

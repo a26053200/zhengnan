@@ -5,12 +5,13 @@
 --- 网络通信
 ---
 
----@class Betel.Net.NetworkManager : Betel.LuaMonoBehaviour
----@field public listenerList Game.Modules.World.Scenes.BaseScene
-local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
-local NetworkManager = class("NetworkManager", LuaMonoBehaviour)
 local json = require("cjson")
 local NetworkListener = require("Betel.Net.NetworkListener")
+local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
+---@class Betel.Net.NetworkManager : Betel.LuaMonoBehaviour
+---@field public listenerList Game.Modules.World.Scenes.BaseScene
+local NetworkManager = class("NetworkManager", LuaMonoBehaviour)
+
 
 function NetworkManager:Ctor()
     self.listenerList = List.New() ---@type Betel.List

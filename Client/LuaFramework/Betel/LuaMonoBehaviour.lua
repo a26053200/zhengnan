@@ -5,14 +5,20 @@
 --- LuaMonoBehaviour
 ---
 
----@class Betel.LuaMonoBehaviour : Betel.LuaObject
-local LuaObject = require("Betel.LuaObject")
-local LuaMonoBehaviour = class("LuaMonoBehaviour",LuaObject)
-
 local BehaviourFun = {"Awake","Start","OnEnable","OnDisable","OnDestroy","Update","LateUpdate","FixedUpdate"}
 
-function LuaMonoBehaviour:Ctor()
+local LuaObject = require("Betel.LuaObject")
+---@class Betel.LuaMonoBehaviour : Betel.LuaObject
+---@field gameObject UnityEngine.GameObject
+---@field transform UnityEngine.Transform
+local LuaMonoBehaviour = class("LuaMonoBehaviour",LuaObject)
 
+---@param gameObject UnityEngine.GameObject
+function LuaMonoBehaviour:Ctor(gameObject)
+    self.gameObject = gameObject
+    if not isNull(gameObject) then
+        self.transform = gameObject.transform
+    end
 end
 
 function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)

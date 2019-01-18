@@ -67,11 +67,6 @@ function logError(msg,...)
     end
 end
 
-function err(msg,...)
-    local arg = ...
-    logger.LogError(msg,arg)
-end
-
 function logWarn(msg,...)
     local arg = ...
     logger.Warning(msg,arg)

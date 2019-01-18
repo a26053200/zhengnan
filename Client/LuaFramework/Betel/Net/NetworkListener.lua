@@ -5,8 +5,9 @@
 --- 网络监听器
 ---
 
----@class Betel.Net.NetworkListener : Betel.LuaMonoBehaviour
+
 local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
+---@class Betel.Net.NetworkListener : Betel.LuaMonoBehaviour
 local NetworkListener = class("NetworkListener",LuaMonoBehaviour)
 
 function NetworkListener:Ctor(errorReport)

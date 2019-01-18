@@ -120,12 +120,12 @@ function table2json(t)
 end
 
 ---回调
-function handler(obj,method)
+function handler(caller,method)
     if method == nil then
         logError("method is nil")
     end
     return function (...)
-        return method(obj, ...)
+        return method(caller, ...)
     end
 end
 
@@ -139,17 +139,33 @@ function isNull(obj)
 end
 
 ---异步销毁
+---@param obj UnityEngine.GameObject
+---@param delay number 延时销毁
 function destroy(obj,delay)
     delay = delay or 0
     GameObject.Destroy(obj,delay)
 end
 
 ---同步销毁
+---@param obj UnityEngine.GameObject
 function destroyImmediate(obj)
     GameObject.DestroyImmediate(obj)
 end
 
 ---标志不销毁对象
+---@param obj UnityEngine.GameObject
 function dontDestroyOnLoad(obj)
     GameObject.DontDestroyOnLoad(obj)
+end
+
+---实例化或者复制对象
+---@param obj UnityEngine.GameObject
+---@param parent UnityEngine.Transform
+---@return UnityEngine.GameObject
+function Instantiate(obj,parent)
+    local newObj = GameObject.Instantiate(obj) ---@type UnityEngine.GameObject
+    if not isNull(parent) then
+        newObj.transform:SetParent(parent)
+    end
+    return newObj
 end
