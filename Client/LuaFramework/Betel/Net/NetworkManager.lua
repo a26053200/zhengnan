@@ -97,9 +97,9 @@ function NetworkManager:OnJsonRspd(jsonStr)
     --print("OnJsonRspd " .. jsonStr)
     for i = 1, self.listenerList:Size() do
         if string.find(jsonData.action,"push@") ~= nil then
-            self.listenerList[i]:handlerPushCallback(jsonData.action, jsonData.data)
+            self.listenerList[i]:handlerPushCallback(jsonData.action, jsonData)
         else
-            self.listenerList[i]:handlerRqstCallback(jsonData.action, jsonData.data)
+            self.listenerList[i]:handlerRqstCallback(jsonData.action, jsonData)
         end
     end
 end
