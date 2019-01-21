@@ -47,7 +47,7 @@ namespace Framework
             }
         }
 
-        public static void RemoveButtonClick(GameObject go, LuaFunction func)
+        public static void RemoveButtonClick(GameObject go)
         {
             Button btn = go.GetComponent<Button>();
             if (btn)
