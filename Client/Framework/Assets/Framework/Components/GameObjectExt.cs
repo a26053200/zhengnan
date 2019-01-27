@@ -20,13 +20,24 @@ public static class GameObjectExt
         return cpt;
     }
 
-    //获取组件文本
+    //获取组件
     public static Component GetCom(this GameObject obj, string comName)
     {
         Component cpt = obj.GetComponent(comName);
         return cpt;
     }
 
+    //获取组件文本
+    public static Button GetButton(this GameObject gameObject, string path)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+        {
+            Button btn = child.GetComponent<Button>();
+            return btn;
+        }
+        return null;
+    }
     //获取组件文本
     public static string GetText(this GameObject gameObject, string path)
     {

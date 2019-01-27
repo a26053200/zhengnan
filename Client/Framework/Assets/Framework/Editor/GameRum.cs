@@ -3,7 +3,8 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameRum : MonoBehaviour {
+public static class GameRum
+{
 
     [MenuItem("Run/Run Game")]
 	static void RunGame()

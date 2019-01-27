@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class UGUIUIEditor
+public static class UGUIUIEditor
 {
     [MenuItem("GameObject/UI/List View")]
 	static void CreateListView()
@@ -52,13 +52,26 @@ public class UGUIUIEditor
     [MenuItem("GameObject/UI/Button Normal")]
     static void CreateNormalButton()
     {
-        CreateButton(new Vector2(160, 40), new Color(13f / 255f, 95f / 255f, 68f / 255f, 1));
+        CreateButton(new Vector2(128, 32), new Color(13f / 255f, 95f / 255f, 68f / 255f, 1));
     }
 
     [MenuItem("GameObject/UI/Button Small")]
     static void CreateSmallButton()
     {
-        CreateButton(new Vector2(128, 32), new Color(6f / 255f, 47f / 255f, 34f / 255f, 1));
+        CreateButton(new Vector2(100, 24), new Color(6f / 255f, 47f / 255f, 34f / 255f, 1));
+    }
+
+    [MenuItem("GameObject/UI/Title Panel")]
+    static void CreateTitlePanel()
+    {
+        GameObject prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Res/Prefabs/UI/Common/TitlePanel.prefab");
+        GameObject panel = GameObject.Instantiate(prefab);
+        panel.name = "TitlePanel";
+        if (Selection.activeObject)
+        {
+            panel.transform.SetParent((Selection.activeObject as GameObject).transform);
+            panel.transform.localScale = Vector3.one;
+        }
     }
 
     static void CreateButton(Vector2 size,Color color)

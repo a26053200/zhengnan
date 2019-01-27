@@ -104,7 +104,8 @@ public class ModulesGenerater : EditorWindow
             string moduleDirPath = moduleDirs[i];//模块目录路径
             LuaModuleInfo moduleInfo = new LuaModuleInfo(Path.GetFileName(moduleDirs[i]));
             moduleInfo.moduleDirPath = moduleDirPath;//模块目录路径
-
+            if (moduleDirPath.IndexOf("Common") != -1)
+                continue;
             moduleInfo.viewDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.View);
             moduleInfo.modelDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Model);
             moduleInfo.serviceDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Service);
@@ -330,21 +331,21 @@ public class ModulesGenerater : EditorWindow
             LuaModuleInfo moduleInfo = moduleInfoList[i];
             if(Directory.Exists(moduleInfo.viewDirPath))
             {
-                string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
+                string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*Mdr.lua");
                 for (int j = 0; j < mdrFiles.Length; j++)
                     mdrSb.AppendLine(ToLuaGenerater.GetMdrLuaLine(mdrFiles[j], moduleInfo.moduleName, LuaFolder.Mdr));
             }
 
             if (Directory.Exists(moduleInfo.modelDirPath))
             {
-                string[] modelFiles = Directory.GetFiles(moduleInfo.modelDirPath, "*.lua");
+                string[] modelFiles = Directory.GetFiles(moduleInfo.modelDirPath, "*Model.lua");
                 for (int j = 0; j < modelFiles.Length; j++)
                     modelSb.AppendLine(ToLuaGenerater.GetSingletonLuaLine(modelFiles[j], LuaFolder.Model));
             }
 
             if (Directory.Exists(moduleInfo.modelDirPath))
             {
-                string[] serviceFiles = Directory.GetFiles(moduleInfo.serviceDirPath, "*.lua");
+                string[] serviceFiles = Directory.GetFiles(moduleInfo.serviceDirPath, "*Service.lua");
                 for (int j = 0; j < serviceFiles.Length; j++)
                     serviceSb.AppendLine(ToLuaGenerater.GetSingletonLuaLine(serviceFiles[j], LuaFolder.Service));
             }
