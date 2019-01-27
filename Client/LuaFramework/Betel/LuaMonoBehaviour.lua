@@ -35,14 +35,18 @@ function LuaMonoBehaviour:StartCoroutine(coFun)
     if self.coMap == nil then
         self.coMap = {}
     end
-    self.coMap[coFun] = coroutine.start(function ()
-        coFun()
-    end)
+    if self.coMap[coFun] == nil then
+        self.coMap[coFun] = coroutine.start(function ()
+            coFun()
+        end)
+    else
+        logError("StartCoroutine has already exits" .. tostring(coFun))
+    end
     return self.coMap[coFun]
 end
 
 function LuaMonoBehaviour:Destroy()
-    destroy(self.behaviour)
+    destroy(self.gameObject)
     if self.coMap then
         for _, co in pairs(self.coMap) do
             coroutine.stop(co)
@@ -52,7 +56,7 @@ function LuaMonoBehaviour:Destroy()
 end
 
 function LuaMonoBehaviour:OnDestroy()
-    self:Destroy()
+
 end
 
 return LuaMonoBehaviour
