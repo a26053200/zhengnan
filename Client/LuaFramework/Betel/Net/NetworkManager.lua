@@ -9,7 +9,7 @@ local json = require("cjson")
 local NetworkListener = require("Betel.Net.NetworkListener")
 local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
 ---@class Betel.Net.NetworkManager : Betel.LuaMonoBehaviour
----@field public listenerList Game.Modules.World.Scenes.BaseScene
+---@field public listenerList table<number,Betel.Net.NetworkListener>
 local NetworkManager = class("NetworkManager", LuaMonoBehaviour)
 
 
@@ -81,7 +81,7 @@ function NetworkManager:Request(data, params, callback)
     end
     data = self:parseParams(data,params)
     local jsonStr = json.encode(data)
-    print("[Send]" .. jsonStr)
+    --print("[Send]" .. jsonStr)
     netMgr:SendJson(jsonStr)
 end
 

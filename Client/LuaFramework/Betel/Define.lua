@@ -21,7 +21,7 @@ TYPE.table = "table"        --Lua 中的表（table）其实是一个"关联数�
 GameObject = UnityEngine.GameObject;
 Application = UnityEngine.Application;
 PlayerPrefs = UnityEngine.PlayerPrefs;
-
+Vector3 = UnityEngine.Vector3;
 ---3rd
 
 ---@class DT
