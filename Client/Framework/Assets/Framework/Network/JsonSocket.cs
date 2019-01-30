@@ -58,7 +58,7 @@ public class JsonSocket : SocketBase
         if (GlobalConsts.EnableLogNetwork)
         {
             //int cmd = getPT(json);
-            MyDebug.Log(string.Format("[Send] <color=#df5c4aff>send json</color>:{0}", json));
+            MyDebug.Log(string.Format("[Socket] <color=#df5c4aff>send json</color>:{0}", json));
         }
         StartCoroutine(doSendCo(json));
     }

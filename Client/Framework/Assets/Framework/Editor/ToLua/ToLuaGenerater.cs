@@ -12,9 +12,15 @@ using System.Text;
 /// </summary> 
 public class ToLuaGenerater
 {
+    readonly static string MODULE_NAME = "$MODULE_NAME$";
+
+    readonly static string Module_name = "$Module_name$";
+
     readonly static string CLASS_NAME = "$CLASS_NAME$";
 
     readonly static string INSTANCE_NAME = "$INSTANCE_NAME$";
+
+    readonly static string MODULE_PAKER = "$MODULE_PAKER$";
 
     readonly static string CLASS_PACKER = "$CLASS_PACKER$";
 
@@ -68,8 +74,8 @@ return $CLASS_NAME$
 
 local BaseMediator = require('Game.Core.Ioc.BaseMediator')
 ---@class $CLASS_PACKER$.$CLASS_NAME$Mdr : Game.Core.Ioc.BaseMediator
----@class $INSTANCE_NAME$Model
----@class $INSTANCE_NAME$Service
+---@field $Module_name$Model $MODULE_PAKER$.Model.$MODULE_NAME$Model
+---@field $Module_name$Service $MODULE_PAKER$.Service.$MODULE_NAME$Service
 local $CLASS_NAME$Mdr = class('$CLASS_NAME$Mdr',BaseMediator)
 
 function $CLASS_NAME$Mdr:OnInit()
@@ -89,7 +95,7 @@ return $CLASS_NAME$Mdr
 
 local BaseModel = require('Game.Core.Ioc.BaseModel')
 ---@class $CLASS_PACKER$.$CLASS_NAME$Model : Game.Core.Ioc.BaseModel
----@class $INSTANCE_NAME$Service
+---@field $INSTANCE_NAME$Service $MODULE_PAKER$.Service.$CLASS_NAME$Service
 local $CLASS_NAME$Model = class('$CLASS_NAME$Model',BaseModel)
 
 function $CLASS_NAME$Model:Ctor()
@@ -108,7 +114,7 @@ return $CLASS_NAME$Model
 
 local BaseService = require('Game.Core.Ioc.BaseService')
 ---@class $CLASS_PACKER$.$CLASS_NAME$Service : Game.Core.Ioc.BaseService
----@class $INSTANCE_NAME$Model
+---@field $INSTANCE_NAME$Model $MODULE_PAKER$.Model.$CLASS_NAME$Model
 local $CLASS_NAME$Service = class('$CLASS_NAME$Service',BaseService)
 
 function $CLASS_NAME$Service:Ctor()
@@ -164,7 +170,11 @@ return $CLASS_NAME$Vo
         string instanceName = StringUtils.FirstToLower(className);
         luaFileText = string.Format(luaFileText, SystemUtils.GetSystemUserName(), TimeUtils.NowString());
         LuaFolder moduleFolder = folder == LuaFolder.Mdr ? LuaFolder.View : folder;
+        string modulePakerName = GetLuaPackerNameByPath(path + "/");//模块包名
         string packerName = GetLuaPackerNameByPath(path + Folder2Directory(moduleFolder));//包名
+        luaFileText = StringUtils.ReplaceAll(luaFileText, MODULE_NAME, moduleName);
+        luaFileText = StringUtils.ReplaceAll(luaFileText, Module_name, StringUtils.FirstToLower(moduleName));
+        luaFileText = StringUtils.ReplaceAll(luaFileText, MODULE_PAKER, modulePakerName);
         luaFileText = StringUtils.ReplaceAll(luaFileText, CLASS_PACKER, packerName);
         luaFileText = StringUtils.ReplaceAll(luaFileText, CLASS_NAME, className);
         luaFileText = StringUtils.ReplaceAll(luaFileText, INSTANCE_NAME, instanceName);

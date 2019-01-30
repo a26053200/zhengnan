@@ -110,8 +110,8 @@ public class SocketBase : MonoBehaviour
         }
         try
         {
-            if (GlobalConsts.EnableLogNetwork)
-                MyDebug.Log("[Socket] Receive data len:" + e.BytesTransferred);
+            //if (GlobalConsts.EnableLogNetwork)
+            //    MyDebug.Log("[Socket] Receive data len:" + e.BytesTransferred);
             if (e.BytesTransferred >= MAX_READ)
                 MyDebug.LogError("[Socket] Receive data too long. len:" + e.BytesTransferred);
             doOnReceive(_byteBuffer, e.BytesTransferred);
