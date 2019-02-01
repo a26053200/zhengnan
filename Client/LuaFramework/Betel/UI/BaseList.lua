@@ -17,7 +17,7 @@ local BaseList = class("Betel.UI.BaseList",LuaMonoBehaviour)
 function BaseList:Ctor(gameObject, itemRendererClass)
     BaseList.super.Ctor(self,gameObject)
     self.itemRendererClass = itemRendererClass
-    self.listView = gameObject:FindChild("Content"):GetCom("ListView")
+    self.listView = GetListView(gameObject:FindChild("Content"))
     self.adapter = self.listView.Adapter
     self.eventDispatcher = EventDispatcher.New()
     --self.cell = self.adapter.gameObject:GetCom("LuaListViewCell")

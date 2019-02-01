@@ -8,6 +8,21 @@ Res = {}
 
 assetsMgr = Framework.GameManager.GetAssetsManager()
 
-function Res.LoadPrefab(url)
-    return assetsMgr:LoadPrefab(url);
+
+---@param path string
+---@return string
+function Res.LoadText(path)
+    return assetsMgr:LoadText(path);
+end
+
+---@param path string
+---@return UnityEngine.GameObject
+function Res.LoadPrefab(path)
+    return assetsMgr:LoadPrefab(path);
+end
+
+---@param path string
+---@return UnityEngine.Sprite
+function Res.LoadSprite(path)
+    return assetsMgr:LoadSprite(path);
 end
