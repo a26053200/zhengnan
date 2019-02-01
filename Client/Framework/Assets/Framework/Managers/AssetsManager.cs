@@ -21,7 +21,7 @@ namespace Framework
         /// </summary>
         Common,
         /// <summary>
-        /// 当前主场景卸载时卸载
+        /// 当前场景卸载时卸载
         /// </summary>
         Scene,
     }
@@ -30,40 +30,38 @@ namespace Framework
         //编辑器模式下的加载根目录
         private const string EDITOT_MODE_ROOT_PATH = "Assets/Res/";
 
-        public string LoadText(string assetName)
+        public string LoadText(string path)
         {
-#if UNITY_EDITOR
-            TextAsset textAsset = null;
-            if(GlobalConsts.isAssetBundleMode)
-                textAsset = LoadAsset_Editor<TextAsset>(assetName);
-            else
-                textAsset = LoadAsset_Editor<TextAsset>(assetName);
-#else
-            TextAsset textAsset = LoadAsset_Editor<TextAsset>(assetName);
-#endif
+            TextAsset textAsset = LoadAsset<TextAsset>(path);
             return textAsset.text;
         }
-        public GameObject LoadPrefab(string assetName)
+
+        public Sprite LoadSprite(string path)
         {
-#if UNITY_EDITOR
-            GameObject prefab = LoadAsset_Editor<GameObject>(assetName);
-#endif
-            return prefab;
+            return LoadAsset<Sprite>(path);
         }
 
-#if UNITY_EDITOR
-        /// <summary>
-        /// 编辑器环境下加载资源
-        /// </summary>
-        /// <returns></returns>
-        T LoadAsset_Editor<T>(string path) where T : UnityEngine.Object
+        public GameObject LoadPrefab(string path)
         {
+            return LoadAsset<GameObject>(path);
+        }
+
+        /// <summary>
+        /// 同步加载资源
+        /// </summary>
+        /// <returns>T</returns>
+        T LoadAsset<T>(string path) where T : UnityEngine.Object
+        {
+#if UNITY_EDITOR
             T tempTex = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
             if (tempTex == default(T))
                 Logger.LogError("Asset:'{0}' has not found", path);
             return tempTex;
-        }
+#else
+            //加载bundle
 #endif
+        }
+
     }
 }
 
