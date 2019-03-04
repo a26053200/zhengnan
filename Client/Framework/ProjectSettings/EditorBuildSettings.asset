@@ -23,4 +23,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Res/BundleScenes/Lobby.unity
     guid: 6aa079fbf1a73ff4ea70085096a96902
+  - enabled: 1
+    path: Assets/Res/BundleScenes/Room_HJ.unity
+    guid: 58b49dabc009e3645a8861e8ed39a5bb
   m_configObjects: {}
