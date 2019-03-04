@@ -27,7 +27,7 @@ public static class GameObjectExt
         return cpt;
     }
 
-    //获取组件文本
+    //获取按钮
     public static Button GetButton(this GameObject gameObject, string path)
     {
         GameObject child = gameObject.FindChild(path);
@@ -38,6 +38,17 @@ public static class GameObjectExt
         }
         return null;
     }
+
+    //设置按钮文本
+    public static void SetButtonText(this GameObject gameObject, string path, string label)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+        {
+            child.SetText("Text", label);
+        }
+    }
+
     //获取组件文本
     public static string GetText(this GameObject gameObject, string path)
     {

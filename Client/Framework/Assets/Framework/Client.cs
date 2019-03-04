@@ -13,16 +13,18 @@ public class Client : MonoBehaviour
     public HttpRequest httpRequest { get; private set; }
 
     public Logger logger { get; private set; }
-    private void Awake()
+    
+    // Use this for initialization
+    void Start ()
     {
         if (Ins == null)
             Ins = this;
         else
-            throw new Exception("There is only one Client instance in this app");
-    }
-    // Use this for initialization
-    void Start ()
-    {
+        {
+            return;
+            //throw new Exception("There is only one Client instance in this app");
+        }
+            
         DontDestroyOnLoad(this);
        
         httpRequest = gameObject.AddComponent<HttpRequest>();
