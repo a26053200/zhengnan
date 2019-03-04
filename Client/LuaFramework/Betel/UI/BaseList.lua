@@ -20,6 +20,7 @@ function BaseList:Ctor(gameObject, itemRendererClass)
     self.listView = GetListView(gameObject:FindChild("Content"))
     self.adapter = self.listView.Adapter
     self.eventDispatcher = EventDispatcher.New()
+    self.itemList = {}
     --self.cell = self.adapter.gameObject:GetCom("LuaListViewCell")
     self:AddLuaMonoBehaviour(gameObject,"BaseList")
 end
@@ -35,10 +36,18 @@ end
 ---@param index number
 function BaseList:OnItemCreate(cell, index)
     local item = self.itemRendererClass.New(cell.gameObject)
+    self.itemList[index + 1] = item
     item:Update(self.dataList[index + 1],index + 1)
     LuaHelper.AddButtonClick(cell.gameObject,handler(self,function ()
         self.eventDispatcher:Dispatcher(ListViewEvent.ItemClick,self.dataList[index + 1])
     end))
+end
+
+--单独更新一个
+---@param index number
+function BaseList:UpdateItem(index)
+    local item = self.itemList[index]
+    item:Update(self.dataList[index],index)
 end
 
 function BaseList:OnDestroy()

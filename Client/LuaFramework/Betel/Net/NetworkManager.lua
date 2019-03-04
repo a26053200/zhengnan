@@ -111,6 +111,7 @@ function NetworkManager:parseParams(data,values)
             data[fields[i]] = values[i]
         end
     end
+    data = Tools.removeElementByKey(data,"fields")
     data.client = "Unity"
     return data
 end
