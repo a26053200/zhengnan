@@ -77,6 +77,18 @@ public static class GameObjectExt
             child.GetComponent<InputField>().text = text;
     }
 
+    //获取组件Image
+    public static Image GetImage(this GameObject gameObject, string path)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+        {
+            Image img = child.GetComponent<Image>();
+            return img;
+        }
+        return null;
+    }
+
     //获取组件Sprite
     public static Sprite GetSprite(this GameObject gameObject, string path)
     {
@@ -95,6 +107,18 @@ public static class GameObjectExt
         GameObject child = gameObject.FindChild(path);
         if (child)
             child.GetComponent<Image>().sprite = sprite;
+    }
+
+    //设置组件Sprite Alpha
+    public static void SetSpriteAlpha(this GameObject gameObject, string path, float alpha)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+        {
+            Color col = child.GetComponent<Image>().color;
+            col.a = alpha;
+            child.GetComponent<Image>().color = col;
+        }
     }
 
     //设置组件Slider

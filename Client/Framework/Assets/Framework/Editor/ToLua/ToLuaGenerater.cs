@@ -131,8 +131,8 @@ return $CLASS_NAME$Service
 --- DateTime: {1}
 ---
 
-local BaseVo = require('Game.Core.Ioc.BaseVo')
----@class $CLASS_PACKER$.$CLASS_NAME$Vo : Game.Core.Ioc.BaseVo
+local BaseVo = require('Game.Core.BaseVo')
+---@class $CLASS_PACKER$.$CLASS_NAME$Vo : Game.Core.BaseVo
 local $CLASS_NAME$Vo = class('$CLASS_NAME$Vo',BaseVo)
 
 function $CLASS_NAME$Vo:Ctor()

@@ -149,14 +149,14 @@ public class LuaTable
     {
         StringBuilder sb = new StringBuilder();
         //Header
-        sb.AppendLine(string.Format("{0}={{}}", rootName));
+        sb.AppendLine(string.Format("{0} = {{}}", rootName));
         foreach (var key in hashTable.Keys)
         {
             StringBuilder lineSb = new StringBuilder();
             Dictionary<string, object> tableLine = hashTable[key];
             foreach (var field in tableLine.Keys)
                 AddFiled(lineSb, field, tableLine[field]);
-            sb.AppendLine(string.Format("{0}.{1}={{{2}}}", rootName, key, lineSb.ToString()));
+            sb.AppendLine(string.Format("{0}.{1} = {{{2}}}", rootName, key, lineSb.ToString()));
         }
         return sb.ToString();
     }
@@ -168,13 +168,13 @@ public class LuaTable
         float f = float.MinValue;
         bool b = false;
         if (int.TryParse(temp,out i))
-            lineSb.Append(string.Format("{0}={1},", field, i));
+            lineSb.Append(string.Format("{0} = {1},", field, i));
         else if (float.TryParse(temp, out f))
-            lineSb.Append(string.Format("{0}={1},", field, f));
+            lineSb.Append(string.Format("{0} = {1},", field, f));
         else if (bool.TryParse(temp, out b))
-            lineSb.Append(string.Format("{0}={1},", field, b.ToString().ToLower()));
+            lineSb.Append(string.Format("{0} = {1},", field, b.ToString().ToLower()));
         else
-            lineSb.Append(string.Format("{0}=\"{1}\",", field, value.ToString()));
+            lineSb.Append(string.Format("{0} = \"{1}\",", field, value.ToString()));
     }
 }
 

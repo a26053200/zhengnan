@@ -203,19 +203,14 @@ public class ModulesGenerater : EditorWindow
 
                 //Vos
                 EditorGUI.indentLevel++;
-                if (moduleInfo.voList.Count > 0)
                 {
                     EditorGUILayout.LabelField("Value Objects:");
-                    for (int j = 0; j < moduleInfo.voList.Count; j++)
-                        EditorGUILayout.LabelField((j + 1).ToString(), moduleInfo.voList[j] + ".lua");
-                }
-                else
-                {
-                    EditorGUILayout.BeginHorizontal();
-                    EditorGUILayout.LabelField("Value Objects:");
+                    if (moduleInfo.voList.Count > 0)
+                    {
+                        for (int j = 0; j < moduleInfo.voList.Count; j++)
+                            EditorGUILayout.LabelField((j + 1).ToString(), moduleInfo.voList[j] + ".lua");
+                    }
                     EditFolder(moduleInfo, LuaFolder.Vo);
-                    EditorGUILayout.EndHorizontal();
-
                 }
                 EditorGUI.indentLevel--;
 
@@ -281,6 +276,8 @@ public class ModulesGenerater : EditorWindow
         {
             if (!ToLuaGenerater.FileNameValid(newVoName,this))
                 return;
+            if (newVoName.EndsWith("Vo"))
+                newVoName = newVoName.Substring(0, newVoName.Length - 2);
             ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName, newVoName, LuaFolder.Vo);
             RefreshVos(moduleInfo);
             newVoName = "";
