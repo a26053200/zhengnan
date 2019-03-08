@@ -35,11 +35,12 @@ end
 ---@param cell LuaListViewCell
 ---@param index number
 function BaseList:OnItemCreate(cell, index)
+    local data = self.dataList[index + 1]
     local item = self.itemRendererClass.New(cell.gameObject)
     self.itemList[index + 1] = item
-    item:Update(self.dataList[index + 1],index + 1)
+    item:Update(data,index + 1)
     LuaHelper.AddButtonClick(cell.gameObject,handler(self,function ()
-        self.eventDispatcher:Dispatcher(ListViewEvent.ItemClick,self.dataList[index + 1])
+        self.eventDispatcher:Dispatcher(ListViewEvent.ItemClick, data)
     end))
 end
 
