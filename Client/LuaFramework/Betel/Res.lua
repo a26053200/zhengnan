@@ -26,3 +26,9 @@ end
 function Res.LoadSprite(path)
     return assetsMgr:LoadSprite(path);
 end
+
+---@param path string
+---@return UnityEngine.Texture
+function Res.LoadTexture(path)
+    return assetsMgr:LoadTexture(path);
+end
