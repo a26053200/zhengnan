@@ -41,6 +41,11 @@ namespace Framework
             return LoadAsset<Sprite>(path);
         }
 
+        public Texture LoadTexture(string path)
+        {
+            return LoadAsset<Texture>(path);
+        }
+
         public GameObject LoadPrefab(string path)
         {
             return LoadAsset<GameObject>(path);
