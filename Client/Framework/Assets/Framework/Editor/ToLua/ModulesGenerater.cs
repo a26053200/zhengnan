@@ -116,6 +116,8 @@ public class ModulesGenerater : EditorWindow
             {
                 string mdrFilePath = mdrFiles[j];
                 string mdrName = Path.GetFileNameWithoutExtension(mdrFilePath);
+                if (mdrName.IndexOf("Mdr") == -1)
+                    continue;
                 mdrName = mdrName.Replace("Mdr", "");
                 LuaViewInfo viewInfo = new LuaViewInfo(mdrName);
                 viewInfo.viewName = mdrName;

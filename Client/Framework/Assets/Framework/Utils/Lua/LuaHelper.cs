@@ -9,6 +9,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using LuaInterface;
 using UnityEngine.UI;
+using UnityEngine.EventSystems;
 
 namespace Framework
 {
@@ -84,6 +85,42 @@ namespace Framework
             T t = go.AddComponent<T>();
             t.componentName = componentName;
             return t;
+        }
+
+        /// <summary>
+        /// 给GameObject 注册点击事件
+        /// </summary>
+        /// <param name="go"></param>
+        /// <param name="luaFunc"></param>
+        /// <returns></returns>
+        public static UnityEngine.EventSystems.EventTrigger AddObjectClickEvent(GameObject go, LuaFunction luaFunc)
+        {
+            return AddObjectEvent(go, EventTriggerType.PointerClick, luaFunc);
+        }
+        /// <summary>
+        /// 给GameObject 注册事件
+        /// </summary>
+        /// <param name="go"></param>
+        /// <param name="type"></param>
+        /// <param name="luaFunc"></param>
+        public static UnityEngine.EventSystems.EventTrigger AddObjectEvent(GameObject go, EventTriggerType type, LuaFunction luaFunc)
+        {
+            UnityEngine.EventSystems.EventTrigger trigger = go.GetComponent<UnityEngine.EventSystems.EventTrigger>();
+            if (trigger == null)
+                trigger = go.AddComponent<UnityEngine.EventSystems.EventTrigger>();
+
+            UnityEngine.EventSystems.EventTrigger.Entry entry = new UnityEngine.EventSystems.EventTrigger.Entry();
+            entry.eventID = type;
+            UnityEngine.Events.UnityAction<BaseEventData> eventHandler = new UnityEngine.Events.UnityAction<BaseEventData>(delegate(BaseEventData eventData)
+            {
+                luaFunc.BeginPCall();
+                luaFunc.Call<BaseEventData> (eventData);
+                luaFunc.EndPCall();
+            });
+            entry.callback.AddListener(eventHandler);
+            trigger.triggers.Clear();
+            trigger.triggers.Add(entry);
+            return trigger;
         }
     }
 }

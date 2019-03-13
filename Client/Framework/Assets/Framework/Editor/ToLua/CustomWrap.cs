@@ -27,7 +27,8 @@ public static class CustomWrap
         _GT(typeof(PlayerPrefs)),
         _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
         _GT(typeof(UnityEngine.SceneManagement.Scene)),
-
+        _GT(typeof(UnityEngine.EventSystems.EventTrigger)),
+        _GT(typeof(UnityEngine.EventSystems.EventTriggerType)),
         //================
         // DoTween
         //================
