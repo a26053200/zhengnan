@@ -21,7 +21,13 @@ TYPE.table = "table"        --Lua 中的表（table）其实是一个"关联数�
 GameObject = UnityEngine.GameObject;
 Application = UnityEngine.Application;
 PlayerPrefs = UnityEngine.PlayerPrefs;
+Vector2 = UnityEngine.Vector2;
 Vector3 = UnityEngine.Vector3;
+Vector4 = UnityEngine.Vector4;
+---@class UnityEngine.Color
+Color = UnityEngine.Color;
+EventTrigger = UnityEngine.EventSystems.EventTrigger;
+EventTriggerType = UnityEngine.EventSystems.EventTriggerType;
 ---3rd
 
 ---@class DT
@@ -43,6 +49,7 @@ RotateMode = DT.RotateMode
 ---Framework
 logger = Logger
 EventDispatcher = require("Betel.Events.EventDispatcher")
+edp = EventDispatcher.New() --全局事件派发器
 Event = require("Betel.Events.Event")
 ListViewEvent = require("Betel.UI.ListViewEvent")
 BaseList = require("Betel.UI.BaseList")

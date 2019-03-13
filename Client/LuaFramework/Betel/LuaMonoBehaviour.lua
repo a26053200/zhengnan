@@ -19,6 +19,7 @@ function LuaMonoBehaviour:Ctor(gameObject)
     if not isNull(gameObject) then
         self.transform = gameObject.transform
     end
+    self.eventMap = {}
 end
 
 function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
@@ -29,6 +30,19 @@ function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
         end
     end
     return self.behaviour
+end
+
+function LuaMonoBehaviour:AddGlobalEventListener(type, listener)
+    if self.eventMap[listener] == nil then
+        self.eventMap[listener] = {type = type, handler = handler(self,listener)}
+        edp:AddEventListener(type, self.eventMap[listener].handler)
+    end
+end
+
+function LuaMonoBehaviour:RemoveGlobalEventListener(type, handler)
+    if self.eventMap[handler] then
+        edp:RemoveEventListener(type, self.eventMap[handler].handler)
+    end
 end
 
 function LuaMonoBehaviour:StartCoroutine(coFun)
@@ -45,14 +59,24 @@ function LuaMonoBehaviour:StartCoroutine(coFun)
     return self.coMap[coFun]
 end
 
-function LuaMonoBehaviour:Destroy()
-    destroy(self.gameObject)
+function LuaMonoBehaviour:Dispose()
     if self.coMap then
         for _, co in pairs(self.coMap) do
             coroutine.stop(co)
         end
     end
+    if self.eventMap then
+        for _, event in pairs(self.eventMap) do
+            edp:RemoveEventListener(event.type, event.handler)
+        end
+    end
     self.coMap = nil
+    self.eventMap = nil
+end
+
+function LuaMonoBehaviour:Destroy()
+    destroy(self.gameObject)
+    self:Dispose()
 end
 
 function LuaMonoBehaviour:OnDestroy()

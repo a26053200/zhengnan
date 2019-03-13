@@ -41,6 +41,7 @@ function EventDispatcher:AddEventListener(sType, Listener)
             error("AddEventListener error : Listener hai in")
         end
     end
+    return Listener
 end
 
 

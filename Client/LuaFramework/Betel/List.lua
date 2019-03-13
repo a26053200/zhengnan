@@ -122,5 +122,13 @@ function _List:Clone()
     return newList
 end
 
+function _List:Sort(compFunc)
+    table.sort(self._array,compFunc)
+end
+
+function _List:SortClone(compFunc)
+    local newList = self:Clone()
+    return newList:Sort(compFunc)
+end
 return _List
 
