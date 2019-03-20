@@ -20,6 +20,7 @@ function LuaMonoBehaviour:Ctor(gameObject)
         self.transform = gameObject.transform
     end
     self.eventMap = {}
+    self.objectEvent = {}
 end
 
 function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
@@ -42,6 +43,12 @@ end
 function LuaMonoBehaviour:RemoveGlobalEventListener(type, handler)
     if self.eventMap[handler] then
         edp:RemoveEventListener(type, self.eventMap[handler].handler)
+    end
+end
+
+function LuaMonoBehaviour:AddObjectEvent(entry)
+    if self.objectEvent[entry.eventID] == nil then
+        self.objectEvent[entry.eventID] = entry
     end
 end
 
@@ -72,6 +79,11 @@ function LuaMonoBehaviour:Dispose()
     end
     self.coMap = nil
     self.eventMap = nil
+    if self.objectClickEvent then
+        for _, entry in pairs(self.objectClickEvent) do
+            LuaHelper.RemoveObjectEvent(self.gameObject, entry)
+        end
+    end
 end
 
 function LuaMonoBehaviour:Destroy()

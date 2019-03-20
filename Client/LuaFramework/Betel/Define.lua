@@ -24,10 +24,19 @@ PlayerPrefs = UnityEngine.PlayerPrefs;
 Vector2 = UnityEngine.Vector2;
 Vector3 = UnityEngine.Vector3;
 Vector4 = UnityEngine.Vector4;
----@class UnityEngine.Color
 Color = UnityEngine.Color;
-EventTrigger = UnityEngine.EventSystems.EventTrigger;
-EventTriggerType = UnityEngine.EventSystems.EventTriggerType;
+Input = UnityEngine.Input;
+---@class UnityEngine.EventSystems
+---@field EventTrigger UnityEngine.EventSystems.EventTrigger
+---@field EventTriggerType UnityEngine.EventSystems.EventTriggerType
+EventSystems = {
+    EventTrigger = UnityEngine.EventSystems.EventTrigger;
+    EventTriggerType = UnityEngine.EventSystems.EventTriggerType;
+    InputButton = UnityEngine.EventSystems.PointerEventData.InputButton;
+}
+EventTrigger = EventSystems.EventTrigger
+EventTriggerType = EventSystems.EventTriggerType
+InputButton = EventSystems.InputButton
 ---3rd
 
 ---@class DT
