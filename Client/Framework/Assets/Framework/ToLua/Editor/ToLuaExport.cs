@@ -158,7 +158,12 @@ public static class ToLuaExport
         "UIWidget.showHandlesWithMoveTool",
         "UIWidget.showHandles",
         "Input.IsJoystickPreconfigured",
-        "UIDrawCall.isActive"
+        "UIDrawCall.isActive",
+        //
+        "RectTransform.reapplyDrivenProperties",
+        "RectTransform.Axis",
+        "RectTransform.Edge",
+        "RectTransform.ReapplyDrivenProperties",
     };
 
     class _MethodBase

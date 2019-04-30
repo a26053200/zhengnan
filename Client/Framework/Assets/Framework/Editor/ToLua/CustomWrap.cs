@@ -25,10 +25,28 @@ public static class CustomWrap
         _GT(typeof(DateTime)),
         _GT(typeof(Rect)),
         _GT(typeof(PlayerPrefs)),
+        _GT(typeof(Touch)),
         _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
         _GT(typeof(UnityEngine.SceneManagement.Scene)),
+        _GT(typeof(UnityEngine.EventSystems.PointerEventData)),
+        _GT(typeof(UnityEngine.EventSystems.PointerEventData.InputButton)),
         _GT(typeof(UnityEngine.EventSystems.EventTrigger)),
+        _GT(typeof(UnityEngine.EventSystems.EventTrigger.Entry)),
         _GT(typeof(UnityEngine.EventSystems.EventTriggerType)),
+        //================
+        // UnityEngine.UI
+        //================
+        //_GT(typeof(RectTransform)),
+        //_GT(typeof(Text)),
+        //_GT(typeof(Image)),
+        //_GT(typeof(Slider)),
+        //_GT(typeof(CanvasGroup)),
+        _GT(typeof(InputField)),
+        _GT(typeof(ScrollRect)),
+        _GT(typeof(Button)),
+        _GT(typeof(Toggle)),
+        _GT(typeof(ContentSizeFitter)),
+        _GT(typeof(ContentSizeFitter.FitMode)),
         //================
         // DoTween
         //================
@@ -40,6 +58,7 @@ public static class CustomWrap
         //================
         // FrameWork Core
         //================
+        _GT(typeof(EventTriggerListener)),
         _GT(typeof(Logger)),
         _GT(typeof(AssetsManager)),
         _GT(typeof(SceneManager)),
@@ -50,19 +69,7 @@ public static class CustomWrap
         _GT(typeof(LuaMonoBehaviour)),
         _GT(typeof(StringUtils)),
         _GT(typeof(SystemUtils)),
-        //================
-        // UI
-        //================
-        //_GT(typeof(RectTransform)),
-        //_GT(typeof(Text)),
-        //_GT(typeof(Image)),
-        //_GT(typeof(Slider)),
-        //_GT(typeof(CanvasGroup)),
-        _GT(typeof(ScrollRect)),
-        _GT(typeof(Button)),
-        _GT(typeof(Toggle)),
-        _GT(typeof(ContentSizeFitter)),
-        _GT(typeof(ContentSizeFitter.FitMode)),
+        
         /// Custom Components
         _GT(typeof(ListView)),
         _GT(typeof(LuaListViewAdapter)),

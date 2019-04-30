@@ -9,6 +9,17 @@ using UnityEngine.UI;
 /// </summary> 
 public static class GameObjectExt
 {
+    //充值Transorm
+    public static void ResetTransform(this GameObject obj)
+    {
+        if (obj)
+        {
+            obj.transform.localPosition = Vector3.zero;
+            obj.transform.localEulerAngles = Vector3.zero;
+            obj.transform.localScale = Vector3.one;
+        }
+    }
+
     //添加或者获得组件
     public static Component GetOrAddComponent(this GameObject obj, System.Type t)
     {
@@ -20,6 +31,14 @@ public static class GameObjectExt
         return cpt;
     }
 
+    //获取 RectTransform 组件
+    public static RectTransform GetRect(this GameObject obj)
+    {
+        RectTransform rect = obj.GetComponent<RectTransform>();
+        Debug.Log("RectTransform GetRectRectTransform GetRectRectTransform GetRect");
+        return rect;
+    }
+
     //获取组件
     public static Component GetCom(this GameObject obj, string comName)
     {
@@ -28,7 +47,7 @@ public static class GameObjectExt
     }
 
     //获取按钮
-    public static Button GetButton(this GameObject gameObject, string path)
+    public static Button GetButton(this GameObject gameObject, string path = null)
     {
         GameObject child = gameObject.FindChild(path);
         if (child)
@@ -39,46 +58,33 @@ public static class GameObjectExt
         return null;
     }
 
-    //设置按钮文本
-    public static void SetButtonText(this GameObject gameObject, string path, string label)
-    {
-        GameObject child = gameObject.FindChild(path);
-        if (child)
-        {
-            child.SetText("Text", label);
-        }
-    }
 
     //获取组件文本
-    public static string GetText(this GameObject gameObject, string path)
+    public static Text GetText(this GameObject gameObject, string path = null)
     {
         GameObject child = gameObject.FindChild(path);
         if (child)
         {
             Text text = child.GetComponent<Text>();
-            return text.text;
+            return text;
         }
         return null;
     }
 
-    //设置组件文本
-    public static void SetText(this GameObject gameObject, string path, string text)
+    //获取文本输入组件
+    public static InputField GetInputField(this GameObject gameObject, string path = null)
     {
         GameObject child = gameObject.FindChild(path);
         if (child)
-            child.GetComponent<Text>().text = text;
-    }
-
-    //设置输入组件文本
-    public static void SetInputField(this GameObject gameObject, string path, string text)
-    {
-        GameObject child = gameObject.FindChild(path);
-        if (child)
-            child.GetComponent<InputField>().text = text;
+        {
+            InputField com = child.GetComponent<InputField>();
+            return com;
+        }
+        return null;
     }
 
     //获取组件Image
-    public static Image GetImage(this GameObject gameObject, string path)
+    public static Image GetImage(this GameObject gameObject, string path = null)
     {
         GameObject child = gameObject.FindChild(path);
         if (child)
@@ -89,28 +95,32 @@ public static class GameObjectExt
         return null;
     }
 
-    //获取组件Sprite
-    public static Sprite GetSprite(this GameObject gameObject, string path)
+    //获取组件Slider
+    public static Slider GetSlider(this GameObject gameObject, string path = null)
     {
         GameObject child = gameObject.FindChild(path);
         if (child)
         {
-            Image img = child.GetComponent<Image>();
-            return img.sprite;
+            Slider slider = child.GetComponent<Slider>();
+            return slider;
         }
         return null;
     }
 
-    //设置组件Sprite
-    public static void SetSprite(this GameObject gameObject, string path, Sprite sprite)
+    //获取组件CanvasGroup
+    public static CanvasGroup GetCanvasGroup(this GameObject gameObject, string path = null)
     {
         GameObject child = gameObject.FindChild(path);
         if (child)
-            child.GetComponent<Image>().sprite = sprite;
+        {
+            CanvasGroup canvasGroup = child.GetComponent<CanvasGroup>();
+            return canvasGroup;
+        }
+        return null;
     }
 
-    //设置组件Sprite Alpha
-    public static void SetSpriteAlpha(this GameObject gameObject, string path, float alpha)
+    //设置组件Image Alpha
+    public static void SetImageAlpha(this GameObject gameObject, float alpha, string path = null)
     {
         GameObject child = gameObject.FindChild(path);
         if (child)
@@ -121,34 +131,14 @@ public static class GameObjectExt
         }
     }
 
-    //设置组件Slider
-    public static void SetSlider(this GameObject gameObject, string path, float value)
-    {
-        GameObject child = gameObject.FindChild(path);
-        if (child)
-            child.GetComponent<Slider>().value = value;
-    }
-
-    //获取组件Slider值
-    public static float GetSlider(this GameObject gameObject, string path)
-    {
-        GameObject child = gameObject.FindChild(path);
-        if (child)
-            return child.GetComponent<Slider>().value;
-        else
-            return 0;
-    }
-
-    //获取组件CanvasGroup
-    public static CanvasGroup GetCanvasGroup(this GameObject gameObject, string path)
+    //设置按钮文本
+    public static void SetButtonText(this GameObject gameObject, string path, string label)
     {
         GameObject child = gameObject.FindChild(path);
         if (child)
         {
-            CanvasGroup canvasGroup = child.GetComponent<CanvasGroup>();
-            return canvasGroup;
+            child.GetText("Text").text = label;
         }
-        return null;
     }
 
     //按节点路径查找子节点
@@ -160,7 +150,7 @@ public static class GameObjectExt
         {
             Queue<string> childQueue = new Queue<string>(path.Split('/'));
             Transform findChild = null;
-            foreach (Transform child in gameObject.GetComponentsInChildren<Transform>())
+            foreach (Transform child in gameObject.GetComponentsInChildren<Transform>(true))
             {
                 if (childQueue.Peek() == child.name)
                 {
@@ -231,6 +221,11 @@ public static class GameObjectExt
         gameObject.layer = 1 << LayerMask.GetMask(layer);
     }
 
+    /// <summary>
+    /// 设置该节点及其所有子节点层级
+    /// </summary>
+    /// <param name="gameObject"></param>
+    /// <param name="layer"></param>
     public static void SetLayerRecursion(this GameObject gameObject, string layer)
     {
         gameObject.layer = 1 << LayerMask.GetMask(layer);
@@ -240,6 +235,11 @@ public static class GameObjectExt
         }
     }
 
+    /// <summary>
+    /// 设置该节点及其所有子节点tag
+    /// </summary>
+    /// <param name="gameObject"></param>
+    /// <param name="tag"></param>
     public static void SetTagRecursion(this GameObject gameObject, string tag)
     {
         gameObject.tag = tag;
