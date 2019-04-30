@@ -16,8 +16,8 @@ function ListItemRenderer:Ctor(gameObject)
     ListItemRenderer.super.Ctor(self,gameObject)
 end
 
-function ListItemRenderer:Update(data,index)
-
+function ListItemRenderer:UpdateItem(data, index)
+    self.data = data
 end
 
 function ListItemRenderer:OnDestroy()

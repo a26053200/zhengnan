@@ -26,6 +26,8 @@ Vector3 = UnityEngine.Vector3;
 Vector4 = UnityEngine.Vector4;
 Color = UnityEngine.Color;
 Input = UnityEngine.Input;
+Time = UnityEngine.Time;
+Mathf = UnityEngine.Mathf;
 ---@class UnityEngine.EventSystems
 ---@field EventTrigger UnityEngine.EventSystems.EventTrigger
 ---@field EventTriggerType UnityEngine.EventSystems.EventTriggerType

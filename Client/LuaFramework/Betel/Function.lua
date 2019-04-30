@@ -66,6 +66,17 @@ function class(className, super)
 end
 ]]--
 
+--type(v) 用来判断v的类型
+--"nil", "number", "string", "boolean", "table", "function", "thread", "userdata"
+local __NIL = "nil"
+local __Number = "number"
+local __String = "string"
+local __Boolean = "boolean"
+local __Table = "table"
+local __Function = "function"
+local __Thread = "thread"
+local __Userdata = "userdata"
+
 ---Lua class
 --- 父类的方法调用 Class.super.Func(self,...) 错误使用 Class.super:Func(...)
 ---@param className string
@@ -126,6 +137,33 @@ function handler(caller,method)
     end
     return function (...)
         return method(caller, ...)
+    end
+end
+
+---是否为Number对象
+function isNumber(tbl)
+    if tbl == nil then
+        return false
+    else
+        return type(tbl) == __Number
+    end
+end
+
+---是否为String对象
+function isString(tbl)
+    if tbl == nil then
+        return false
+    else
+        return type(tbl) == __String
+    end
+end
+
+---是否为Function对象
+function isFunction(tbl)
+    if tbl == nil then
+        return false
+    else
+        return type(tbl) == __Function
     end
 end
 

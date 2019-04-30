@@ -10,6 +10,7 @@ local LuaMonoBehaviour = require("Betel.LuaMonoBehaviour")
 ---@field adapter LuaListViewAdapter
 ---@field cell LuaListViewCell
 ---@field dataList Betel.List
+---@field itemList table<any, Betel.UI.ListItemRenderer>
 local BaseList = class("Betel.UI.BaseList",LuaMonoBehaviour)
 
 ---@param gameObject UnityEngine.GameObject
@@ -36,9 +37,9 @@ end
 ---@param index number
 function BaseList:OnItemCreate(cell, index)
     local data = self.dataList[index + 1]
-    local item = self.itemRendererClass.New(cell.gameObject)
+    local item = self.itemRendererClass.New(cell.gameObject) ---@type Betel.UI.ListItemRenderer
     self.itemList[index + 1] = item
-    item:Update(data,index + 1)
+    item:UpdateItem(data,index + 1)
     LuaHelper.AddButtonClick(cell.gameObject,handler(self,function ()
         self.eventDispatcher:Dispatcher(ListViewEvent.ItemClick, data)
     end))
@@ -48,7 +49,7 @@ end
 ---@param index number
 function BaseList:UpdateItem(index)
     local item = self.itemList[index]
-    item:Update(self.dataList[index],index)
+    item:UpdateItem(self.dataList[index],index)
 end
 
 function BaseList:OnDestroy()

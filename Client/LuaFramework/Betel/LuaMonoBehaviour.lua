@@ -26,7 +26,7 @@ end
 function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
     self.behaviour = nil
     for k, v in pairs(BehaviourFun) do
-        if self[v] then
+        if self[v] and isFunction(self[v]) then
             self.behaviour = LuaHelper.AddLuaMonoBehaviour(go,name,v,handler(self,self[v]))
         end
     end
