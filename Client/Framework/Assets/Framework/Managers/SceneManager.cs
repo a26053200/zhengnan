@@ -36,7 +36,7 @@ namespace Framework
             yield return operation;
             if (func != null)
             {
-                func.Call((object)GetActiveScene());
+                func.Call(UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneName));
             }
         }
         /// <summary>
@@ -56,6 +56,33 @@ namespace Framework
 		public void LoadSubSceneAsync(string sceneName, LuaFunction func)
         {
             StartCoroutine(OnLoadSceneAnsyn(sceneName, func, LoadSceneMode.Additive));
+        }
+
+
+        /// <summary>
+        ///  异步方式卸载子场景
+        /// </summary>
+        /// <param name="sceneName">加载的场景名称</param>
+        /// <param name="func">加载完成Lua回调函数</param>
+        public void UnloadSubSceneAsync(string sceneName, LuaFunction func)
+        {
+            StartCoroutine(OnUnloadSceneAnsyn(sceneName, func));
+        }
+
+
+        /// <summary>
+        /// 协程方式异步卸载场景
+        /// </summary>
+        /// <param name="sceneName">加载的场景名称</param>
+        /// <param name="func">加载完成Lua回调函数</param>
+        IEnumerator OnUnloadSceneAnsyn(string sceneName, LuaFunction func)
+        {
+            AsyncOperation operation = UnityEngine.SceneManagement.SceneManager.UnloadSceneAsync(sceneName);
+            yield return operation;
+            if (func != null)
+            {
+                func.Call(sceneName);
+            }
         }
     }
 }
