@@ -6,8 +6,8 @@
 ---
 
 local BehaviourFun = {"Awake","Start","OnEnable","OnDisable","OnDestroy","Update","LateUpdate","FixedUpdate"}
-
 local LuaObject = require("Betel.LuaObject")
+
 ---@class Betel.LuaMonoBehaviour : Betel.LuaObject
 ---@field gameObject UnityEngine.GameObject
 ---@field transform UnityEngine.Transform
@@ -19,8 +19,8 @@ function LuaMonoBehaviour:Ctor(gameObject)
     if not isNull(gameObject) then
         self.transform = gameObject.transform
     end
+    self.coMap = {}
     self.eventMap = {}
-    self.objectEvent = {}
 end
 
 function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
@@ -46,16 +46,7 @@ function LuaMonoBehaviour:RemoveGlobalEventListener(type, handler)
     end
 end
 
-function LuaMonoBehaviour:AddObjectEvent(entry)
-    if self.objectEvent[entry.eventID] == nil then
-        self.objectEvent[entry.eventID] = entry
-    end
-end
-
 function LuaMonoBehaviour:StartCoroutine(coFun)
-    if self.coMap == nil then
-        self.coMap = {}
-    end
     if self.coMap[coFun] == nil then
         self.coMap[coFun] = coroutine.start(function ()
             coFun()
@@ -79,11 +70,6 @@ function LuaMonoBehaviour:Dispose()
     end
     self.coMap = nil
     self.eventMap = nil
-    if self.objectClickEvent then
-        for _, entry in pairs(self.objectClickEvent) do
-            LuaHelper.RemoveObjectEvent(self.gameObject, entry)
-        end
-    end
 end
 
 function LuaMonoBehaviour:Destroy()

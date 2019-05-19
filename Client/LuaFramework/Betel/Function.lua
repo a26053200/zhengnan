@@ -197,11 +197,16 @@ function dontDestroyOnLoad(obj)
 end
 
 ---实例化或者复制对象
----@param obj UnityEngine.GameObject
+---@param obj string|UnityEngine.GameObject
 ---@param parent UnityEngine.Transform
 ---@return UnityEngine.GameObject
 function Instantiate(obj,parent)
-    local newObj = GameObject.Instantiate(obj) ---@type UnityEngine.GameObject
+    local newObj
+    if isString(obj) then
+        newObj = GameObject.Instantiate(Res.LoadPrefab(obj))
+    else
+        newObj = GameObject.Instantiate(obj) ---@type UnityEngine.GameObject
+    end
     if not isNull(parent) then
         newObj.transform:SetParent(parent)
     end
