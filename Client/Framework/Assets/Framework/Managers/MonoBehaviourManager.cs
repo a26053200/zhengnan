@@ -26,19 +26,19 @@ namespace Framework
         private void Update()
         {
             for (int i = 0; i < updateList.Count; i++)
-                updateList[i].Call();
+                Call(updateList[i]);
         }
 
         private void LateUpdate()
         {
             for (int i = 0; i < lateUpdateList.Count; i++)
-                lateUpdateList[i].Call();
+                Call(lateUpdateList[i]);
         }
 
         private void FixedUpdate()
         {
             for (int i = 0; i < fixedUpdateList.Count; i++)
-                fixedUpdateList[i].Call();
+                Call(fixedUpdateList[i]);
         }
 
         public void AddUpdateFun(LuaFunction func)
@@ -75,6 +75,13 @@ namespace Framework
         {
             if (fixedUpdateList.Contains(func))
                 fixedUpdateList.Remove(func);
+        }
+
+        private void Call(LuaFunction func)
+        {
+            func.BeginPCall();
+            func.PCall();
+            func.EndPCall();
         }
     }
 }

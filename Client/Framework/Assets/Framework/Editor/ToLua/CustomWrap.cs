@@ -26,6 +26,7 @@ public static class CustomWrap
         _GT(typeof(Rect)),
         _GT(typeof(PlayerPrefs)),
         _GT(typeof(Touch)),
+        _GT(typeof(AudioRolloffMode)),
         _GT(typeof(UnityEngine.SceneManagement.SceneManager)),
         _GT(typeof(UnityEngine.SceneManagement.Scene)),
         _GT(typeof(UnityEngine.EventSystems.PointerEventData)),
@@ -70,6 +71,13 @@ public static class CustomWrap
         _GT(typeof(StringUtils)),
         _GT(typeof(SystemUtils)),
         
+        //================
+        // 3rd
+        //================
+        _GT(typeof(AStar.Grid)),
+        _GT(typeof(AStar.Path)),
+        _GT(typeof(AStar.PathRequestManager)),
+
         /// Custom Components
         _GT(typeof(ListView)),
         _GT(typeof(LuaListViewAdapter)),
