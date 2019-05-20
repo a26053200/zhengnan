@@ -7,6 +7,10 @@
 ---@class Betel.Events.Event
 local Event = class("Betel.Events.Event")
 
+Event.Update = "Update"
+Event.LateUpdate = "LateUpdate"
+Event.FixedUpdate = "FixedUpdate"
+
 function Event:Ctor()
 
 end

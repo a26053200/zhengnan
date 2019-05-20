@@ -59,9 +59,10 @@ RotateMode = DT.RotateMode
 
 ---Framework
 logger = Logger
+Event = require("Betel.Events.Event")
 EventDispatcher = require("Betel.Events.EventDispatcher")
 edp = EventDispatcher.New() --全局事件派发器
-Event = require("Betel.Events.Event")
+require("Betel.Events.GlobalEvent")
 ListViewEvent = require("Betel.UI.ListViewEvent")
 BaseList = require("Betel.UI.BaseList")
 ListItemRenderer = require("Betel.UI.ListItemRenderer")
