@@ -9,7 +9,7 @@ local unpack = unpack
 local remove = table.remove
 
 ---@class Handler
----@field New fun() : Handler
+---@field New fun(callback:fun(), caller:any) : Handler
 ---@field callback fun()
 ---@field caller any
 ---@field args any[]

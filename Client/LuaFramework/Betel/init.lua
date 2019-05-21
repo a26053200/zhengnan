@@ -7,7 +7,7 @@
 require "Betel.string"
 require "Betel.Function"
 require "Betel.Define"
-require "Betel.Tools"
+require "Betel.Utils.Tools"
 require "Betel.Log"
 require "Betel.Res"
 

@@ -14,7 +14,7 @@ function AddEventListener(type, callback, caller)
         logError("re register event!")
         return
     end
-    local handler = _handler(callback, caller)
+    local handler = _handler(caller, callback)
     _Map[callback] = handler
     if type == Event.Update then
         monoMgr:AddUpdateFun(handler)
