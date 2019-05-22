@@ -21,13 +21,14 @@ TYPE.table = "table"        --Lua 中的表（table）其实是一个"关联数�
 GameObject = UnityEngine.GameObject;
 Application = UnityEngine.Application;
 PlayerPrefs = UnityEngine.PlayerPrefs;
-Vector2 = UnityEngine.Vector2;
-Vector3 = UnityEngine.Vector3;
-Vector4 = UnityEngine.Vector4;
+Vector2 = UnityEngine.Vector2
+Vector3 = UnityEngine.Vector3
+Vector4 = UnityEngine.Vector4
 Color = UnityEngine.Color;
 Input = UnityEngine.Input;
 Time = UnityEngine.Time;
 Mathf = UnityEngine.Mathf;
+Camera = UnityEngine.Camera
 ---@class UnityEngine.EventSystems
 ---@field EventTrigger UnityEngine.EventSystems.EventTrigger
 ---@field EventTriggerType UnityEngine.EventSystems.EventTriggerType
