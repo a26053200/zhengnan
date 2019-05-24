@@ -76,6 +76,7 @@ public static class CustomWrap
         //================
         _GT(typeof(AStar.Grid)),
         _GT(typeof(AStar.Path)),
+        _GT(typeof(AStar.Node)),
         _GT(typeof(AStar.PathRequestManager)),
 
         /// Custom Components
