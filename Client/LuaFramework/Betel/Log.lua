@@ -13,6 +13,7 @@ logger.GetInstance().WriteToFile = true;
 
 function log(msg,...)
     local args = Tools.GetArgs(...)
+    msg = debug.traceback(msg, 1)
     local argNum = #args
     if argNum == 1 then
         logger.Info(msg,args[1])
@@ -42,6 +43,7 @@ end
 function logError(msg,...)
     local args = Tools.GetArgs(...)
     local argNum = #args
+    msg = debug.traceback(msg, 1)
     if argNum == 1 then
         logger.Error(msg,args[1])
     elseif argNum == 2 then

@@ -9,7 +9,7 @@ local LuaMonoBehaviour = require("Betel.LuaMonoBehaviour")
 ---@field listView ListView
 ---@field adapter LuaListViewAdapter
 ---@field cell LuaListViewCell
----@field dataList Betel.List
+---@field dataList List
 ---@field itemList table<any, Betel.UI.ListItemRenderer>
 local BaseList = class("Betel.UI.BaseList",LuaMonoBehaviour)
 
@@ -26,7 +26,7 @@ function BaseList:Ctor(gameObject, itemRendererClass)
     self:AddLuaMonoBehaviour(gameObject,"BaseList")
 end
 
----@param dataList Betel.List
+---@param dataList List
 function BaseList:SetData(dataList)
     self.dataList = dataList
     self.adapter:Init(self.dataList:Size(),handler(self,self.OnItemCreate))

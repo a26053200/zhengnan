@@ -5,7 +5,7 @@
 ---
 
 local LuaObject = require("Betel.LuaObject")
----@class Betel.List : Betel.LuaObject
+---@class List : Betel.LuaObject
 local _List = class("_List",LuaObject)
 
 local function Operator(list)
@@ -67,6 +67,21 @@ function _List:Shift()
     return table.remove(self._array,1)
 end
 
+--列表首位数据项
+function _List:Peek()
+    if #self._array == 0 then
+        logError("List is Empty")
+    end
+    return self._array[1]
+end
+
+--列表末位数据项
+function _List:Tail()
+    if #self._array == 0 then
+        logError("List is Empty")
+    end
+    return self._array[#self._array]
+end
 --
 function _List:Pop()
     return table.remove(self._array,#self._array)

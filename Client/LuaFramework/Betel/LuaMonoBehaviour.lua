@@ -24,13 +24,13 @@ function LuaMonoBehaviour:Ctor(gameObject)
 end
 
 function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
-    self.behaviour = nil
+    self.luaBehaviour = nil
     for k, v in pairs(BehaviourFun) do
         if self[v] and isFunction(self[v]) then
-            self.behaviour = LuaHelper.AddLuaMonoBehaviour(go,name,v,handler(self,self[v]))
+            self.luaBehaviour = LuaHelper.AddLuaMonoBehaviour(go,name,v,handler(self,self[v]))
         end
     end
-    return self.behaviour
+    return self.luaBehaviour
 end
 
 function LuaMonoBehaviour:AddGlobalEventListener(type, listener)

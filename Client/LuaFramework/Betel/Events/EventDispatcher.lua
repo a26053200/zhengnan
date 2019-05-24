@@ -5,6 +5,7 @@
 ---
 
 ---@class Betel.Events.EventDispatcher
+---@field New fun() : Betel.Events.EventDispatcher
 local EventDispatcher = class("Betel.Events.EventDispatcher")
 local _Events = nil
 

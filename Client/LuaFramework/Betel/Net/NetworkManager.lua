@@ -14,7 +14,7 @@ local NetworkManager = class("NetworkManager", LuaMonoBehaviour)
 
 
 function NetworkManager:Ctor()
-    self.listenerList = List.New() ---@type Betel.List
+    self.listenerList = List.New() ---@type List
     self.listener = NetworkListener.New(true)
     self.listenerList:Add(self.listener)
 

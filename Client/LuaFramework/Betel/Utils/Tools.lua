@@ -4,7 +4,7 @@
 --- DateTime: 2018/7/12 21:39
 ---
 
-Tools = {}
+local Tools = {}
 
 --获取...的参数数组
 function Tools.GetArgs(...)
@@ -13,6 +13,16 @@ function Tools.GetArgs(...)
         args[i] = select(i,...)
     end
     return args
+end
+
+--c# 数组转化为Lua表
+---@param array any
+function Tools.ToLuaArray(array)
+    local list = {}
+    for i = 0, array.Length - 1 do
+        table.insert(list, array[i])
+    end
+    return list
 end
 
 function Tools.FindObj(go, path)
@@ -59,3 +69,5 @@ function Tools.removeElementByKey(tbl,key)
     end
     return newTbl
 end
+
+return Tools

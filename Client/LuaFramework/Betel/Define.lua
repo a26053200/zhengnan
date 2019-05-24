@@ -60,6 +60,7 @@ RotateMode = DT.RotateMode
 
 ---Framework
 logger = Logger
+Tools = require("Betel.Utils.Tools")
 Event = require("Betel.Events.Event")
 Handler = require("Betel.Handler")
 EventDispatcher = require("Betel.Events.EventDispatcher")
