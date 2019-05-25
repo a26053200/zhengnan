@@ -10,7 +10,7 @@ local Math3D = {}
 function Math3D.GetRandomArray(n)
     local map = {}
     local list = {}
-    for i = 1, 10 do
+    for i = 1, n do
         local r = math.random(i, n)
         local a = r
         if map[r] then
