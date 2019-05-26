@@ -12,8 +12,11 @@ namespace AStar
         public readonly int finishLineIndex;
         public readonly int slowDownIndex;
 
+        public Vector3 startPos;
+
         public Path(Vector3[] waypoints, Vector3 startPos, float turnDst, float stoppingDst)
         {
+            this.startPos = startPos;
             lookPoints = waypoints;
             turnBoundaries = new Line[lookPoints.Length];
             finishLineIndex = turnBoundaries.Length - 1;

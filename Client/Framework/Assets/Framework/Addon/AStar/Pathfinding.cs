@@ -11,6 +11,8 @@ namespace AStar
 
         Grid grid;
 
+        bool smooth = false;
+
         void Awake()
         {
             grid = GetComponent<Grid>();
@@ -19,7 +21,7 @@ namespace AStar
 
         public void FindPath(PathRequest request, Action<PathResult> callback)
         {
-
+            this.smooth = request.smooth;
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
@@ -92,25 +94,28 @@ namespace AStar
                 path.Add(currentNode);
                 currentNode = currentNode.parent;
             }
-            Vector3[] waypoints = SimplifyPath(path);
+            Vector3[] waypoints = SmoothPath(path);
             Array.Reverse(waypoints);
             return waypoints;
 
         }
 
-        Vector3[] SimplifyPath(List<Node> path)
+        Vector3[] SmoothPath(List<Node> path)
         {
             List<Vector3> waypoints = new List<Vector3>();
             Vector2 directionOld = Vector2.zero;
 
             for (int i = 1; i < path.Count; i++)
             {
-                Vector2 directionNew = new Vector2(path[i - 1].gridX - path[i].gridX, path[i - 1].gridY - path[i].gridY);
-                if (directionNew != directionOld)
+                if (this.smooth)
                 {
-                    waypoints.Add(path[i].worldPosition);
+                    Vector2 directionNew = new Vector2(path[i - 1].gridX - path[i].gridX, path[i - 1].gridY - path[i].gridY);
+                    if (directionNew != directionOld)
+                        waypoints.Add(path[i].worldPosition);
+                    directionOld = directionNew;
                 }
-                directionOld = directionNew;
+                else
+                    waypoints.Add(path[i].worldPosition);
             }
             return waypoints.ToArray();
         }

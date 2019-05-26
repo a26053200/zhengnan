@@ -40,7 +40,7 @@ namespace AStar
             {
                 yield return new WaitForSeconds(.3f);
             }
-            PathRequestManager.RequestPath(new PathRequest(transform.position, target.position, OnPathFound));
+            PathRequestManager.RequestPath(new PathRequest(transform.position, target.position, false, OnPathFound));
 
             float sqrMoveThreshold = pathUpdateMoveThreshold * pathUpdateMoveThreshold;
             Vector3 targetPosOld = target.position;
@@ -51,7 +51,7 @@ namespace AStar
                 print(((target.position - targetPosOld).sqrMagnitude) + "    " + sqrMoveThreshold);
                 if ((target.position - targetPosOld).sqrMagnitude > sqrMoveThreshold)
                 {
-                    PathRequestManager.RequestPath(new PathRequest(transform.position, target.position, OnPathFound));
+                    PathRequestManager.RequestPath(new PathRequest(transform.position, target.position, false, OnPathFound));
                     targetPosOld = target.position;
                 }
             }

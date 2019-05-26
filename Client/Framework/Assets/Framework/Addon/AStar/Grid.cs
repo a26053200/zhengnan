@@ -176,6 +176,11 @@ namespace AStar
             return grid[x, y];
         }
 
+        public Node GetNode(int x,int y)
+        {
+            return grid[x, y];
+        }
+
         void OnDrawGizmos()
         {
             Gizmos.DrawWireCube(transform.position, new Vector3(gridWorldSize.x, 1, gridWorldSize.y));
