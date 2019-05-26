@@ -19,6 +19,10 @@ local Handler = class("Handler")
 ---@param caller any
 ---@vararg any 参数
 function Handler:Ctor(callback, caller, ...)
+    if callback == nil then
+        logError("error params! callback can not be nil!")
+        return
+    end
     self.callback = callback
     self.caller = caller
     self.args = { ... }
@@ -32,7 +36,7 @@ function Handler:Execute(...)
     local new_args_count = select("#", ...)
     local args = self.args
     local args_count = select("#", unpack(self.args))
-    for i = 1, args_count do
+    for i = 1, new_args_count do
         args[args_count + i] = new_args[i]
     end
     if callback ~= nil then

@@ -35,12 +35,13 @@ function EventDispatcher:AddEventListener(sType, Listener)
         table.insert(eventList, Listener) --想队列里面插入一个事件
         _Events[sType] = eventList   --放到大表里面
     else
-        local func = eventList[Listener]
-        if func == nil then
-            table.insert(eventList, Listener)
-        else
-            error("AddEventListener error : Listener hai in")
+        for i, v in ipairs(eventList) do
+            if v == Listener then
+                error("AddEventListener error : Listener already add!")
+                return Listener
+            end
         end
+        table.insert(eventList, Listener)
     end
     return Listener
 end

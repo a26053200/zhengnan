@@ -29,6 +29,7 @@ Input = UnityEngine.Input;
 Time = UnityEngine.Time;
 Mathf = UnityEngine.Mathf;
 Camera = UnityEngine.Camera
+Rect = UnityEngine.Rect
 ---@class UnityEngine.EventSystems
 ---@field EventTrigger UnityEngine.EventSystems.EventTrigger
 ---@field EventTriggerType UnityEngine.EventSystems.EventTriggerType
@@ -61,11 +62,11 @@ RotateMode = DT.RotateMode
 ---Framework
 logger = Logger
 Tools = require("Betel.Utils.Tools")
+Math3D = require("Betel.Utils.Math3D")
 Event = require("Betel.Events.Event")
 Handler = require("Betel.Handler")
 EventDispatcher = require("Betel.Events.EventDispatcher")
 edp = EventDispatcher.New() --全局事件派发器
-require("Betel.Events.GlobalEvent")
 ListViewEvent = require("Betel.UI.ListViewEvent")
 BaseList = require("Betel.UI.BaseList")
 ListItemRenderer = require("Betel.UI.ListItemRenderer")
