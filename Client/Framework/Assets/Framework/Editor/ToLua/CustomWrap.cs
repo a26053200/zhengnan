@@ -34,6 +34,9 @@ public static class CustomWrap
         _GT(typeof(UnityEngine.EventSystems.EventTrigger)),
         _GT(typeof(UnityEngine.EventSystems.EventTrigger.Entry)),
         _GT(typeof(UnityEngine.EventSystems.EventTriggerType)),
+
+        _GT(typeof(AnimatorStateInfo)),
+
         //================
         // UnityEngine.UI
         //================
@@ -48,6 +51,7 @@ public static class CustomWrap
         _GT(typeof(Toggle)),
         _GT(typeof(ContentSizeFitter)),
         _GT(typeof(ContentSizeFitter.FitMode)),
+        
         //================
         // DoTween
         //================
