@@ -70,6 +70,12 @@ edp = EventDispatcher.New() --全局事件派发器
 ListViewEvent = require("Betel.UI.ListViewEvent")
 BaseList = require("Betel.UI.BaseList")
 ListItemRenderer = require("Betel.UI.ListItemRenderer")
+
+StateAction = FastBehavior.StateAction
+StateMachine = FastBehavior.StateMachine
+StateNode = FastBehavior.StateNode
+BaseBehavior = FastBehavior.BaseBehavior
+
 ---=============---
 ---Global Define
 ---=============---
