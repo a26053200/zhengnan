@@ -78,10 +78,16 @@ public static class CustomWrap
         //================
         // 3rd
         //================
+        //Astar
         _GT(typeof(AStar.Grid)),
         _GT(typeof(AStar.Path)),
         _GT(typeof(AStar.Node)),
         _GT(typeof(AStar.PathRequestManager)),
+        //FastBehavior
+        _GT(typeof(FastBehavior.StateAction)),
+        _GT(typeof(FastBehavior.StateMachine)),
+        _GT(typeof(FastBehavior.StateNode)),
+        _GT(typeof(FastBehavior.BaseBehavior)),
 
         /// Custom Components
         _GT(typeof(ListView)),
