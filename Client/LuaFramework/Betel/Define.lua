@@ -74,7 +74,7 @@ ListItemRenderer = require("Betel.UI.ListItemRenderer")
 StateAction = FastBehavior.StateAction
 StateMachine = FastBehavior.StateMachine
 StateNode = FastBehavior.StateNode
-BaseBehavior = FastBehavior.BaseBehavior
+FastLuaBehavior = FastBehavior.FastLuaBehavior
 
 ---=============---
 ---Global Define
