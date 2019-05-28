@@ -380,6 +380,7 @@ public static class ToLuaMenu
         ToLuaExport.allTypes.Clear();
         allTypes.Clear();        
         AssetDatabase.Refresh();
+        
     }
 
     static HashSet<Type> GetCustomTypeDelegates()
@@ -717,6 +718,10 @@ public static class ToLuaMenu
 
         AssetDatabase.Refresh();
         Debugger.Log("Generate LuaBinder over !");
+
+        //自动生成API
+        //EmmyLua - Gen API for EmmyLua
+        Emmy.ToLuaEmmyAPIGenerator.DoIt();
     }
 
     static void GenRegisterInfo(string nameSpace, StringBuilder sb, List<DelegateType> delegateList, List<DelegateType> wrappedDelegatesCache)

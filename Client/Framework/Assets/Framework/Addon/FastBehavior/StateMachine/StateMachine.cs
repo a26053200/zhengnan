@@ -11,39 +11,43 @@ namespace FastBehavior
     /// </summary> 
     public class StateMachine : MonoBehaviour
     {
-        static long s_id = 1;
+        static double s_id = 1;
 
-        private long id;
+        private double id;
 
-        private List<StateAction> m_state2DList = new List<StateAction>();
+        public FastLuaBehavior fastBehavior;
+        public List<StateAction> state2DList = new List<StateAction>();
+        public StateAction currState { get { return m_currState; } }
+
         private List<StateAction> m_currstateList = new List<StateAction>();
         private List<StateAction> m_currStateExeList = new List<StateAction>();
         private StateAction m_currState;
         private Queue<StateAction> m_curr2DQueue;
         private LuaFunction m_cycleOverCallback;
 
-        private bool m_isRuning;
+        
         void Awake()
         {
             id = s_id;
             s_id++;
 
-            m_currstateList = m_state2DList;
+            //hideFlags = HideFlags.HideInInspector;
+            m_currstateList = state2DList;
         }
 
         public void Run(LuaFunction cycleOverCallback = null)
         {
             m_cycleOverCallback = cycleOverCallback;
             m_currState = null;
-            m_curr2DQueue = new Queue<StateAction>(m_state2DList);
-            m_isRuning = true;
+            m_curr2DQueue = new Queue<StateAction>(state2DList);
+            enabled = true;
             NextState();
         }
 
         public void Stop()
         {
             m_currState = null;
-            m_isRuning = false;
+            enabled = false;
         }
 
 
@@ -56,35 +60,35 @@ namespace FastBehavior
         {
             StateAction subState = new StateAction(new StateNode());
             subState.order = StateOrder.Select;
-            m_state2DList.Add(subState);
+            state2DList.Add(subState);
             m_currstateList = new List<StateAction>();
             subState.AddSubList(m_currstateList);
         }
 
         public void EndScelet()
         {
-            m_currstateList = m_state2DList;
+            m_currstateList = state2DList;
         }
 
         public void BeginParallel()
         {
             StateAction subState = new StateAction(new StateNode());
             subState.order = StateOrder.Parallel;
-            m_state2DList.Add(subState);
+            state2DList.Add(subState);
             m_currstateList = new List<StateAction>();
             subState.AddSubList(m_currstateList);
         }
 
         public void EndParallel()
         {
-            m_currstateList = m_state2DList;
+            m_currstateList = state2DList;
         }
 
         public void NextState()
         {
             if (m_curr2DQueue.Count == 0)
             {
-                m_curr2DQueue = new Queue<StateAction>(m_state2DList);
+                m_curr2DQueue = new Queue<StateAction>(state2DList);
                 if (m_cycleOverCallback != null )
                 {
                     m_cycleOverCallback.BeginPCall();
@@ -118,29 +122,26 @@ namespace FastBehavior
 
         void Update()
         {
-            if (m_isRuning)
+            if (m_currState != null)
             {
-                if (m_currState != null)
+                StateAction state = m_currState;
+                bool isOver = state.IsOver();
+                if (!state.execute)
                 {
-                    StateAction state = m_currState;
-                    bool isOver = state.IsOver();
+                    state.execute = true;
+                    state.Execute();
+                }
+                if (isOver)
+                    NextState();
+            }else if (m_currStateExeList != null)
+            {
+                for (int i = 0; i < m_currStateExeList.Count; i++)
+                {
+                    StateAction state = m_currStateExeList[i];
                     if (!state.execute)
                     {
                         state.execute = true;
                         state.Execute();
-                    }
-                    if (isOver)
-                        NextState();
-                }else if (m_currStateExeList != null)
-                {
-                    for (int i = 0; i < m_currStateExeList.Count; i++)
-                    {
-                        StateAction state = m_currStateExeList[i];
-                        if (!state.execute)
-                        {
-                            state.execute = true;
-                            state.Execute();
-                        }
                     }
                 }
             }

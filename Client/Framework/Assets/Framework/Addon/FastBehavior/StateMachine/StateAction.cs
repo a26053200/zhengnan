@@ -14,6 +14,7 @@ namespace FastBehavior
         private StateNode m_node;
         private float m_startTime;
 
+        public StateNode node { get { return m_node; } }
         public StateOrder order { get; set; }
         public List<StateAction> subStateList { get; private set; }
 

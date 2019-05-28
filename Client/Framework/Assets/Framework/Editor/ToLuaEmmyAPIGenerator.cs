@@ -15,7 +15,7 @@ namespace Emmy
 	public class ToLuaEmmyAPIGenerator
 	{
 		[MenuItem ("Lua/Gen API for EmmyLua")]
-		static void DoIt ()
+		public static void DoIt ()
 		{
 			Filter<Type> baseFilter = new GeneralFilter<Type> (ToLuaMenu.baseType);
 			Filter<Type> dropFilter = new GeneralFilter<Type> (ToLuaMenu.dropType);

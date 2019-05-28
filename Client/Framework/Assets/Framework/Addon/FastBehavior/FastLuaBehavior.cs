@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using LuaInterface;
 
@@ -10,22 +9,23 @@ namespace FastBehavior
     /// <para>Author: zhengnan</para>
     /// <para>Create: 2019/5/27 23:51:07</para>
     /// </summary> 
-    
-    public class BaseBehavior
+    public class FastLuaBehavior
     {
-        static long s_id = 1;
-        public long id { get; private set; }
+        static double s_id = 1;
+        public double id { get; private set; }
 
-        private StateMachine m_machine;
-        private List<BaseBehavior> m_subBehaviors;
+        public StateMachine stateMachine { get; private set; }
 
-        public BaseBehavior(StateMachine machine)
+        public List<FastLuaBehavior> subBehaviors { get; private set; }
+
+        public FastLuaBehavior(StateMachine machine)
         {
             id = s_id;
             s_id++;
 
-            m_machine = machine;
-            m_subBehaviors = new List<BaseBehavior>();
+            stateMachine = machine;
+            machine.fastBehavior = this;
+            subBehaviors = new List<FastLuaBehavior>();
         }
 
         public void AppendState(LuaFunction onEnter, string name)
@@ -67,11 +67,11 @@ namespace FastBehavior
         }
 
 
-        public void AppendBehavior(BaseBehavior behavior)
+        public void AppendBehavior(FastLuaBehavior behavior)
         {
             StateNode node = new StateNode();
             node.name = "Sub BaseBehavior id:" + behavior.id;
-            m_subBehaviors.Add(behavior);
+            subBehaviors.Add(behavior);
             node.OnEnter = delegate ()
             {
                 behavior.Run();
@@ -89,24 +89,24 @@ namespace FastBehavior
 
         public void AppendStateNode(StateNode node)
         {
-            m_machine.AppendState(new StateAction(node));
+            stateMachine.AppendState(new StateAction(node));
         }
 
 
         public void Run(LuaFunction cycleOverCallback = null)
         {
-            m_machine.Run(cycleOverCallback);
+            stateMachine.Run(cycleOverCallback);
         }
 
         public void Stop()
         {
-            m_machine.Stop();
+            stateMachine.Stop();
         }
 
         public void NextState()
         {
-            m_machine.NextState();
+            stateMachine.NextState();
         }
     }
 }
-
+    

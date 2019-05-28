@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
-using System.Collections;
+using UnityEditor;
 
-public class BaseBehaviorEditor : MonoBehaviour
+namespace FastBehavior
 {
-
-    // Use this for initialization
-    void Start()
+    public class BaseBehaviorEditor : Editor
     {
+        protected StateMachine stateMachine;
 
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        protected void LabelField(string title, string content, bool enabled)
+        {
+            EditorGUI.BeginDisabledGroup(!enabled);
+            {
+                EditorGUILayout.LabelField(title, content);
+            }
+            EditorGUI.EndDisabledGroup();
+        }
     }
 }
