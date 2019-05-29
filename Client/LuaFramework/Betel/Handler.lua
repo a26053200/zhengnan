@@ -12,6 +12,8 @@ local remove = table.remove
 ---@field New fun(callback:fun(), caller:any) : Handler
 ---@field callback fun()
 ---@field caller any
+---@field startTime any
+---@field delay any
 ---@field args any[]
 local Handler = class("Handler")
 
@@ -25,6 +27,8 @@ function Handler:Ctor(callback, caller, ...)
     end
     self.callback = callback
     self.caller = caller
+    self.startTime = nil
+    self.delay = 0
     self.args = { ... }
 end
 
@@ -34,7 +38,7 @@ function Handler:Execute(...)
     local caller = self.caller
     local new_args = { ... }
     local new_args_count = select("#", ...)
-    local args = self.args
+    local args = clone(self.args)
     local args_count = select("#", unpack(self.args))
     for i = 1, new_args_count do
         args[args_count + i] = new_args[i]
