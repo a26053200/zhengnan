@@ -14,6 +14,8 @@ namespace FastBehavior
         static double s_id = 1;
         public double id { get; private set; }
 
+        public StateNode parentNode { get; private set; }
+
         public StateMachine stateMachine { get; private set; }
 
         public List<FastLuaBehavior> subBehaviors { get; private set; }
@@ -67,11 +69,13 @@ namespace FastBehavior
         }
 
 
-        public void AppendBehavior(FastLuaBehavior behavior)
+        public void AppendBehavior(FastLuaBehavior behavior, string name)
         {
             StateNode node = new StateNode();
-            node.name = "Sub BaseBehavior id:" + behavior.id;
+            node.name = name;
             subBehaviors.Add(behavior);
+            behavior.stateMachine.hideFlags = HideFlags.HideInInspector;
+            behavior.parentNode = node;
             node.OnEnter = delegate ()
             {
                 behavior.Run();

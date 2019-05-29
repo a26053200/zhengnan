@@ -13,7 +13,7 @@ namespace Framework
     {
         public Color color = Color.yellow;
         [Range(0.01f, 100f)]
-        public float radius = 2;
+        public float radius = 1;
         private void OnDrawGizmos()
         {
             Gizmos.color = color;

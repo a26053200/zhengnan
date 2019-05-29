@@ -12,6 +12,8 @@ namespace FastBehavior
         }
         public override void OnInspectorGUI()
         {
+            if (stateMachine.hideFlags == HideFlags.HideInInspector)
+                return;
             //EditorGUI.BeginDisabledGroup(false);
             //{
             //    EditorGUILayout.ObjectField("Root Obj", stateMachine.gameObject, typeof(GameObject), true);
@@ -19,18 +21,28 @@ namespace FastBehavior
             //}
             //EditorGUI.EndDisabledGroup();
 
-            DisplayStateMachine(stateMachine);
-
-            EditorGUI.indentLevel++;
-            for (int i = 0; i < stateMachine.fastBehavior.subBehaviors.Count; i++)
+            for (int i = 0; i < stateMachine.state2DList.Count; i++)
             {
-                FastLuaBehavior subBehavior = stateMachine.fastBehavior.subBehaviors[i];
-                LabelField("Sub Behavior", subBehavior.id.ToString(), subBehavior.stateMachine.enabled);
+                StateAction stateAction = stateMachine.state2DList[i];
+                bool activeAction = stateAction == stateMachine.currState;
+                LabelField("Action", stateAction.node.name, activeAction);
                 EditorGUI.indentLevel++;
-                DisplayStateMachine(subBehavior.stateMachine);
+                for (int j = 0; j < stateMachine.fastBehavior.subBehaviors.Count; j++)
+                {
+                    FastLuaBehavior subBehavior = stateMachine.fastBehavior.subBehaviors[j];
+                    if (subBehavior.parentNode == stateAction.node)
+                    {
+                        LabelField("Sub Behavior", subBehavior.id.ToString(), activeAction && subBehavior.stateMachine.enabled);
+                        EditorGUI.indentLevel++;
+                        DisplayStateMachine(subBehavior.stateMachine);
+                        EditorGUI.indentLevel--;
+                    }
+                }
                 EditorGUI.indentLevel--;
             }
-            EditorGUI.indentLevel--;
+            //DisplayStateMachine(stateMachine);
+
+            
         }
 
         private void DisplayStateMachine(StateMachine machine)

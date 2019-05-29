@@ -33,6 +33,7 @@ namespace FastBehavior
 
             //hideFlags = HideFlags.HideInInspector;
             m_currstateList = state2DList;
+            enabled = false;
         }
 
         public void Run(LuaFunction cycleOverCallback = null)
