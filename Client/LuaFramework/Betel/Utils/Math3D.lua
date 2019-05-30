@@ -7,19 +7,11 @@
 local Math3D = {}
 
 --获取一个随机数数组
-function Math3D.GetRandomArray(n)
-    local map = {}
-    local list = {}
-    for i = 1, n do
-        local r = math.random(i, n)
-        local a = r
-        if map[r] then
-            a = map[r]
-        end
-        table.insert(list, a)
-        map[r] = map[i] or i
-    end
-    return list
+---@param src UnityEngine.Transform
+---@param dst UnityEngine.Transform
+function Math3D.LookAt_XZ(src, dst)
+    local dst = Vector3.New(dst.position.x, src.position.y, dst.position.z)
+    src:LookAt(dst)
 end
 
 return Math3D

@@ -15,6 +15,15 @@ function Tools.GetArgs(...)
     return args
 end
 
+
+--是否是空对象
+function Tools.isNullObj(obj)
+    if obj == nil or isNull(obj.gameObject) then
+        return true
+    end
+    return false
+end
+
 --c# 数组转化为Lua表
 ---@param array any
 function Tools.ToLuaArray(array)
@@ -68,6 +77,21 @@ function Tools.removeElementByKey(tbl,key)
         end
     end
     return newTbl
+end
+--获取一个随机数数组
+function Tools.GetRandomArray(n)
+    local map = {}
+    local list = {}
+    for i = 1, n do
+        local r = math.random(i, n)
+        local a = r
+        if map[r] then
+            a = map[r]
+        end
+        table.insert(list, a)
+        map[r] = map[i] or i
+    end
+    return list
 end
 
 return Tools
