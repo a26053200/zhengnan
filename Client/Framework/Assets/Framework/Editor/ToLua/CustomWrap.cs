@@ -36,7 +36,7 @@ public static class CustomWrap
         _GT(typeof(UnityEngine.EventSystems.EventTriggerType)),
 
         _GT(typeof(AnimatorStateInfo)),
-
+        _GT(typeof(TextMesh)),
         //================
         // UnityEngine.UI
         //================
