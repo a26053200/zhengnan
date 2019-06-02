@@ -44,7 +44,7 @@ namespace AStar
             {
                 Path path = pathList[i];
                 float x = UnityEngine.Random.Range(0f,1f);
-                Color color = new Color(1, 1, x, 1);
+                Color color = new Color(path.lookPoints[0].x * 100 % 255, path.lookPoints[0].y * 100 % 255, path.lookPoints[0].z * 100 % 255, 1);
                 for (int j = 0; j < path.lookPoints.Length - 1; j++)
                 {
                     if (j == 0)

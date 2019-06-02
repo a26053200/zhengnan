@@ -51,6 +51,10 @@ namespace Framework
             return LoadAsset<GameObject>(path);
         }
 
+        public Material LoadMaterial(string path)
+        {
+            return LoadAsset<Material>(path);
+        }
         /// <summary>
         /// 同步加载资源
         /// </summary>
