@@ -30,6 +30,7 @@ function Handler:Ctor(callback, caller, ...)
     self.startTime = nil
     self.delay = 0
     self.args = { ... }
+    self.Delegate = handler(caller, callback)
 end
 
 function Handler:Execute(...)

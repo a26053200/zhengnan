@@ -32,3 +32,9 @@ end
 function Res.LoadTexture(path)
     return assetsMgr:LoadTexture(path);
 end
+
+---@param path string
+---@return UnityEngine.Material
+function Res.LoadMaterial(path)
+    return assetsMgr:LoadMaterial(path);
+end

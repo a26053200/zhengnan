@@ -66,6 +66,8 @@ function class(className, super)
 end
 ]]--
 
+local setmetatable = setmetatable
+
 --type(v) 用来判断v的类型
 --"nil", "number", "string", "boolean", "table", "function", "thread", "userdata"
 local __NIL = "nil"
@@ -80,7 +82,7 @@ local __Userdata = "userdata"
 ---Lua class
 --- 父类的方法调用 Class.super.Func(self,...) 错误使用 Class.super:Func(...)
 ---@param className string
----@param optional super table
+---@param super table
 ---@return table
 function class(className, super)
     local cls = {}
@@ -99,7 +101,9 @@ function class(className, super)
 
     function cls.New(...)
         local instance = setmetatable({}, cls)
-        for k,v in pairs(cls) do instance[k] = v end
+        for k,v in pairs(cls) do
+            instance[k] = clone(v)
+        end
         instance:Ctor(...)
         return instance
     end

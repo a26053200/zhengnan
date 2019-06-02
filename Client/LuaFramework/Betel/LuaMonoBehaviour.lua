@@ -21,6 +21,7 @@ function LuaMonoBehaviour:Ctor(gameObject)
     end
     self.coMap = {}
     self.eventMap = {}
+    self.delayList = {}
 end
 
 function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
@@ -57,6 +58,14 @@ function LuaMonoBehaviour:StartCoroutine(coFun)
     return self.coMap[coFun]
 end
 
+---@param delay number
+---@param callback Handler
+function LuaMonoBehaviour:CreateDelay(delay, callback)
+    local d = DelayCallback(delay,callback)
+    table.insert(self.delayList, d)
+    return d
+end
+
 function LuaMonoBehaviour:Dispose()
     if self.coMap then
         for _, co in pairs(self.coMap) do
@@ -68,8 +77,14 @@ function LuaMonoBehaviour:Dispose()
             edp:RemoveEventListener(event.type, event.handler)
         end
     end
-    self.coMap = nil
-    self.eventMap = nil
+    if self.delayList then
+        for _, d in pairs(self.delayList) do
+            CancelDelayCallback(d)
+        end
+    end
+    self.coMap = {}
+    self.eventMap = {}
+    self.delayList = {}
 end
 
 function LuaMonoBehaviour:Destroy()

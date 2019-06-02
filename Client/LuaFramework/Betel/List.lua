@@ -6,7 +6,7 @@
 
 local LuaObject = require("Betel.LuaObject")
 ---@class List : Betel.LuaObject
-local _List = class("_List",LuaObject)
+local _List = class("List",LuaObject)
 
 local function Operator(list)
     local mt = getmetatable(list).__index
@@ -19,6 +19,7 @@ local function Operator(list)
 end
 
 function _List:Ctor(table)
+    _List.super.Ctor(self, table)
     Operator(self)
     self._array = table and table or {}
 end
