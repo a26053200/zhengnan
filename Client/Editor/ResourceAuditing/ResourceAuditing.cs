@@ -2,6 +2,7 @@
 using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
+using System;
 
 namespace ResourceAuditing
 {
@@ -41,13 +42,41 @@ namespace ResourceAuditing
         {
 
         }
-
+        private void OnLostFocus()
+        {
+            Close();
+        }
         void OnGUI()
         {
             //EditorGUI.BeginChangeCheck();
+            //EditorGUI.EndChangeCheck();
+            EditorGUILayout.BeginHorizontal(EditorStyles.toolbar, GUILayout.ExpandWidth(true));
+            {
+                Array arr = Enum.GetValues(typeof(DetailsType));
+                for (int i = 0; i < DetailsStrings.Length; i++)
+                {
+                    if (GUILayout.Button(DetailsStrings[i]))
+                    {
+                        currSelectDetailsType = (DetailsType)Enum.ToObject(typeof(DetailsType), i);
+                        switch (currSelectDetailsType)
+                        {
+                            case DetailsType.Textures:
+                                GetListTextures();
+                                break;
+                            case DetailsType.Materials:
+                                //ListMaterials();
+                                break;
+                            case DetailsType.Meshes:
+                                //ListMeshes();
+                                break;
+                        }
+                    }
+                }
+            }
+            EditorGUILayout.EndHorizontal();
 
-            currSelectDetailsType = (DetailsType)GUILayout.Toolbar((int)currSelectDetailsType, DetailsStrings);
-            //ctrlPressed = Event.current.control || Event.current.command;
+            //currSelectDetailsType = (DetailsType)GUILayout.Toolbar((int)currSelectDetailsType, DetailsStrings);
+            ////ctrlPressed = Event.current.control || Event.current.command;
             switch (currSelectDetailsType)
             {
                 case DetailsType.Textures:
@@ -60,10 +89,16 @@ namespace ResourceAuditing
                     //ListMeshes();
                     break;
             }
+            //if (GUILayout.Button("T%"))
+            //{
+            //    GetListTextures();
+            //}
+            //ListTextures();
 
 
         }
-        void ListTextures()
+
+        void GetListTextures()
         {
             if (allTextures.Count == 0)
             {
@@ -87,28 +122,68 @@ namespace ResourceAuditing
                         string dir = EditorFileUitl.Absolute2Relativity(fileInfo.DirectoryName) + "/";
                         dir = dir.ToLower();
                         td.name = lowerName;
+                        td.path = dir + lowerName;
                         td.texture = AssetDatabase.LoadAssetAtPath<Texture>(dir + lowerName);
                         td.fileInfo = fileInfo;
                         allTextures.Add(td);
                     }
                 }
             }
-            else
+        }
+        void ListTextures()
+        {
+            if (allTextures.Count > 0)
             {
                 //List Header
-
+                //EditorGUILayout.BeginHorizontal();
+                //EditorGUILayout.EndHorizontal();
                 //List Body
-                scrollerPos = EditorGUILayout.BeginScrollView(scrollerPos, GUILayout.ExpandWidth(true), GUILayout.Height(100));
+                scrollerPos = EditorGUILayout.BeginScrollView(scrollerPos, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
                 {
-                    foreach (var td in allTextures)
+
+                    //EditorGUILayout.BeginVertical();
+                    for (int i = 0; i < allTextures.Count; i++)
                     {
-                        EditorGUILayout.ObjectField(td.name, td.texture, typeof(Texture), false);
+                        TextureDetails td = allTextures[i];
+                        BeginFoldout(td);
                     }
+                    //EditorGUILayout.EndVertical();
                 }
                 EditorGUILayout.EndScrollView();
-                
             }
-            
         }
+        Rect rect64 = new Rect(32,0,100,64);
+        Rect rect32 = new Rect(0, 0, 100, 64);
+        void BeginFoldout(TextureDetails td)
+        {
+            if (td.isOpen)
+            {
+                EditorGUILayout.BeginHorizontal();
+                {
+                    GUILayout.BeginArea(rect64);
+                    td.isOpen = EditorGUILayout.Foldout(td.isOpen, new GUIContent(td.name), td.isClick);
+                    GUILayout.EndArea();
+                    //EditorGUILayout.LabelField(td.name);
+                    EditorGUI.BeginDisabledGroup(true);
+                    EditorGUILayout.ObjectField("", td.texture, typeof(Texture), true, GUILayout.Width(64));
+                    EditorGUILayout.TextField("", td.path);
+                    EditorGUI.EndDisabledGroup();
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+            else
+            {
+                
+                EditorGUILayout.BeginHorizontal();
+                {
+                    td.isOpen = EditorGUILayout.Foldout(td.isOpen, td.name);
+                    EditorGUI.BeginDisabledGroup(true);
+                    EditorGUILayout.ObjectField("", td.texture, typeof(Texture), true, GUILayout.Width(32), GUILayout.Height(32));
+                    EditorGUI.EndDisabledGroup();
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+        
     }
 }

@@ -8,8 +8,12 @@ namespace ResourceAuditing
 {
     public class TextureDetails : IEquatable<TextureDetails>
     {
+        public bool isOpen = false;
+        public bool isClick = false;
+
         public bool isCubeMap;
         public string name;
+        public string path;
         public int memSizeKB;
         public Texture texture;
         public FileInfo fileInfo;
