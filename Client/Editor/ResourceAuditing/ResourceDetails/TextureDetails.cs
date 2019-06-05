@@ -6,34 +6,32 @@ using System.IO;
 
 namespace ResourceAuditing
 {
-    public class TextureDetails : IEquatable<TextureDetails>
+    public class TextureDetails
     {
         public bool isOpen = false;
         public bool isClick = false;
 
-        public bool isCubeMap;
+        public string md5;
+        public int hashCode;
+        public List<TextureResource> resources;
+
+
+        public TextureDetails()
+        {
+            resources = new List<TextureResource>();
+        }
+
+        
+    }
+    public class TextureResource : IEquatable<TextureResource>
+    {
         public string name;
         public string path;
-        public int memSizeKB;
         public Texture texture;
         public FileInfo fileInfo;
         public TextureFormat format;
-        public int mipMapCount;
-        public List<Object> FoundInMaterials = new List<Object>();
-        public List<Object> FoundInRenderers = new List<Object>();
-        public List<Object> FoundInAnimators = new List<Object>();
-        public List<Object> FoundInScripts = new List<Object>();
-        public List<Object> FoundInGraphics = new List<Object>();
-        public List<Object> FoundInButtons = new List<Object>();
-        public bool isSky;
-        public bool instance;
-        public bool isgui;
-        public TextureDetails()
-        {
 
-        }
-
-        public bool Equals(TextureDetails other)
+        public bool Equals(TextureResource other)
         {
             return texture != null && other.texture != null &&
                 texture.GetNativeTexturePtr() == other.texture.GetNativeTexturePtr();
