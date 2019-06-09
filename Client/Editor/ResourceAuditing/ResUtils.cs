@@ -14,6 +14,60 @@ namespace ResourceAuditing
     /// </summary> 
     public static class ResUtils
     {
+        //Style
+        //static GUIStyle labelDefault;
+        static GUIStyle labelRed;
+        static GUIStyle labelGreen;
+        static GUIStyle labelYellow;
+
+        static ResUtils()
+        {
+            labelRed = new GUIStyle();
+            labelRed.normal.textColor = Color.red;
+
+            labelGreen = new GUIStyle();
+            labelGreen.normal.textColor = Color.green;
+
+            labelYellow = new GUIStyle();
+            labelYellow.normal.textColor = Color.yellow;
+        }
+
+        public static void ColorLabelField(string title, string content, int level = 0, int width = 0)
+        {
+            GUIStyle labelStyle = labelGreen;
+            if (level == 1)
+                labelStyle = labelYellow;
+            else if (level == 2)
+                labelStyle = labelRed;
+            EditorGUILayout.LabelField(title + ": " + content, labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+        }
+
+        public static void ColorLabelFieldTooltip(string title, string content,string tooltip, int level = 0, int width = 0)
+        {
+            GUIStyle labelStyle = labelGreen;
+            if (level == 1)
+                labelStyle = labelYellow;
+            else if (level == 2)
+                labelStyle = labelRed;
+            EditorGUILayout.LabelField(new GUIContent(title + ": " + content, tooltip), labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+        }
+
+        public static void ColorLabelField(string title, string content, bool vaild, int width = 0)
+        {
+            EditorGUILayout.LabelField(title + ": "+ content, vaild ? labelGreen : labelRed, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+        }
+        public static void ColorLabelFieldTooltip(string title, string content, string tooltip, bool vaild,  int width = 0)
+        {
+            if (labelRed == null)
+            {
+                labelRed = new GUIStyle();
+                labelRed.normal.textColor = Color.red;
+
+                labelGreen = new GUIStyle();
+                labelGreen.normal.textColor = Color.green;
+            }
+            EditorGUILayout.LabelField(new GUIContent(title + ": " + content, tooltip), vaild ? labelGreen : labelRed, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+        }
         #region 获取相同的文件
         /// <summary>
         /// 获取相同的文件
@@ -36,6 +90,36 @@ namespace ResourceAuditing
 
             }
             return samePaths.ToArray();
+        }
+        #endregion
+
+
+        #region 获取其他引用Assets的路径
+        public static string[] GetUseAssetPaths(string assetPath, List<string> allAssetsPaths)
+        {
+            List<string> assetPaths = new List<string>();
+            //使用GUID作为判断标准
+            string assetGUID = AssetDatabase.AssetPathToGUID(assetPath);
+            //遍历所有Assets
+            for (int i = 0; i < allAssetsPaths.Count; i++)
+            {
+                if (allAssetsPaths[i] == assetPath)
+                    continue;
+
+                string[] _OtherPaths = AssetDatabase.GetDependencies(allAssetsPaths[i]);
+                if (_OtherPaths.Length > 1)
+                {
+                    for (int j = 0; j < _OtherPaths.Length; j++)
+                    {
+                        string _OtherGUID = AssetDatabase.AssetPathToGUID(_OtherPaths[j]);
+                        if (assetGUID == _OtherGUID)
+                        {
+                            assetPaths.Add(allAssetsPaths[i]);
+                        }
+                    }
+                }
+            }
+            return assetPaths.ToArray();
         }
         #endregion
 
@@ -114,6 +198,31 @@ namespace ResourceAuditing
 
         #region Hash比较
         public static bool CompareFile(string path1, string path2)
+        {
+            string _TemPath = Application.dataPath.Replace("Assets", "");
+            string p_1 = _TemPath + path1;
+            string p_2 = _TemPath + path2;
+            //计算第一个文件的哈希值
+            var hash = System.Security.Cryptography.HashAlgorithm.Create();
+            var stream_1 = new System.IO.FileStream(p_1, System.IO.FileMode.Open);
+            byte[] hashByte_1 = hash.ComputeHash(stream_1);
+            stream_1.Close();
+            //计算第二个文件的哈希值
+            var stream_2 = new System.IO.FileStream(p_2, System.IO.FileMode.Open);
+            byte[] hashByte_2 = hash.ComputeHash(stream_2);
+            stream_2.Close();
+
+            //比较两个哈希值
+            if (BitConverter.ToString(hashByte_1) == BitConverter.ToString(hashByte_2))
+                return true;
+            else
+                return false;
+
+        }
+        #endregion
+
+        #region IsActs
+        public static bool IsActs(string path1, string path2)
         {
             string _TemPath = Application.dataPath.Replace("Assets", "");
             string p_1 = _TemPath + path1;

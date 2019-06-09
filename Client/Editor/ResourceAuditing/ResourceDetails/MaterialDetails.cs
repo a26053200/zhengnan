@@ -5,21 +5,38 @@ using System.Collections.Generic;
 
 namespace ResourceAuditing
 {
-    public class MaterialDetails : ScriptableObject
+    public class MaterialDetails : ResourceDetail
     {
-        public Material material;
+        public string path;
+        public int hashCode;
 
-        public List<Renderer> FoundInRenderers = new List<Renderer>();
-        public List<Graphic> FoundInGraphics = new List<Graphic>();
-        public bool instance;
-        public bool isgui;
-        public bool isSky;
-
-        public MaterialDetails()
+        public MaterialDetails(string path, string name) : base(path, name)
         {
-            instance = false;
-            isgui = false;
-            isSky = false;
+            resources = new List<Resource>();
+        }
+    }
+
+    public class MaterialResource : Resource
+    {
+        private Material mat;
+
+        public Material Material
+        {
+            get { return mat; }
+        }
+
+        public override void SetResObj(Object obj)
+        {
+            resObj = obj;
+            mat = obj as Material;
+        }
+
+        public override void OnResourceGUI()
+        {
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("", name);
+            EditorGUILayout.ObjectField("Shader", mat.shader, typeof(Shader), false);
+            EditorGUILayout.EndHorizontal();
         }
     }
 }

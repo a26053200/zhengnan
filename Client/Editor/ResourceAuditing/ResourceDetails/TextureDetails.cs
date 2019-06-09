@@ -3,48 +3,47 @@ using System;
 using System.Collections.Generic;
 using Object = UnityEngine.Object;
 using System.IO;
+using UnityEditor;
 
 namespace ResourceAuditing
 {
-    public class TextureDetails
+    public class TextureDetails : ResourceDetail
     {
-        public bool isOpen = false;
-        public bool isClick = false;
-
-        public string md5;
+        public string path;
         public int hashCode;
-        public List<TextureResource> resources;
 
-
-        public TextureDetails()
+        public TextureDetails(string path, string name) :base(path, name)
         {
-            resources = new List<TextureResource>();
+            resources = new List<Resource>();
         }
-
         
     }
-    public class TextureResource : IEquatable<TextureResource>
+
+    public class TextureResource : Resource
     {
-        public string name;
-        public string path;
-        public Texture texture;
-        public FileInfo fileInfo;
+        private Texture2D texture;
         public TextureFormat format;
 
-        public bool Equals(TextureResource other)
+        public Texture2D Texture
         {
-            return texture != null && other.texture != null &&
-                texture.GetNativeTexturePtr() == other.texture.GetNativeTexturePtr();
+            get { return texture; }
         }
 
-        public override int GetHashCode()
+        public override void SetResObj(Object obj)
         {
-            return (int)texture.GetNativeTexturePtr();
+            resObj = obj;
+            texture = obj as Texture2D;
         }
 
-        public override bool Equals(object obj)
+        public override void OnResourceGUI()
         {
-            return Equals(obj as TextureDetails);
+            EditorGUILayout.BeginHorizontal();
+            //EditorGUILayout.LabelField("", name);
+            EditorGUILayout.LabelField("Format", texture.format.ToString() + " - " + (int)texture.format);
+            //EditorGUILayout.EnumFlagsField("", texture.format);
+            EditorGUILayout.EndHorizontal();
+            
+            
         }
     }
 }

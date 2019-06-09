@@ -4,14 +4,15 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using Object = UnityEngine.Object;
+using UnityEditor.IMGUI.Controls;
 
 namespace ResourceAuditing
 {
     public class ResourceAuditing : BaseEditorWnd
     {
 
-        static int MinWidth = 400;
-        static int MinHeight = 600;
+        static int MinWidth = 600;
+        static int MinHeight = 400;
 
         [MenuItem("Window/Resource Auditing")]
         static void Init()
@@ -28,30 +29,44 @@ namespace ResourceAuditing
         //资源目录
         static string Res_Root_Path = Application.dataPath + "/Res";
         //材质贴图 "*.psd|*.tiff|*.jpg|*.jpeg|*.tga|*.png|*.gif"
-        string[] textureTypes = new string[] { ".psd", ".tiff", ".jpg", ".tga", ".png", ".gif" };
+        string[] textureFileTypes = new string[] { ".psd", ".tiff", ".jpg", ".tga", ".png", ".gif" };
+        //材质球 
+        string[] materialFileTypes = new string[] { ".mat"};
+        //材质球 
+        string[] modelFileTypes = new string[] { ".fbx", ".obj" };
         //常量 
         string[] DetailsStrings = { "Textures", "Materials", "Meshes" };
        
         //变量
-        List<TextureDetails> allTextures = new List<TextureDetails>();
         Dictionary<string, TextureDetails> allTexDict = new Dictionary<string, TextureDetails>();
-        List<Texture> texList = new List<Texture>();
+        Dictionary<string, MaterialDetails> allMatDict = new Dictionary<string, MaterialDetails>();
+        Dictionary<string, ModelDetails> allModelDict = new Dictionary<string, ModelDetails>();
         List<string> allAssetsPaths = new List<string>();
 
         DetailsType currSelectDetailsType;
-        bool ctrlPressed = false;
-        Vector2 scrollerPos = Vector2.zero;
+        bool isSearching = false; //正在搜索
+
+        ResourceTree<TextureDetails> textureTree;
+        ResourceTree<MaterialDetails> materialTree;
+        ResourceTree<ModelDetails> modelTree;
+
         void ResetView()
         {
             GetAllAssets();
             FetchAllTextures();
+
+            textureTree = new ResourceTree<TextureDetails>(allTexDict, allAssetsPaths);
         }
         private void OnLostFocus()
         {
-            //Close();
+            if(!isSearching)
+            {
+                Close();
+            }
         }
         void OnGUI()
         {
+
             EditorGUI.BeginChangeCheck();
             currSelectDetailsType = (DetailsType)GUILayout.Toolbar((int)currSelectDetailsType, DetailsStrings);
             if(EditorGUI.EndChangeCheck())
@@ -62,26 +77,52 @@ namespace ResourceAuditing
                         FetchAllTextures();
                         break;
                     case DetailsType.Materials:
-                        //ListMaterials();
+                        FetchAllMaterials();
                         break;
                     case DetailsType.Meshes:
-                        //ListMeshes();
+                        FetchAllModels();
                         break;
                 }
             }
             switch (currSelectDetailsType)
             {
                 case DetailsType.Textures:
-                    ListTextures();
+                    textureTree.OnGUI();
                     break;
                 case DetailsType.Materials:
-                    //ListMaterials();
+                    materialTree.OnGUI();
                     break;
                 case DetailsType.Meshes:
-                    //ListMeshes();
+                    modelTree.OnGUI();
                     break;
             }
         }
+
+
+        /// <summary>
+        /// 获取所有贴图
+        /// </summary>
+        void FetchAllTextures()
+        {
+            allTexDict = FetchAllResources<TextureDetails, TextureResource>(textureFileTypes);
+        }
+        /// <summary>
+        /// 获取所有材质球
+        /// </summary>
+        void FetchAllMaterials()
+        {
+            allMatDict = FetchAllResources<MaterialDetails, MaterialResource>(materialFileTypes);
+            materialTree = new ResourceTree<MaterialDetails>(allMatDict, allAssetsPaths);
+        }
+        /// <summary>
+        /// 获取模型文件,(网格信息和动作)
+        /// </summary>
+        void FetchAllModels()
+        {
+            allModelDict = FetchAllResources<ModelDetails, ModelResource>(modelFileTypes);
+            modelTree = new ResourceTree<ModelDetails>(allModelDict, allAssetsPaths);
+        }
+
         #region 获取所有的asset
         void GetAllAssets()
         {
@@ -103,172 +144,53 @@ namespace ResourceAuditing
         }
         #endregion
 
-        /// <summary>
-        /// 获取所有贴图
-        /// </summary>
-        void FetchAllTextures()
-        {
-            if (allTextures.Count == 0)
-            {
-                allTexDict.Clear();
-                // 获取所有贴图
-                FileInfo[] texFiles = EditorFileUitl.GetAllFiles(Res_Root_Path, "*.*");
-                foreach (var fileInfo in texFiles)
-                {
-                    string lowerName = fileInfo.Name.ToLower();
-                    bool find = false;
-                    for (int i = 0; i < textureTypes.Length; i++)
-                    {
-                        if (lowerName.EndsWith(textureTypes[i]))
-                        {
-                            find = true;
-                            break;
-                        }
-                    }
-                    if (find)
-                    {
-                        string dir = EditorFileUitl.Absolute2Relativity(fileInfo.DirectoryName) + "/";
-                        string path = dir + fileInfo.Name;
-                        Texture tex = AssetDatabase.LoadAssetAtPath<Texture>(path);
-                        string md5 = ResUtils.GetFileMD5(path);
-                        TextureDetails td = null;
-                        if(!allTexDict.TryGetValue(md5, out td))
-                        {
-                            td = new TextureDetails();
-                            td.md5 = md5;
-                            allTexDict.Add(md5, td);
-                        }
-                        TextureResource tr = new TextureResource()
-                        {
-                            name = fileInfo.Name,
-                            path = dir + fileInfo.Name,
-                            texture = AssetDatabase.LoadAssetAtPath<Texture>(path),
-                            fileInfo = fileInfo,
-                        };
-                        td.resources.Add(tr);
 
-                        allTextures.Add(td);
-                    }
-                }
-            }
-        }
-        void ListTextures()
-        {
-            if (allTexDict.Count > 0)
-            {
-                //List Header
-                //EditorGUILayout.BeginHorizontal();
-                //EditorGUILayout.EndHorizontal();
-                //List Body
-                scrollerPos = EditorGUILayout.BeginScrollView(scrollerPos, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                {
 
-                    //EditorGUILayout.BeginVertical();
-                    foreach (var td in allTexDict.Values)
-                    {
-                        BeginFoldout(td);
-                    }
-                    //EditorGUILayout.EndVertical();
-                }
-                EditorGUILayout.EndScrollView();
-            }
-        }
-        void BeginFoldout(TextureDetails td)
+        #region 获取所有制定的资源
+        Dictionary<string, RD> FetchAllResources<RD, R>(string[] fileTypes) where RD : ResourceDetail where R : Resource
         {
-            EditorGUILayout.BeginHorizontal();
+            isSearching = true;
+            Dictionary<string, RD> allDict = new Dictionary<string, RD>();
+            FileInfo[] resFiles = EditorFileUitl.GetAllFiles(Res_Root_Path, "*.*");
+            for (int i = 0; i < resFiles.Length; i++)
             {
-                EditorGUI.BeginDisabledGroup(true);
-                EditorGUILayout.ObjectField("", td.resources[0].texture, typeof(Texture), false, GUILayout.Width(64));
-                EditorGUI.EndDisabledGroup();
-                td.isOpen = EditorGUILayout.ToggleLeft("", td.isOpen, GUILayout.Width(32));
-                if (td.isOpen)
+                FileInfo fileInfo = resFiles[i];
+                string lowerName = fileInfo.Name.ToLower();
+                bool find = false;
+                for (int j = 0; j < fileTypes.Length; j++)
                 {
-                    //td.isOpen = EditorGUILayout.Foldout(td.isOpen, new GUIContent("-------" + td.name), td.isClick);
-                    EditorGUILayout.BeginVertical();
+                    if (lowerName.EndsWith(fileTypes[j]))
                     {
-                        EditorGUILayout.LabelField("md5", td.md5);
-                        for (int i = 0; i < td.resources.Count; i++)
-                        {
-                            var tr = td.resources[i];
-                            EditorGUILayout.LabelField("", tr.path);
-                            EditorGUILayout.BeginHorizontal();
-                            {
-                                //EditorGUILayout.BeginVertical();
-                                {
-                                    //EditorGUI.BeginDisabledGroup(true);
-                                    //EditorGUILayout.ObjectField("", tr.texture, typeof(Texture), false, GUILayout.Width(64));
-                                    //EditorGUI.EndDisabledGroup();
-                                }
-                                //EditorGUILayout.EndVertical();
-                                //Object obj = AssetDatabase.LoadAssetAtPath(tr.path, typeof(Object));
-                                //EditorGUILayout.ObjectField("", obj, typeof(Object), false);
-                                //使用过的
-                                EditorGUI.BeginDisabledGroup(true);
-                                EditorGUILayout.BeginVertical();
-                                {
-                                    string[] _TempArray = GetUseAssetPaths(tr.path);
-                                    EditorGUI.indentLevel++;
-                                    for (int j = 0; j < _TempArray.Length; j++)
-                                    {
-                                        Object obj = AssetDatabase.LoadAssetAtPath(_TempArray[j], typeof(Object));
-                                        if (!AssetDatabase.IsSubAsset(obj))
-                                        {//排除FBX 内部引用
-                                            EditorGUILayout.ObjectField("", obj, typeof(Object), false);
-                                        }
-                                    }
-                                    EditorGUI.indentLevel--;
-                                }
-                                EditorGUILayout.EndVertical();
-                                EditorGUI.EndDisabledGroup();
-                            }
-                            EditorGUILayout.EndHorizontal();
-                        }
+                        find = true;
+                        break;
                     }
-                    EditorGUILayout.EndVertical();
                 }
-                else
+                if (find)
                 {
-                    Rect rect = EditorGUILayout.BeginHorizontal();
+                    string dir = EditorFileUitl.Absolute2Relativity(fileInfo.DirectoryName) + "/";
+                    string path = dir + fileInfo.Name;
+                    EditorUtility.DisplayProgressBar("Resource Searching...", path, (float)i + 1.0f / (float)resFiles.Length);
+                    string md5 = ResUtils.GetFileMD5(path);
+                    RD rd = null;
+                    if (!allDict.TryGetValue(md5, out rd))
                     {
-                        var tr = td.resources[0];
-                        //EditorGUI.BeginDisabledGroup();
-                        //GUILayout.DelayedIntField(rect);
-                        //GUILayout.Label(AssetDatabase.GetCachedIcon(td.resources[0].path), new GUILayoutOption[] { GUILayout.Width(30), GUILayout.Height(30) });
-                        EditorGUILayout.LabelField("md5", td.md5);
-                        //EditorGUILayout.ObjectField("", td.texture, typeof(Texture), true, GUILayout.Width(32), GUILayout.Height(32));
-                        //EditorGUI.EndDisabledGroup();
+                        
+                        rd = (RD) System.Activator.CreateInstance(typeof(RD), md5, fileInfo.Name);
+                        rd.MD5 = md5;
+                        allDict.Add(md5, rd);
                     }
-                    EditorGUILayout.EndHorizontal();
+                    R r = (R)System.Activator.CreateInstance(typeof(R));
+                    r.name = fileInfo.Name;
+                    r.path = dir + fileInfo.Name;
+                    r.SetResObj(AssetDatabase.LoadAssetAtPath<Object>(path));
+                    r.fileInfo = fileInfo;
+                    r.hashCode = r.resObj.GetHashCode();
+                    rd.resources.Add(r);
                 }
             }
-            EditorGUILayout.EndHorizontal();
-        }
-        #region 获取其他引用Assets的路径
-        string[] GetUseAssetPaths(string _AssetPath)
-        {
-            List<string> _AssetPaths = new List<string>();
-            //使用GUID作为判断标准
-            string _AssetGUID = AssetDatabase.AssetPathToGUID(_AssetPath);
-            //遍历所有Assets
-            for (int i = 0; i < allAssetsPaths.Count; i++)
-            {
-                if (allAssetsPaths[i] == _AssetPath)
-                    continue;
-
-                string[] _OtherPaths = AssetDatabase.GetDependencies(allAssetsPaths[i]);
-                if (_OtherPaths.Length > 1)
-                {
-                    for (int j = 0; j < _OtherPaths.Length; j++)
-                    {
-                        string _OtherGUID = AssetDatabase.AssetPathToGUID(_OtherPaths[j]);
-                        if (_AssetGUID == _OtherGUID)
-                        {
-                            _AssetPaths.Add(allAssetsPaths[i]);
-                        }
-                    }
-                }
-            }
-            return _AssetPaths.ToArray();
+            EditorUtility.ClearProgressBar();
+            isSearching = false;
+            return allDict;
         }
         #endregion
     }
