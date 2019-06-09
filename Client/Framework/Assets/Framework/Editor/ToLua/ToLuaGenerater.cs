@@ -5,6 +5,7 @@ using UnityEditor;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Text;
+using Framework;
 /// <summary>
 /// <para>Lua 代码文件生成器</para>
 /// <para>Author: zhengnan</para>
