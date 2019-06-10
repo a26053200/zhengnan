@@ -49,7 +49,10 @@ namespace ResourceAuditing
                 labelStyle = labelYellow;
             else if (level == 2)
                 labelStyle = labelRed;
-            EditorGUILayout.LabelField(new GUIContent(title + ": " + content, tooltip), labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+            //EditorGUI.BeginDisabledGroup(true);
+            EditorGUILayout.LabelField(new GUIContent(title), new GUIContent(content, tooltip), labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+            //EditorGUILayout.TextField(new GUIContent(title, tooltip), content, labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+            //EditorGUI.EndDisabledGroup();
         }
 
         public static void ColorLabelField(string title, string content, bool vaild, int width = 0)

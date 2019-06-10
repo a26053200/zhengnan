@@ -53,15 +53,11 @@ namespace ResourceAuditing
         {
             if (rd.isOpen)
             {
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label(AssetDatabase.GetCachedIcon(rd.resources[0].path), new GUILayoutOption[] { GUILayout.Width(30), GUILayout.Height(20) });
-                rd.isOpen = EditorGUILayout.Foldout(rd.isOpen, rd.resources[0].name);
-                ResUtils.ColorLabelField("Reference", rd.resources.Count.ToString(), rd.resources.Count <= 1);
-                EditorGUILayout.EndHorizontal();
+                DrawHeader(rd);
                 //EditorGUI.BeginDisabledGroup(true);
                 for (int i = 0; i < rd.resources.Count; i++)
                 {
-                    EditorGUI.indentLevel++;
+                    EditorGUI.indentLevel+=2;
                     var res = rd.resources[i];
                     //EditorGUILayout.ObjectField("", res.resObj, typeof(Object), false);
                     res.OnResourceGUI();
@@ -84,19 +80,27 @@ namespace ResourceAuditing
                         }
                         EditorGUI.indentLevel--;
                     }
-                    EditorGUI.indentLevel--;
+                    EditorGUI.indentLevel-=2;
                 }
                 //EditorGUI.EndDisabledGroup();
             }
             else
             {
-                EditorGUILayout.BeginHorizontal();
-                GUILayout.Label(AssetDatabase.GetCachedIcon(rd.resources[0].path), new GUILayoutOption[] { GUILayout.Width(30), GUILayout.Height(20) });
-                rd.isOpen = EditorGUILayout.Foldout(rd.isOpen, rd.resources[0].name);
-                ResUtils.ColorLabelField("Reference", rd.resources.Count.ToString(), rd.resources.Count <= 1);
-                EditorGUILayout.EndHorizontal();
+                DrawHeader(rd);
             }
             
+        }
+
+        void DrawHeader(ResourceDetail rd)
+        {
+            
+            Rect rect = EditorGUILayout.BeginHorizontal();
+            GUILayout.Label(AssetDatabase.GetCachedIcon(rd.resources[0].path), new GUILayoutOption[] { GUILayout.Width(30), GUILayout.Height(20) });
+            rd.isOpen = EditorGUILayout.Foldout(rd.isOpen, rd.resources[0].name);
+            ResUtils.ColorLabelField("Reference", rd.resources.Count.ToString(), rd.resources.Count <= 1, 100);
+            ResUtils.ColorLabelField("Warning", rd.warnNum.ToString(), rd.warnNum < 1 ? 0 : 1, 100);
+            ResUtils.ColorLabelField("Error", rd.errorNum.ToString(), rd.errorNum == 0 ? 0 : 2,100);
+            EditorGUILayout.EndHorizontal();
         }
     }
 }

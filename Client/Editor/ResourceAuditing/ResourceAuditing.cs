@@ -28,6 +28,8 @@ namespace ResourceAuditing
 
         //资源目录
         static string Res_Root_Path = Application.dataPath + "/Res";
+        //标准配置文件路径
+        static string Norm_Setting_Path = Application.dataPath + "/Norm-Setting.txt";
         //材质贴图 "*.psd|*.tiff|*.jpg|*.jpeg|*.tga|*.png|*.gif"
         string[] textureFileTypes = new string[] { ".psd", ".tiff", ".jpg", ".tga", ".png", ".gif" };
         //材质球 
@@ -50,12 +52,16 @@ namespace ResourceAuditing
         ResourceTree<MaterialDetails> materialTree;
         ResourceTree<ModelDetails> modelTree;
 
+        Norm norm;
         void ResetView()
         {
             GetAllAssets();
             FetchAllTextures();
 
             textureTree = new ResourceTree<TextureDetails>(allTexDict, allAssetsPaths);
+
+            Norm.GetIntance().LoadNorm(Norm_Setting_Path);
+            norm = Norm.GetIntance();
         }
         private void OnLostFocus()
         {
@@ -66,6 +72,22 @@ namespace ResourceAuditing
         }
         void OnGUI()
         {
+            norm.Tex_Format_Recommend_IOS = EditorGUILayout.TextField("Recommend Texture Format in IOS", norm.Tex_Format_Recommend_IOS);
+            norm.Tex_Format_Forbid_IOS = EditorGUILayout.TextField("Forbid Texture Format in IOS", norm.Tex_Format_Forbid_IOS);
+            norm.Tex_Format_Recommend_Android = EditorGUILayout.TextField("Recommend Texture Format in Android", norm.Tex_Format_Recommend_Android);
+            norm.Tex_Format_Forbid_Android = EditorGUILayout.TextField("Forbid Texture Format in Android", norm.Tex_Format_Forbid_Android);
+            norm.Tex_Max_Size = EditorGUILayout.IntField("Max Texture Size", norm.Tex_Max_Size);
+            norm.Tex_Recommend_Size = EditorGUILayout.IntField("Recommend Texture Size", norm.Tex_Recommend_Size);
+            norm.Mesh_Max_TrisNum = EditorGUILayout.IntField("Max Mesh Tris Num ", norm.Mesh_Max_TrisNum);
+            norm.Mesh_Recommend_TrisNum = EditorGUILayout.IntField("Recommend Mesh Tris Num ", norm.Mesh_Recommend_TrisNum);
+            
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.LabelField("Operate","");
+            if(GUILayout.Button("Save Norm Setting"))
+            {
+                norm.SaveNorm(Norm_Setting_Path);
+            }
+            EditorGUILayout.EndHorizontal();
 
             EditorGUI.BeginChangeCheck();
             currSelectDetailsType = (DetailsType)GUILayout.Toolbar((int)currSelectDetailsType, DetailsStrings);
@@ -176,7 +198,6 @@ namespace ResourceAuditing
                     {
                         
                         rd = (RD) System.Activator.CreateInstance(typeof(RD), md5, fileInfo.Name);
-                        rd.MD5 = md5;
                         allDict.Add(md5, rd);
                     }
                     R r = (R)System.Activator.CreateInstance(typeof(R));

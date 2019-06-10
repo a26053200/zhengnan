@@ -21,6 +21,9 @@ namespace ResourceAuditing
         public Object resObj { get; protected set; }
         public FileInfo fileInfo;
 
+        public int errorNum;
+        public int warnNum;
+
         public virtual void SetResObj(Object obj)
         {
             resObj = obj;

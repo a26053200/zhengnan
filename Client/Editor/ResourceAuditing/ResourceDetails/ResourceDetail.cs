@@ -14,10 +14,35 @@ namespace ResourceAuditing
         public bool isOpen = false;
         public bool isClick = false;
 
-        public string Name;
-        public string MD5;
-        public List<Resource> resources;
+        public string Name { get; private set; }
+        public string MD5 { get; private set; }
+        public List<Resource> resources { get; protected set; }
 
+        public int warnNum
+        {
+            get
+            {
+                int num = 0;
+                for (int i = 0; i < resources.Count; i++)
+                {
+                    num += resources[i].warnNum;
+                }
+                return num;
+            }
+        }
+
+        public int errorNum
+        {
+            get
+            {
+                int num = 0;
+                for (int i = 0; i < resources.Count; i++)
+                {
+                    num += resources[i].errorNum;
+                }
+                return num;
+            }
+        }
         public ResourceDetail(string md5, string name)
         {
             MD5 = md5;
