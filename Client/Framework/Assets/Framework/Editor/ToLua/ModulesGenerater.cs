@@ -98,6 +98,8 @@ public class ModulesGenerater : EditorWindow
     void LoadAllModules()
     {
         string modulesRootDir = Path.Combine(Application.dataPath, LuaModulesDir);
+        if (!Directory.Exists(modulesRootDir))
+            return;
         string[] moduleDirs = Directory.GetDirectories(modulesRootDir);
         moduleInfoList = new List<LuaModuleInfo>();
         for (int i = 0; i < moduleDirs.Length; i++)
@@ -369,7 +371,7 @@ public class ModulesGenerater : EditorWindow
     LuaTable GetLuaTable(string path)
     {
         string[] textLine = FileUtils.GetFileTextLine(path);
-        if(textLine.Length > 0)
+        if(textLine != null && textLine.Length > 0)
         {
             LuaTable lt = new LuaTable();
             lt.fromTextLine(textLine);
