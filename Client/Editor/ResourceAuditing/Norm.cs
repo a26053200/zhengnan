@@ -31,7 +31,7 @@ namespace ResourceAuditing
         /// <summary>
         /// IOS平台推荐使用贴图格式
         /// </summary>
-        public string Tex_Format_Recommend_IOS = "Automatic,PVRTC";
+        public string Tex_Format_Recommend_IOS = "PVRTC";
 
         /// <summary>
         /// IOS平台禁止使用贴图格式
@@ -41,7 +41,7 @@ namespace ResourceAuditing
         /// <summary>
         /// Android平台推荐使用贴图格式
         /// </summary>
-        public string Tex_Format_Recommend_Android = "Automatic,ETC";
+        public string Tex_Format_Recommend_Android = "ETC";
 
         /// <summary>
         /// Android平台禁止使用贴图格式
@@ -59,6 +59,11 @@ namespace ResourceAuditing
         public int Tex_Recommend_Size = 1024;
 
         /// <summary>
+        /// 禁止使用的Shader
+        /// </summary>
+        public string Shader_Forbid = "Standard";
+
+        /// <summary>
         /// 模型最大面数
         /// </summary>
         public int Mesh_Max_TrisNum = 3000;
@@ -68,16 +73,23 @@ namespace ResourceAuditing
         /// </summary>
         public int Mesh_Recommend_TrisNum = 1500;
 
+        Dictionary<string, string> defaultDict;
+
         public void LoadNorm(string path)
         {
+            defaultDict = new Dictionary<string, string>();
+            FieldInfo[] fields = GetType().GetFields();
+            for (int i = 0; i < fields.Length; i++)
+            {
+                FieldInfo field = fields[i];
+                defaultDict.Add(field.Name, field.GetValue(this).ToString());
+            }
+
             Dictionary<string, string> normDict = EditorFileUitl.GetDictionaryFromFile(path);
             if (normDict == null)
-            {
                 normDict = new Dictionary<string, string>();
-            }
             else
             {
-                FieldInfo[] fields = GetType().GetFields();
                 for (int i = 0; i < fields.Length; i++)
                 {
                     FieldInfo field = fields[i];
@@ -94,6 +106,28 @@ namespace ResourceAuditing
                         }
                     }
 
+                }
+            }
+        }
+
+        public void ResetToDefault()
+        {
+            FieldInfo[] fields = GetType().GetFields();
+            for (int i = 0; i < fields.Length; i++)
+            {
+                FieldInfo field = fields[i];
+                string value = null;
+                if (defaultDict.TryGetValue(field.Name, out value))
+                {
+                    if (field.FieldType == typeof(int))
+                    {
+                        field.SetValue(this, int.Parse(value));
+                    }
+                    else if (field.FieldType == typeof(string))
+                    {
+                        field.SetValue(this, value);
+                    }
+                    Debug.Log(field.FieldType + " - " + value);
                 }
             }
         }

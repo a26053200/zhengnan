@@ -58,7 +58,7 @@ namespace ResourceAuditing
             GetAllAssets();
             FetchAllTextures();
 
-            textureTree = new ResourceTree<TextureDetails>(allTexDict, allAssetsPaths);
+            
 
             Norm.GetIntance().LoadNorm(Norm_Setting_Path);
             norm = Norm.GetIntance();
@@ -72,26 +72,38 @@ namespace ResourceAuditing
         }
         void OnGUI()
         {
-            norm.Tex_Format_Recommend_IOS = EditorGUILayout.TextField("Recommend Texture Format in IOS", norm.Tex_Format_Recommend_IOS);
-            norm.Tex_Format_Forbid_IOS = EditorGUILayout.TextField("Forbid Texture Format in IOS", norm.Tex_Format_Forbid_IOS);
-            norm.Tex_Format_Recommend_Android = EditorGUILayout.TextField("Recommend Texture Format in Android", norm.Tex_Format_Recommend_Android);
-            norm.Tex_Format_Forbid_Android = EditorGUILayout.TextField("Forbid Texture Format in Android", norm.Tex_Format_Forbid_Android);
+            EditorGUILayout.Space();
+            EditorGUILayout.LabelField("Norm Setting:");
+            norm.Tex_Format_Recommend_IOS = EditorGUILayout.TextField("Rec Format IOS", norm.Tex_Format_Recommend_IOS);
+            norm.Tex_Format_Forbid_IOS = EditorGUILayout.TextField("Fbd Format IOS", norm.Tex_Format_Forbid_IOS);
+            norm.Tex_Format_Recommend_Android = EditorGUILayout.TextField("Rec Format Android", norm.Tex_Format_Recommend_Android);
+            norm.Tex_Format_Forbid_Android = EditorGUILayout.TextField("Fbd Format Android", norm.Tex_Format_Forbid_Android);
             norm.Tex_Max_Size = EditorGUILayout.IntField("Max Texture Size", norm.Tex_Max_Size);
-            norm.Tex_Recommend_Size = EditorGUILayout.IntField("Recommend Texture Size", norm.Tex_Recommend_Size);
+            norm.Tex_Recommend_Size = EditorGUILayout.IntField("Rec Texture Size", norm.Tex_Recommend_Size);
             norm.Mesh_Max_TrisNum = EditorGUILayout.IntField("Max Mesh Tris Num ", norm.Mesh_Max_TrisNum);
-            norm.Mesh_Recommend_TrisNum = EditorGUILayout.IntField("Recommend Mesh Tris Num ", norm.Mesh_Recommend_TrisNum);
-            
+            norm.Mesh_Recommend_TrisNum = EditorGUILayout.IntField("Rec Mesh Tris Num ", norm.Mesh_Recommend_TrisNum);
+            norm.Shader_Forbid = EditorGUILayout.TextField("Fbd Shader ", norm.Shader_Forbid);
+            EditorGUILayout.Space();
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Operate","");
-            if(GUILayout.Button("Save Norm Setting"))
+            EditorGUILayout.LabelField("","",GUILayout.Width(position.width * 0.618f));
+            if (GUILayout.Button("Default"))
+            {
+                GUI.FocusControl(null);
+                Repaint();
+                norm.ResetToDefault();
+            }
+            if (GUILayout.Button("Save "))
             {
                 norm.SaveNorm(Norm_Setting_Path);
             }
             EditorGUILayout.EndHorizontal();
 
+            EditorGUILayout.Space();
+
             EditorGUI.BeginChangeCheck();
+            DetailsType old = currSelectDetailsType;
             currSelectDetailsType = (DetailsType)GUILayout.Toolbar((int)currSelectDetailsType, DetailsStrings);
-            if(EditorGUI.EndChangeCheck())
+            if(EditorGUI.EndChangeCheck() && old != currSelectDetailsType)
             {
                 switch (currSelectDetailsType)
                 {
@@ -106,6 +118,7 @@ namespace ResourceAuditing
                         break;
                 }
             }
+            EditorGUILayout.Space();
             switch (currSelectDetailsType)
             {
                 case DetailsType.Textures:
@@ -120,13 +133,13 @@ namespace ResourceAuditing
             }
         }
 
-
         /// <summary>
         /// 获取所有贴图
         /// </summary>
         void FetchAllTextures()
         {
             allTexDict = FetchAllResources<TextureDetails, TextureResource>(textureFileTypes);
+            textureTree = new ResourceTree<TextureDetails>(this, allTexDict, allAssetsPaths);
         }
         /// <summary>
         /// 获取所有材质球
@@ -134,7 +147,7 @@ namespace ResourceAuditing
         void FetchAllMaterials()
         {
             allMatDict = FetchAllResources<MaterialDetails, MaterialResource>(materialFileTypes);
-            materialTree = new ResourceTree<MaterialDetails>(allMatDict, allAssetsPaths);
+            materialTree = new ResourceTree<MaterialDetails>(this, allMatDict, allAssetsPaths);
         }
         /// <summary>
         /// 获取模型文件,(网格信息和动作)
@@ -142,7 +155,7 @@ namespace ResourceAuditing
         void FetchAllModels()
         {
             allModelDict = FetchAllResources<ModelDetails, ModelResource>(modelFileTypes);
-            modelTree = new ResourceTree<ModelDetails>(allModelDict, allAssetsPaths);
+            modelTree = new ResourceTree<ModelDetails>(this, allModelDict, allAssetsPaths);
         }
 
         #region 获取所有的asset

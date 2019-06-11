@@ -18,25 +18,42 @@ namespace ResourceAuditing
     public class ModelResource : Resource
     {
         private Object modelOrgObj;
-        public ModelImporter modelImporter;
-
-        public Object ModelOrgObj
-        {
-            get { return modelOrgObj; }
-        }
+        private ModelImporter modelImporter;
 
         public override void SetResObj(Object obj)
         {
             resObj = obj;
             modelOrgObj = obj;
             modelImporter = AssetImporter.GetAtPath(path) as ModelImporter;
+            GameObject modelGameObject = modelOrgObj as GameObject;
+
+            if (modelImporter.isReadable)
+                errorNum++;
+            if (!modelImporter.optimizeMesh)
+                warnNum++;
+
+            Renderer[] renderers = modelGameObject.GetComponentsInChildren<Renderer>();
+            for (int i = 0; i < renderers.Length; i++)
+            {
+                Renderer render = renderers[i];
+                if (render is MeshRenderer)
+                {
+                    MeshFilter mf = render.GetComponent<MeshFilter>();
+                    MeshInfo(mf.sharedMesh);
+                }
+                else if (render is SkinnedMeshRenderer)
+                {
+                    SkinnedMeshRenderer smr = render as SkinnedMeshRenderer;
+                    MeshInfo(smr.sharedMesh);
+                }
+            }
         }
 
         public override void OnResourceGUI()
         {
             EditorGUILayout.BeginHorizontal();
             GameObject modelGameObject = modelOrgObj as GameObject;
-            ResUtils.ColorLabelField("Read&Write", modelImporter.isReadable.ToString(), !modelImporter.isReadable);
+            ResUtils.ColorLabelField("Read & Write", modelImporter.isReadable.ToString(), !modelImporter.isReadable);
             ResUtils.ColorLabelField("Optimize Mesh", modelImporter.optimizeMesh.ToString(), modelImporter.optimizeMesh ? 1 : 0);
             EditorGUILayout.EndHorizontal();
 
@@ -56,24 +73,30 @@ namespace ResourceAuditing
                 }
 
             }
+            //ModelImporterClipAnimation[] mClips = modelImporter.clipAnimations;
+            //for (int i = 0; i < mClips.Length; i++)
+            //{
 
-            ModelImporterClipAnimation[] mClips = modelImporter.clipAnimations;
-            for (int i = 0; i < mClips.Length; i++)
-            {
-
-            }
+            //}
         }
 
+        private void MeshInfo(Mesh mesh)
+        {
+            if (mesh.triangles.Length > Norm.GetIntance().Mesh_Recommend_TrisNum && mesh.triangles.Length <= Norm.GetIntance().Mesh_Max_TrisNum)
+                warnNum++;
+            else if (mesh.triangles.Length > Norm.GetIntance().Mesh_Max_TrisNum)
+                errorNum++;
+        }
         private void DrawMeshInfo(Mesh mesh)
         {
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.ObjectField("", mesh, typeof(Mesh), false);
             int level = 0;
-            if (mesh.triangles.Length > 1500 && mesh.triangles.Length <= 3000)
+            if (mesh.triangles.Length > Norm.GetIntance().Mesh_Recommend_TrisNum && mesh.triangles.Length <= Norm.GetIntance().Mesh_Max_TrisNum)
                 level = 1;
-            else if (mesh.triangles.Length > 3000)
+            else if (mesh.triangles.Length > Norm.GetIntance().Mesh_Max_TrisNum)
                 level = 2;
-            ResUtils.ColorLabelFieldTooltip("tris", mesh.triangles.Length.ToString(), "Max tris num is 3000", level, 150);
+            ResUtils.ColorLabelFieldTooltip("Tris num", mesh.triangles.Length.ToString(), "Max tris num is "+ Norm.GetIntance().Mesh_Max_TrisNum, level);
             EditorGUILayout.EndHorizontal();
         }
 

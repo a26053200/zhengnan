@@ -66,11 +66,11 @@ namespace ResourceAuditing
         {
             ResUtils.ColorLabelFieldTooltip("Read & Write", textureImporter.isReadable.ToString(), string.Format("Read & Write is not enable"), !textureImporter.isReadable, 150);
             ResUtils.ColorLabelFieldTooltip("Texture Real Size", textureSize.ToString(), string.Format("Texture Real Size Max is %d", Norm.GetIntance().Tex_Max_Size), textureSizeLevel, 150);
-            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginVertical();
             DisplayPlatformSetting(standalone_setting);
             DisplayPlatformSetting(ios_setting);
             DisplayPlatformSetting(android_setting);
-            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.EndVertical();
         }
 
         public TexturePlatformNorm GetPlatformNorm(TextureImporterPlatformSettings setting, string normRecommend, string normForbid)
@@ -119,13 +119,13 @@ namespace ResourceAuditing
 
         public void DisplayPlatformSetting(TexturePlatformNorm tpn)
         {
-            EditorGUILayout.BeginVertical();
+            EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("Platform", tpn.setting.name);
             //format
             string format = tpn.setting.format.ToString();
-            ResUtils.ColorLabelFieldTooltip("Texture Format", format, string.Format("Recommend Format is %d", tpn.normRecommend), tpn.formatLevel, 150);
-            ResUtils.ColorLabelFieldTooltip("Max Texture Size", tpn.setting.maxTextureSize.ToString(), string.Format("Max Size is %d", tpn.setting.maxTextureSize), tpn.maxSizeLevel, 150);
-            EditorGUILayout.EndVertical();
+            ResUtils.ColorLabelFieldTooltip("Texture Format", format, string.Format("Recommend Format is %d", tpn.normRecommend), tpn.formatLevel);
+            ResUtils.ColorLabelFieldTooltip("Max Texture Size", tpn.setting.maxTextureSize.ToString(), string.Format("Max Size is %d", tpn.setting.maxTextureSize), tpn.maxSizeLevel);
+            EditorGUILayout.EndHorizontal();
         }
 
         private bool isInclude(string[] formats, string format)

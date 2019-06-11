@@ -39,7 +39,17 @@ namespace ResourceAuditing
                 labelStyle = labelYellow;
             else if (level == 2)
                 labelStyle = labelRed;
-            EditorGUILayout.LabelField(title + ": " + content, labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+            EditorGUILayout.LabelField(title, content, labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+        }
+
+        public static void ColorLabel(string title, string content, int level = 0, int width = 0)
+        {
+            GUIStyle labelStyle = labelGreen;
+            if (level == 1)
+                labelStyle = labelYellow;
+            else if (level == 2)
+                labelStyle = labelRed;
+            EditorGUILayout.LabelField(title+":" + content, labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
         }
 
         public static void ColorLabelFieldTooltip(string title, string content,string tooltip, int level = 0, int width = 0)
@@ -57,7 +67,7 @@ namespace ResourceAuditing
 
         public static void ColorLabelField(string title, string content, bool vaild, int width = 0)
         {
-            EditorGUILayout.LabelField(title + ": "+ content, vaild ? labelGreen : labelRed, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+            EditorGUILayout.LabelField(title, content, vaild ? labelGreen : labelRed, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
         }
         public static void ColorLabelFieldTooltip(string title, string content, string tooltip, bool vaild,  int width = 0)
         {
@@ -69,7 +79,7 @@ namespace ResourceAuditing
                 labelGreen = new GUIStyle();
                 labelGreen.normal.textColor = Color.green;
             }
-            EditorGUILayout.LabelField(new GUIContent(title + ": " + content, tooltip), vaild ? labelGreen : labelRed, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+            EditorGUILayout.LabelField(new GUIContent(title, tooltip), new GUIContent(content, tooltip), vaild ? labelGreen : labelRed, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
         }
         #region 获取相同的文件
         /// <summary>

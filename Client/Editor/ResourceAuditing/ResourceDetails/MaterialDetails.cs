@@ -20,22 +20,33 @@ namespace ResourceAuditing
     {
         private Material mat;
 
-        public Material Material
-        {
-            get { return mat; }
-        }
+        private Shader shader;
+        private int shaderLevel;
 
         public override void SetResObj(Object obj)
         {
             resObj = obj;
             mat = obj as Material;
+            shader = mat.shader;
+
+            string[] forbid_shaders = Norm.GetIntance().Shader_Forbid.Split(',');
+            shaderLevel = 0;
+            for (int i = 0; i < forbid_shaders.Length; i++)
+            {
+                if (shader.name.ToLower().IndexOf(forbid_shaders[i].ToLower()) != -1)
+                {
+                    shaderLevel = 2;
+                    errorNum += 1;
+                    break;
+                }
+            }
         }
 
         public override void OnResourceGUI()
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("", name);
-            EditorGUILayout.ObjectField("Shader", mat.shader, typeof(Shader), false);
+            ResUtils.ColorLabelFieldTooltip("Shader", shader.name, string.Format("Shader Forbid: %d", Norm.GetIntance().Shader_Forbid), shaderLevel);
+            EditorGUILayout.ObjectField("", mat.shader, typeof(Shader), false);
             EditorGUILayout.EndHorizontal();
         }
     }

@@ -17,9 +17,11 @@ namespace ResourceAuditing
         List<string> allAssetsPaths;
 
         Vector2 scrollerPos = Vector2.zero;
+        ResourceAuditing wnd;
 
-        public ResourceTree(Dictionary<string, T> allResourceDetailDict, List<string> allAssetsPaths)
+        public ResourceTree(ResourceAuditing wnd, Dictionary<string, T> allResourceDetailDict, List<string> allAssetsPaths)
         {
+            this.wnd = wnd;
             this.allResourceDetailDict = allResourceDetailDict;
             this.allAssetsPaths = allAssetsPaths;
         }
@@ -93,13 +95,16 @@ namespace ResourceAuditing
 
         void DrawHeader(ResourceDetail rd)
         {
-            
-            Rect rect = EditorGUILayout.BeginHorizontal();
-            GUILayout.Label(AssetDatabase.GetCachedIcon(rd.resources[0].path), new GUILayoutOption[] { GUILayout.Width(30), GUILayout.Height(20) });
+            EditorGUILayout.BeginHorizontal();
+            EditorGUILayout.BeginHorizontal(GUILayout.Width(wnd.position.width * (1-0.618f)));
+            EditorGUILayout.LabelField(new GUIContent(AssetDatabase.GetCachedIcon(rd.resources[0].path)), new GUILayoutOption[] { GUILayout.Width(30), GUILayout.Height(20) });
             rd.isOpen = EditorGUILayout.Foldout(rd.isOpen, rd.resources[0].name);
-            ResUtils.ColorLabelField("Reference", rd.resources.Count.ToString(), rd.resources.Count <= 1, 100);
-            ResUtils.ColorLabelField("Warning", rd.warnNum.ToString(), rd.warnNum < 1 ? 0 : 1, 100);
-            ResUtils.ColorLabelField("Error", rd.errorNum.ToString(), rd.errorNum == 0 ? 0 : 2,100);
+            EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal(GUILayout.Width(wnd.position.width * 0.618f));
+            ResUtils.ColorLabel("Reference", rd.resources.Count.ToString(), rd.resources.Count <= 1?0:2);
+            ResUtils.ColorLabel("Warning", rd.warnNum.ToString(), rd.warnNum < 1 ? 0 : 1);
+            ResUtils.ColorLabel("Error", rd.errorNum.ToString(), rd.errorNum == 0 ? 0 : 2);
+            EditorGUILayout.EndHorizontal();
             EditorGUILayout.EndHorizontal();
         }
     }
