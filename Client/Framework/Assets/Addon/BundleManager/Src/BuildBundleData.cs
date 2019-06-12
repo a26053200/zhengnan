@@ -83,15 +83,15 @@ public class BMUrls
 		};
 	}
 	
-	public string GetInterpretedDownloadUrl(BuildPlatform platform)
-	{
-		return BMUtility.InterpretPath(downloadUrls[platform.ToString()], platform);
-	}
+	//public string GetInterpretedDownloadUrl(BuildPlatform platform)
+	//{
+	//	return BMUtility.InterpretPath(downloadUrls[platform.ToString()], platform);
+	//}
 	
-	public string GetInterpretedOutputPath(BuildPlatform platform)
-	{
-		return BMUtility.InterpretPath(outputs[platform.ToString()], platform);
-	}
+	//public string GetInterpretedOutputPath(BuildPlatform platform)
+	//{
+	//	return BMUtility.InterpretPath(outputs[platform.ToString()], platform);
+	//}
 
 	public static string SerializeToString(BMUrls urls)
 	{
