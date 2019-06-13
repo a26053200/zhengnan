@@ -29,6 +29,11 @@ namespace BM
         }
     }
 
+    public enum BuildType
+    {
+        Single, //单包
+        Scene,  //场景
+    }
     /// <summary>
     /// 语言和地域
     /// </summary>

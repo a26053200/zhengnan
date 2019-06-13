@@ -14,6 +14,7 @@ namespace BM
         public string name = "";
         public string path = "";
         public string abName = "";
+        public string type = "";
         public uint crc = 0;
         public long size = -1;
         public int priority;

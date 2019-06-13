@@ -13,26 +13,34 @@ namespace BM
     /// </summary> 
     public static class BundleBuilder
     {
-        public static string ResFolder = "/Res";
-        //public static string ResFolder = "Assets/Res/";
-        public static string Suffix = ".bundle";
-
-        public static string File_Meta = ".meta";
-
-        public static string File_Svn = ".svn";
-
-        public static string File_DS_Store = ".DS_Store";
-
         [MenuItem("Tools/Bundle Build")]
         static void StartBuild()
         {
             FetchAllResources();
         }
 
+        //配置路径
+        static string BMSettings_Path = "Assets/Res/BMSettings.txt";
+
+        //配置
+        static BMSettings settings;
+
+        public static void Build()
+        {
+            LoadSetting();
+            FetchAllResources();
+        }
+
+        static void LoadSetting()
+        {
+            settings = BMSettings.GetIntance();
+            settings.LoadSettings();
+        }
+
         static void FetchAllResources()
         {
             Debug.ClearDeveloperConsole();
-            string resDir = Application.dataPath + ResFolder;
+            string resDir = BMEditUtility.Relativity2Absolute(settings.ResFolder);
             FileInfo[] resFiles = BMEditUtility.GetAllFiles(resDir, "*.*");
             for (int i = 0; i < resFiles.Length; i++)
             {
@@ -40,35 +48,53 @@ namespace BM
                 string lowerName = fileInfo.Name.ToLower();
                 string dirPath = BMEditUtility.Absolute2Relativity(fileInfo.DirectoryName) + "/";
 
-                //过滤文件
+                //过滤一些文件
                 if ((fileInfo.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                     continue;
                 if ((fileInfo.Directory.Attributes & FileAttributes.Hidden) == FileAttributes.Hidden)
                     continue;
-                if (lowerName.EndsWith(File_Meta) || fileInfo.Name.EndsWith(File_DS_Store) || dirPath.IndexOf(File_Svn) != -1)
+                if (IgnoreFile(lowerName, dirPath))
                     continue;
 
                 string path = dirPath + fileInfo.Name; //相对路径
 
-                if(FileType.IsValidFileType(FileType.Texture, lowerName))
+                BundleFileInfo bundleFileInfo = new BundleFileInfo()
+                {
+                    path = path,
+                };
+                if (dirPath.IndexOf(settings.Folder_Scenes) != -1)
+                {
+                    bundleFileInfo.type = BundleType.Scene.ToString();
+                }
+                else
                 {
 
                 }
-                else if (FileType.IsValidFileType(FileType.Material, lowerName))
-                {
-
-                }
-                else if(FileType.IsValidFileType(FileType.Scene, lowerName))
-                {
-
-                }else if(FileType.IsValidFileType(FileType.Model, lowerName))
-                {
-
-                } 
-                    Logger.Log("path:{0}", path);
+                Logger.Log("path:{0}", path);
                 EditorUtility.DisplayProgressBar("Resource Searching...", path, (float)i + 1.0f / (float)resFiles.Length);
             }
             EditorUtility.ClearProgressBar();
+        }
+
+        //=======================
+        // 工具函数
+        //=======================
+        //忽略文件
+        static bool IgnoreFile(string lowerName, string dirPath)
+        {
+            string[] ignoreSuffixs = settings.Ignore_Suffix.Split(',');
+            for (int i = 0; i < ignoreSuffixs.Length; i++)
+            {
+                if (lowerName.EndsWith(ignoreSuffixs[i]))
+                    return true;
+            }
+            string[] ignoreFolders = settings.Ignore_Folder.Split(',');
+            for (int i = 0; i < ignoreFolders.Length; i++)
+            {
+                if (dirPath.IndexOf(ignoreFolders[i]) != -1)
+                    return true;
+            }
+            return false;
         }
     }
 }

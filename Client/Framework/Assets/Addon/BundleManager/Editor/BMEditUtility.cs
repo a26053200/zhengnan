@@ -43,8 +43,73 @@ namespace BM
         {
             DirectoryInfo direction = new DirectoryInfo(path);
             FileInfo[] files = direction.GetFiles("*", SearchOption.TopDirectoryOnly);
-            path = files[0].FullName.ToString();
+            path = files[0].DirectoryName;
             return path;
+        }
+
+        public static byte[] GetFileData(string fn)
+        {
+            if (!File.Exists(fn))
+                return null;
+            FileStream fs = new FileStream(fn, FileMode.Open);
+            try
+            {
+                if (fs.Length > 0)
+                {
+                    byte[] data = new byte[(int)fs.Length];
+                    fs.Read(data, 0, (int)fs.Length);
+                    return data;
+                }
+                else
+                {
+                    return null;
+                }
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        public static void SaveFileData(string fn, byte[] data)
+        {
+            string dir = Path.GetDirectoryName(fn);
+            System.IO.DirectoryInfo dirinfo = new System.IO.DirectoryInfo(dir);
+            if (!dirinfo.Exists)
+                dirinfo.Create();
+            FileStream fs = new FileStream(fn, FileMode.Create);
+            try
+            {
+                fs.Write(data, 0, data.Length);
+            }
+            finally
+            {
+                fs.Close();
+            }
+        }
+
+        public static Dictionary<string, string> GetDictionaryFromFile(string fn)
+        {
+            byte[] data = GetFileData(fn);
+            if (data != null)
+            {
+                ByteReader br = new ByteReader(data);
+                return br.ReadDictionary();
+            }
+            return null;
+        }
+
+        public static void SaveDictionary(string fn, Dictionary<string, string> dic)
+        {
+            System.Text.StringBuilder sb = new System.Text.StringBuilder();
+            foreach (string k in dic.Keys)
+            {
+                string v = dic[k];
+                sb.Append(string.Format("{0}={1}\r\n", k, v));
+            }
+            byte[] data = System.Text.ASCIIEncoding.ASCII.GetBytes(sb.ToString());
+            SaveFileData(fn, data);
+
         }
     }
 }
