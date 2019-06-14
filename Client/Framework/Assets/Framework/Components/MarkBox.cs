@@ -13,16 +13,15 @@ namespace Framework
     [RequireComponent(typeof(MeshFilter))]
     public class MarkBox : MonoBehaviour
     {
-#if UNITY_EDITOR
         public Color color = Color.yellow;
         private MeshFilter cubeMesh;
-#endif
+
         private void Awake()
         {
 #if UNITY_EDITOR
             
 #else
-        Destroy(this)
+        Destroy(this);
 #endif
         }
 

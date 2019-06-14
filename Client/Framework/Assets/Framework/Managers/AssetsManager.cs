@@ -68,6 +68,7 @@ namespace Framework
             return tempTex;
 #else
             //加载bundle
+            return null;
 #endif
         }
 

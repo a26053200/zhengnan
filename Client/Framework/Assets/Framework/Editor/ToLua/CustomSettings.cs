@@ -28,7 +28,7 @@ public static class CustomSettings
         typeof(UnityEngine.Resources),
         typeof(UnityEngine.Physics),
         typeof(UnityEngine.RenderSettings),
-        typeof(UnityEngine.QualitySettings),
+        //typeof(UnityEngine.QualitySettings),
         typeof(UnityEngine.GL),
         typeof(UnityEngine.Graphics),
     };
@@ -107,7 +107,7 @@ public static class CustomSettings
         _GT(typeof(Texture2D)),
         _GT(typeof(Shader)),        
         _GT(typeof(Renderer)),
-        _GT(typeof(WWW)),
+        //_GT(typeof(WWW)),
         _GT(typeof(Screen)),        
         _GT(typeof(CameraClearFlags)),
         _GT(typeof(AudioClip)),        
@@ -147,7 +147,7 @@ public static class CustomSettings
         _GT(typeof(PlayMode)),
         _GT(typeof(WrapMode)),
 
-        _GT(typeof(QualitySettings)),
+        //_GT(typeof(QualitySettings)),
         _GT(typeof(RenderSettings)),                                                   
         _GT(typeof(BlendWeights)),           
         _GT(typeof(RenderTexture)),

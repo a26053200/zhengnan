@@ -14,7 +14,8 @@ namespace BM
         public string name = "";
         public string path = "";
         public string abName = "";
-        public string type = "";
+        public bool packDependencies;           //是否包含整个依赖
+        public CompressType compressType;       //压缩类型
         public uint crc = 0;
         public long size = -1;
         public int priority;

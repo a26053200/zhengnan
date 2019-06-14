@@ -12,17 +12,15 @@ namespace Framework
 {
     public class MarkCude : MonoBehaviour
     {
-#if UNITY_EDITOR
         public Color color = Color.yellow;
         [Range(0.01f, 100f)]
         private BoxCollider collider;
-#endif
         private void Awake()
         {
 #if UNITY_EDITOR
             collider = gameObject.GetComponent<BoxCollider>();
 #else
-        Destroy(this)
+        Destroy(this);
 #endif
         }
 

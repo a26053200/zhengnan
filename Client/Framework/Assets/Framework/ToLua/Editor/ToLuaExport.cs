@@ -164,6 +164,8 @@ public static class ToLuaExport
         "RectTransform.Axis",
         "RectTransform.Edge",
         "RectTransform.ReapplyDrivenProperties",
+        //
+        "Light.SetLightDirty",
     };
 
     class _MethodBase

@@ -1,33 +1,8 @@
 ﻿using System;
 using UnityEngine;
-using UnityEditor;
 
 namespace BM
 {
-    /// <summary>
-    /// <para>打包平台</para>
-    /// <para>Author: zhengnan</para>
-    /// <para>Create: 2019/6/12 0:24:39</para>
-    /// </summary> 
-    public class Platform
-    {
-        public static string GetPlatformName(BuildTarget target)
-        {
-            switch (target)
-            {
-                case BuildTarget.Android:
-                    return "Android";
-                case BuildTarget.iOS:
-                    return "IOS";
-                case BuildTarget.StandaloneWindows64:
-                    return "Windows";
-                case BuildTarget.StandaloneOSX:
-                    return "OSX";
-                default:
-                    return null;
-            }
-        }
-    }
 
     /// <summary>
     /// 语言和地域
@@ -41,6 +16,22 @@ namespace BM
         ja_JP,//日本 -日本
         en_US,//英语 - 美国
         en_GB,//英语 - 英国
+    }
+
+    public enum BuildType
+    {
+        Single, //单包
+        Scene,  //场景
+    }
+
+    /// <summary>
+    /// 压缩格式
+    /// </summary>
+    public enum CompressType
+    {
+        None,   //不做压缩,缺点是打包后体积非常大,不过输入和加载会很快
+        LZMA,   //优点是打包后体积小，缺点是解包时间长导致加载时间长
+        LZ4,    //优点解压快,解压需要内存小，缺点是打包后体积大
     }
 }
 

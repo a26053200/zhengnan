@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEditor;
+using System.IO;
 
 namespace BM
 {
@@ -21,14 +22,19 @@ namespace BM
             window.minSize = new Vector2(600, 400);
         }
 
+        string BMSettings_Path = "Assets/Res/BMSettings.asset";
 
         FieldInfo[] titleFields;
         BMSettings settings;
+        List<BuildInfo> buildInfoList;
 
         void ResetView()
         {
-            BMSettings.GetIntance().LoadSettings();
-            settings = BMSettings.GetIntance();
+            if(!File.Exists(BMSettings_Path))
+            {
+                BMEditUtility.CreateAsset<BMSettings>(BMSettings_Path);
+            }
+            settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
 
             titleFields = settings.GetType().GetFields();
         }
@@ -70,15 +76,31 @@ namespace BM
             }
             if (GUILayout.Button("Save"))
             {
-                settings.SaveSettings();
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
             }
             EditorGUILayout.EndHorizontal();
             EditorGUILayout.Space();
 
             if (GUILayout.Button("Build"))
             {
-                BundleBuilder.Build();
+                buildInfoList = BundleBuilder.StartBuild();
             }
+            //if(buildInfoList != null)
+            //{
+            //    for (int i = 0; i < buildInfoList.Count; i++)
+            //    {
+            //        BuildInfo buildInfo = buildInfoList[i];
+            //        for (int j = 0; j < buildInfo.assetBundleBuilds.Count; j++)
+            //        {
+            //            AssetBundleBuild assetBundleBuild = buildInfo.assetBundleBuilds[j];
+            //            for (int k = 0; k < assetBundleBuild.assetNames.Length; k++)
+            //            {
+            //                EditorGUILayout.LabelField("path", assetBundleBuild.assetNames[k]);
+            //            }
+            //        }
+            //    }
+            //}
         }
     }
 }

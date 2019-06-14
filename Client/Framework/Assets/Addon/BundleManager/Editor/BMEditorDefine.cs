@@ -29,25 +29,6 @@ namespace BM
         }
     }
 
-    public enum BuildType
-    {
-        Single, //单包
-        Scene,  //场景
-    }
-    /// <summary>
-    /// 语言和地域
-    /// </summary>
-    public enum Language
-    {
-        zh_CN,//华 -大陆
-        zh_HK,//华 -香港
-        zh_TW,//华 -台湾
-        zh_SG,//华 -新加坡
-        ja_JP,//日本 -日本
-        en_US,//英语 - 美国
-        en_GB,//英语 - 英国
-    }
-
     /// <summary>
     /// 文件类型
     /// </summary>
@@ -74,6 +55,7 @@ namespace BM
             return false;
         }
     }
+
 }
 
 
