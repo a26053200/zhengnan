@@ -13,12 +13,24 @@ namespace BM
     /// </summary> 
     public static class BMEditUtility
     {
+        static string PathHead = "assets/res/";
+
+        static string Empty = "";
+
+        public static string Path2Name(string path)
+        {
+            path = path.ToLower();
+            string name = path.Replace("\\", "/");
+            name = name.Replace(PathHead, Empty);
+            name = name.Replace("/", "_");
+            return name;
+        }
         /// <summary>
         /// 创建asset配置文件
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
-        public static void CreateAsset<T>(string path) where T : ScriptableObject
+            public static void CreateAsset<T>(string path) where T : ScriptableObject
         {
             T asset = ScriptableObject.CreateInstance<T>();
             if (string.IsNullOrEmpty(path))
@@ -130,6 +142,18 @@ namespace BM
             byte[] data = System.Text.ASCIIEncoding.ASCII.GetBytes(sb.ToString());
             SaveFileData(fn, data);
 
+        }
+
+        public static void DelFolder(string path)
+        {
+            if(Directory.Exists(path))
+            {
+                FileAttributes atr = File.GetAttributes(path);
+                if (atr == FileAttributes.Directory)
+                    Directory.Delete(path, true);
+                else
+                    File.Delete(path);
+            }
         }
     }
 }

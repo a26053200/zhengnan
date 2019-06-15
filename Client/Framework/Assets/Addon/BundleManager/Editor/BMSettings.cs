@@ -12,21 +12,28 @@ namespace BM
     /// </summary> 
     public class BMSettings : ScriptableObject
     {
-        //
+        //场景文件夹
         public List<string> scenesFolderList = new List<string>();
         //
         public CompressType scenesCompressType;
         //后缀
         public string scenesPattern = "*.unity";
 
-        //
+        //普通文件夹
         public List<string> bundleFolderList = new List<string>();
         //
         public CompressType bundleCompressType;
         //后缀
         public string bundlePattern = "*.*";
 
+        //打包文件夹
+        public List<string> packFolderList = new List<string>();
         //
+        public CompressType packCompressType;
+        //后缀
+        public string packPattern = "*.*";
+
+        //整包文件夹
         public List<string> completeFolderList = new List<string>();
         //
         public CompressType completeCompressType;

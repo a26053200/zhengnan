@@ -15,20 +15,25 @@ namespace BM
         //配置路径
         static string BMSettings_Path = "Assets/Res/BMSettings.asset";
 
-        static string Output_Path = @"D:\work\WorkSpace_Unity\mrpg_trunk\TestBundle";
+        static string Output_Path;
 
-        static string Any_File = "*.*";
         //配置
         static BMSettings settings;
 
         static List<BuildInfo> buildInfoList;
 
-
+        static double buildStartTime = 0;
         //=======================
         // 流程函数
         //=======================
         public static List<BuildInfo> StartBuild()
         {
+            buildStartTime = EditorApplication.timeSinceStartup;
+
+            Output_Path = Application.dataPath.Replace("Assets", "TestBundle");
+            if (Directory.Exists(Output_Path))
+                BMEditUtility.DelFolder(Output_Path);
+            Directory.CreateDirectory(Output_Path);
             //清空控制台日志
             Debug.ClearDeveloperConsole();
             //加载打包配置
@@ -38,9 +43,9 @@ namespace BM
             //获取所有Build信息
             FetchAllBuildInfo();
 
-            GenAssetBundleInfos();
+            CalcAssetBundleInfos();
 
-            GenAssetBundle();
+            GenerateAssetBundle();
 
             return buildInfoList;
         }
@@ -57,11 +62,12 @@ namespace BM
             buildInfoList = new List<BuildInfo>();
 
             FetchBuildInfoList(settings.bundleFolderList, settings.bundlePattern, settings.bundleCompressType);
-            FetchBuildInfoList(settings.scenesFolderList, settings.scenesPattern, settings.scenesCompressType, true);
-            FetchBuildInfoList(settings.completeFolderList, settings.completePattern, settings.completeCompressType, false, true);
+            FetchBuildInfoList(settings.packFolderList, settings.packPattern, settings.packCompressType,true);
+            FetchBuildInfoList(settings.scenesFolderList, settings.scenesPattern, settings.scenesCompressType, false, true);
+            FetchBuildInfoList(settings.completeFolderList, settings.completePattern, settings.completeCompressType, false, false, true);
         }
 
-        static void FetchBuildInfoList(List<string> folders, string searchPattern, CompressType compressType, bool isScene = false, bool isCompleteAssets = false)
+        static void FetchBuildInfoList(List<string> folders, string searchPattern, CompressType compressType, bool isPack = false, bool isScene = false, bool isCompleteAssets = false)
         {
             //包含所有资源的bundle
             for (int i = 0; i < folders.Count; i++)
@@ -70,30 +76,57 @@ namespace BM
                     continue;
                 string resDir = BMEditUtility.Relativity2Absolute(folders[i]);
                 BuildInfo buildInfo = FetchBuildInfo(resDir, searchPattern);
+                buildInfo.buildName = folders[i];
                 buildInfo.isCompleteAssets = isCompleteAssets;
+                buildInfo.isPack = isPack;
                 buildInfo.isScene = isScene;
                 buildInfo.compressType = compressType;
                 buildInfoList.Add(buildInfo);
             }
         }
 
-        static void GenAssetBundleInfos()
+        static void CalcAssetBundleInfos()
         {
+            Dictionary<string, AssetBundleBuild> abbDict = new Dictionary<string, AssetBundleBuild>();
+            Dictionary<string, List<string>> assetNamesDict = new Dictionary<string, List<string>>();
             for (int i = 0; i < buildInfoList.Count; i++)
             {
+                abbDict.Clear();
+                assetNamesDict.Clear();
                 BuildInfo buildInfo = buildInfoList[i];
                 buildInfo.assetBundleBuilds = new List<AssetBundleBuild>();
-                if (buildInfo.isScene)
+                for (int j = 0; j < buildInfo.assetPaths.Count; j++)
                 {
-                    
-                }
-                else
-                {
-                    for (int j = 0; j < buildInfo.assetPaths.Count; j++)
+                    string path = buildInfo.assetPaths[j];
+                    string dirName = Path.GetDirectoryName(path);
+                    if (buildInfo.isPack)
                     {
-                        string path = buildInfo.assetPaths[j];
-                        string name = path.Replace("\\", "_");
-                        name = path.Replace("/", "_");
+                        string name = BMEditUtility.Path2Name(dirName);
+                        AssetBundleBuild assetBundleBuild;
+                        List<string> assetNameList;
+                        if (!assetNamesDict.TryGetValue(name, out assetNameList))
+                        {
+                            assetNameList = new List<string>();
+                            assetNamesDict.Add(name, assetNameList);
+                        }
+                        if (!abbDict.TryGetValue(name, out assetBundleBuild))
+                        {
+                            assetBundleBuild = new AssetBundleBuild()
+                            {
+                                assetBundleName = name,
+                                assetBundleVariant = settings.Suffix_Bundle,
+                            };
+                            abbDict.Add(name, assetBundleBuild);
+                        }
+                        assetBundleBuild = abbDict[name];
+                        assetNameList.Add(path);
+                        assetBundleBuild.assetNames = assetNameList.ToArray();
+                        assetBundleBuild.addressableNames = assetNameList.ToArray();
+                        abbDict[name] = assetBundleBuild;
+                    }
+                    else
+                    {
+                        string name = BMEditUtility.Path2Name(dirName + Path.GetFileNameWithoutExtension(path));
                         AssetBundleBuild assetBundleBuild = new AssetBundleBuild()
                         {
                             assetBundleName = name,
@@ -102,48 +135,72 @@ namespace BM
                             addressableNames = new string[] { path },
                         };
                         buildInfo.assetBundleBuilds.Add(assetBundleBuild);
-                        EditorUtility.DisplayProgressBar("Gen AssetBundle Infos...", path, (float)(j + 1.0f) / (float)buildInfo.assetPaths.Count);
                     }
+
+                    EditorUtility.DisplayProgressBar("Calc Asset Bundle Build Infos...", path, (float)(j + 1.0f) / (float)buildInfo.assetPaths.Count);
+
+                }
+                if (buildInfo.isPack)
+                {
+                    foreach(var abb in abbDict.Values)
+                    {
+                        buildInfo.assetBundleBuilds.Add(abb);
+                    }
+                    EditorUtility.ClearProgressBar();
                 }
             }
             EditorUtility.ClearProgressBar();
         }
 
-        static void GenAssetBundle()
+        static void GenerateAssetBundle()
         {
+            int count = 0;
             for (int i = 0; i < buildInfoList.Count; i++)
             {
                 BuildInfo buildInfo = buildInfoList[i];
                 if (buildInfo.isScene)
                 {
-
+                    for (int j = 0; j < buildInfo.assetPaths.Count; j++)
+                    {
+                        string path = buildInfo.assetPaths[j];
+                        string name = Path.GetFileNameWithoutExtension(path);
+                        BuildPipeline.BuildPlayer(new string[] { path },
+                            Output_Path + name + settings.Suffix_Bundle, BuildTarget.StandaloneWindows64,
+                            BuildOptions.BuildAdditionalStreamedScenes);
+                    }
                 }
                 else
                 {
-                    if(buildInfo.compressType == CompressType.LZ4)
+                    AssetBundleBuild[] abbs = buildInfo.assetBundleBuilds.ToArray();
+                    count += abbs.Length;
+                    if (buildInfo.compressType == CompressType.LZ4)
                     {
                         BuildPipeline.BuildAssetBundles(Output_Path,
-                            buildInfo.assetBundleBuilds.ToArray(),
+                            abbs,
                             BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression,
                             BuildTarget.StandaloneWindows64);
                     }else if (buildInfo.compressType == CompressType.LZMA)
                     {
                         BuildPipeline.BuildAssetBundles(Output_Path,
-                            buildInfo.assetBundleBuilds.ToArray(),
+                            abbs,
                             BuildAssetBundleOptions.DeterministicAssetBundle,
                             BuildTarget.StandaloneWindows64);
                     }
                     else if (buildInfo.compressType == CompressType.None)
                     {
                         BuildPipeline.BuildAssetBundles(Output_Path,
-                            buildInfo.assetBundleBuilds.ToArray(),
+                            abbs,
                             BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.UncompressedAssetBundle,
                             BuildTarget.StandaloneWindows64);
                     }
                 }
-                EditorUtility.DisplayProgressBar("Gen AssetBundle...", (i + 1.0f) + "/" + buildInfoList.Count, (float)(i + 1.0f) / (float)buildInfoList.Count);
+                EditorUtility.DisplayProgressBar("Generate AssetBundle...",
+                    string.Format("{0} {1}/{2}", buildInfo.buildName,(i + 1.0f),buildInfoList.Count),
+                    (float)(i + 1.0f) / (float)buildInfoList.Count);
             }
             EditorUtility.ClearProgressBar();
+
+            Logger.Log("Generate Assets Bundle Over. num:{0} time consuming:{1}s", count, EditorApplication.timeSinceStartup - buildStartTime);
         }
 
         //=======================
@@ -151,7 +208,7 @@ namespace BM
         //=======================
 
         //获取Build信息
-            static BuildInfo FetchBuildInfo(string resDir, string searchPattern)
+        static BuildInfo FetchBuildInfo(string resDir, string searchPattern)
         {
             BuildInfo buildInfo = new BuildInfo();
             buildInfo.assetPaths = new List<string>();
@@ -172,7 +229,7 @@ namespace BM
 
                 string path = dirPath + fileInfo.Name; //相对路径
                 buildInfo.assetPaths.Add(path);
-                Logger.Log("path:{0}", path);
+                //Logger.Log("path:{0}", path);
                 EditorUtility.DisplayProgressBar("Fetch Build Info...", path, (float)(i + 1.0f) / (float)resFiles.Length);
             }
             EditorUtility.ClearProgressBar();
