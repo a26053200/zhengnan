@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LitJson;
+using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
@@ -23,12 +24,29 @@ namespace BM
         static List<BuildInfo> buildInfoList;
 
         static double buildStartTime = 0;
+
+        static JsonData buildInfoJson;
+
+        [MenuItem("Window/Bundle Manager")]
+        public static void Build()
+        {
+            StartBuild(true);
+        }
+
+        [MenuItem("Window/Bundle Manager_Test")]
+        public static void Test()
+        {
+            StartBuild(false);
+        }
         //=======================
         // 流程函数
         //=======================
-        public static List<BuildInfo> StartBuild()
+
+        public static List<BuildInfo> StartBuild(bool generate)
         {
             buildStartTime = EditorApplication.timeSinceStartup;
+
+            buildInfoJson = new JsonData();
 
             Output_Path = Application.dataPath.Replace("Assets", "TestBundle");
             if (Directory.Exists(Output_Path))
@@ -39,13 +57,15 @@ namespace BM
             //加载打包配置
             settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
 
+            //清除AssetBundleName (这步可以不做)
             RemoveAllAssetBundleName();
             //获取所有Build信息
             FetchAllBuildInfo();
-
+            //计算AssetBundle信息
             CalcAssetBundleInfos();
-
-            GenerateAssetBundle();
+            //生成AssetBundle
+            if(generate)
+                GenerateAssetBundle();
 
             return buildInfoList;
         }
@@ -61,10 +81,10 @@ namespace BM
         {
             buildInfoList = new List<BuildInfo>();
 
-            FetchBuildInfoList(settings.bundleFolderList, settings.bundlePattern, settings.bundleCompressType);
+            //FetchBuildInfoList(settings.bundleFolderList, settings.bundlePattern, settings.bundleCompressType);
             FetchBuildInfoList(settings.packFolderList, settings.packPattern, settings.packCompressType,true);
-            FetchBuildInfoList(settings.scenesFolderList, settings.scenesPattern, settings.scenesCompressType, false, true);
-            FetchBuildInfoList(settings.completeFolderList, settings.completePattern, settings.completeCompressType, false, false, true);
+            //FetchBuildInfoList(settings.scenesFolderList, settings.scenesPattern, settings.scenesCompressType, false, true);
+            //FetchBuildInfoList(settings.completeFolderList, settings.completePattern, settings.completeCompressType, false, false, true);
         }
 
         static void FetchBuildInfoList(List<string> folders, string searchPattern, CompressType compressType, bool isPack = false, bool isScene = false, bool isCompleteAssets = false)
@@ -87,118 +107,125 @@ namespace BM
 
         static void CalcAssetBundleInfos()
         {
-            Dictionary<string, AssetBundleBuild> abbDict = new Dictionary<string, AssetBundleBuild>();
-            Dictionary<string, List<string>> assetNamesDict = new Dictionary<string, List<string>>();
             for (int i = 0; i < buildInfoList.Count; i++)
             {
-                abbDict.Clear();
-                assetNamesDict.Clear();
                 BuildInfo buildInfo = buildInfoList[i];
-                buildInfo.assetBundleBuilds = new List<AssetBundleBuild>();
+                buildInfo.subBuildInfoMap = new Dictionary<string, SubBuildInfo>();
                 for (int j = 0; j < buildInfo.assetPaths.Count; j++)
                 {
                     string path = buildInfo.assetPaths[j];
                     string dirName = Path.GetDirectoryName(path);
-                    if (buildInfo.isPack)
+                    string name;
+                    if (buildInfo.isPack)//整包
                     {
-                        string name = BMEditUtility.Path2Name(dirName);
-                        AssetBundleBuild assetBundleBuild;
-                        List<string> assetNameList;
-                        if (!assetNamesDict.TryGetValue(name, out assetNameList))
+                        name = BMEditUtility.Path2Name(dirName);
+                    }
+                    else if (buildInfo.isScene)//场景包
+                    {
+                        name = BMEditUtility.Path2Name(dirName + "/" +Path.GetFileNameWithoutExtension(path));
+                    }
+                    else//一般
+                    {
+                        name = BMEditUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                    }
+                    string md5 = StringUtils.EncryptWithMD5(name);
+                    SubBuildInfo subInfo = null;
+                    if (!buildInfo.subBuildInfoMap.TryGetValue(md5, out subInfo))
+                    {
+                        subInfo = new SubBuildInfo()
                         {
-                            assetNameList = new List<string>();
-                            assetNamesDict.Add(name, assetNameList);
-                        }
-                        if (!abbDict.TryGetValue(name, out assetBundleBuild))
-                        {
+                            bundleName = name,
+                            buildMd5 = md5,
                             assetBundleBuild = new AssetBundleBuild()
                             {
                                 assetBundleName = name,
                                 assetBundleVariant = settings.Suffix_Bundle,
-                            };
-                            abbDict.Add(name, assetBundleBuild);
-                        }
-                        assetBundleBuild = abbDict[name];
-                        assetNameList.Add(path);
-                        assetBundleBuild.assetNames = assetNameList.ToArray();
-                        assetBundleBuild.addressableNames = assetNameList.ToArray();
-                        abbDict[name] = assetBundleBuild;
-                    }
-                    else
-                    {
-                        string name = BMEditUtility.Path2Name(dirName + Path.GetFileNameWithoutExtension(path));
-                        AssetBundleBuild assetBundleBuild = new AssetBundleBuild()
-                        {
-                            assetBundleName = name,
-                            assetBundleVariant = settings.Suffix_Bundle,
-                            assetNames = new string[] { path },
-                            addressableNames = new string[] { path },
+                            },
+                            assetPaths = new List<string>(),
+                            dependenceMap = new Dictionary<string, string[]>(),
                         };
-                        buildInfo.assetBundleBuilds.Add(assetBundleBuild);
+                        buildInfo.subBuildInfoMap.Add(md5, subInfo);
                     }
-
-                    EditorUtility.DisplayProgressBar("Calc Asset Bundle Build Infos...", path, (float)(j + 1.0f) / (float)buildInfo.assetPaths.Count);
-
-                }
-                if (buildInfo.isPack)
-                {
-                    foreach(var abb in abbDict.Values)
+                    string[] dependencePaths;
+                    if (!subInfo.dependenceMap.TryGetValue(path, out dependencePaths))
                     {
-                        buildInfo.assetBundleBuilds.Add(abb);
+                        dependencePaths = AssetDatabase.GetDependencies(path, true);
+                        subInfo.dependenceMap.Add(path, dependencePaths);
                     }
-                    EditorUtility.ClearProgressBar();
+                    subInfo.assetPaths.Add(path);
+                    AssetBundleBuild abb = subInfo.assetBundleBuild;
+                    abb.assetNames = subInfo.assetPaths.ToArray();
+                    //abb.addressableNames = subInfo.assetPaths.ToArray();
+                    subInfo.assetBundleBuild = abb;
+                    EditorUtility.DisplayProgressBar("Calc Asset Bundle Build Infos...", path, (float)(j + 1.0f) / (float)buildInfo.assetPaths.Count);
                 }
             }
             EditorUtility.ClearProgressBar();
+            for (int i = 0; i < buildInfoList.Count; i++)
+            {
+                BuildInfo buildInfo = buildInfoList[i];
+                buildInfoJson.Add(buildInfo.ToJson());
+            }
+            string json = buildInfoJson.ToJson();
+            BMEditUtility.SaveUTF8TextFile(Output_Path + "/BundleData.json", JsonFormatter.PrettyPrint(json));
+
+            Logger.Log("Calc Asset Bundle Infos Over.");
         }
 
         static void GenerateAssetBundle()
         {
             int count = 0;
+            Dictionary<CompressType, List<AssetBundleBuild>> buildAbbMap = new Dictionary<CompressType, List<AssetBundleBuild>>(); 
             for (int i = 0; i < buildInfoList.Count; i++)
             {
                 BuildInfo buildInfo = buildInfoList[i];
-                if (buildInfo.isScene)
+                foreach (var subInfo in buildInfo.subBuildInfoMap.Values)
                 {
-                    for (int j = 0; j < buildInfo.assetPaths.Count; j++)
+                    for (int j = 0; j < subInfo.assetPaths.Count; j++)
                     {
-                        string path = buildInfo.assetPaths[j];
-                        string name = Path.GetFileNameWithoutExtension(path);
-                        BuildPipeline.BuildPlayer(new string[] { path },
-                            Output_Path + name + settings.Suffix_Bundle, BuildTarget.StandaloneWindows64,
-                            BuildOptions.BuildAdditionalStreamedScenes);
+                        if (buildInfo.isScene)
+                        {
+                            string path = subInfo.assetPaths[j];
+                            string dirName = Path.GetDirectoryName(path);
+                            string name = Path.GetFileNameWithoutExtension(path);
+                            string outputPath = string.Format("{0}/{1}.{2}", Output_Path, name, settings.Suffix_Bundle);
+                            BuildPipeline.BuildPlayer(new string[] { path },
+                                outputPath, BuildTarget.StandaloneWindows64,
+                                BuildOptions.BuildAdditionalStreamedScenes);
+                        }
+                        else
+                        {
+                            List<AssetBundleBuild> list;
+                            if(!buildAbbMap.TryGetValue(buildInfo.compressType, out list))
+                            {
+                                list = new List<AssetBundleBuild>();
+                                buildAbbMap.Add(buildInfo.compressType, list);
+                            }
+                            if(!list.Contains(subInfo.assetBundleBuild))
+                                list.Add(subInfo.assetBundleBuild);
+                        }
                     }
                 }
-                else
-                {
-                    AssetBundleBuild[] abbs = buildInfo.assetBundleBuilds.ToArray();
-                    count += abbs.Length;
-                    if (buildInfo.compressType == CompressType.LZ4)
-                    {
-                        BuildPipeline.BuildAssetBundles(Output_Path,
-                            abbs,
-                            BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression,
-                            BuildTarget.StandaloneWindows64);
-                    }else if (buildInfo.compressType == CompressType.LZMA)
-                    {
-                        BuildPipeline.BuildAssetBundles(Output_Path,
-                            abbs,
-                            BuildAssetBundleOptions.DeterministicAssetBundle,
-                            BuildTarget.StandaloneWindows64);
-                    }
-                    else if (buildInfo.compressType == CompressType.None)
-                    {
-                        BuildPipeline.BuildAssetBundles(Output_Path,
-                            abbs,
-                            BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.UncompressedAssetBundle,
-                            BuildTarget.StandaloneWindows64);
-                    }
-                }
-                EditorUtility.DisplayProgressBar("Generate AssetBundle...",
-                    string.Format("{0} {1}/{2}", buildInfo.buildName,(i + 1.0f),buildInfoList.Count),
-                    (float)(i + 1.0f) / (float)buildInfoList.Count);
+                
             }
-            EditorUtility.ClearProgressBar();
+
+            foreach(var buildAbb in buildAbbMap)
+            {
+                BuildAssetBundleOptions bbOpt = BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression;
+                switch (buildAbb.Key)
+                {
+                    case CompressType.LZ4:
+                        bbOpt = BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression;
+                        break;
+                    case CompressType.LZMA:
+                        bbOpt = BuildAssetBundleOptions.DeterministicAssetBundle;
+                        break;
+                    case CompressType.None:
+                        bbOpt = BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.UncompressedAssetBundle;
+                        break;
+                }
+                BuildPipeline.BuildAssetBundles(Output_Path, buildAbb.Value.ToArray(), bbOpt, BuildTarget.StandaloneWindows64);
+            }
 
             Logger.Log("Generate Assets Bundle Over. num:{0} time consuming:{1}s", count, EditorApplication.timeSinceStartup - buildStartTime);
         }
@@ -232,7 +259,7 @@ namespace BM
                 //Logger.Log("path:{0}", path);
                 EditorUtility.DisplayProgressBar("Fetch Build Info...", path, (float)(i + 1.0f) / (float)resFiles.Length);
             }
-            EditorUtility.ClearProgressBar();
+            //EditorUtility.ClearProgressBar();
             return buildInfo;
         }
 

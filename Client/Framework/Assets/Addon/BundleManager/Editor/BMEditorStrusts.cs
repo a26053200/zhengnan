@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LitJson;
+using System.Collections.Generic;
 using UnityEditor;
 
 namespace BM
@@ -16,7 +17,59 @@ namespace BM
         public bool isPack;                    //打包每个子目录
         public CompressType compressType;       //压缩类型
         public List<string> assetPaths;
-        public List<AssetBundleBuild> assetBundleBuilds;
+        public Dictionary<string, SubBuildInfo> subBuildInfoMap;
+
+        public JsonData ToJson()
+        {
+            JsonData json = new JsonData();
+            json["buildName"] = buildName;
+            json["subBuildInfoMap"] = new JsonData();
+            foreach(var subInfo in subBuildInfoMap.Values)
+            {
+                json["subBuildInfoMap"].Add(subInfo.ToJson());
+            }
+
+            return json;
+        }
+    }
+    public class SubBuildInfo
+    {
+        public string bundleName;
+        public string buildMd5;
+        public List<string> assetPaths;
+        public AssetBundleBuild assetBundleBuild;
+        public Dictionary<string, string[]> dependenceMap;
+
+        public JsonData ToJson()
+        {
+            JsonData json = new JsonData();
+            json["bundleName"] = bundleName;
+            json["buildMd5"] = buildMd5;
+            json["assetPaths"] = new JsonData();
+            for (int i = 0; i < assetPaths.Count; i++)
+            {
+                json["assetPaths"].Add(assetPaths[i]);
+            }
+            //json["dependenceMap"] = new JsonData();
+            //bool hasDependence = false;
+            //foreach (var dep in dependenceMap)
+            //{
+            //    JsonData depJson = new JsonData();
+            //    depJson["path"] = dep.Key;
+            //    depJson["dependencePaths"] = new JsonData();
+            //    for (int i = 0; i < dep.Value.Length; i++)
+            //    {
+            //        depJson["dependencePaths"].Add(dep.Value[i]);
+            //        hasDependence = true;
+            //    }
+            //    json["dependenceMap"].Add(depJson);
+            //}
+            //if (!hasDependence)
+            //{
+            //    json.Keys.Remove("dependenceMap");
+            //}
+            return json;
+        }
     }
 
 }

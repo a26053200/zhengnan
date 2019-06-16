@@ -79,6 +79,16 @@ namespace BM
             return path;
         }
 
+        public static void SaveUTF8TextFile(string fn, string txt)
+        {
+            byte[] data = System.Text.UTF8Encoding.UTF8.GetBytes(txt);
+            byte[] bom = new byte[] { 0xef, 0xbb, 0xbf };
+            byte[] saveData = new byte[data.Length + bom.Length];
+            Array.Copy(bom, 0, saveData, 0, bom.Length);
+            Array.Copy(data, 0, saveData, bom.Length, data.Length);
+            SaveFileData(fn, saveData);
+        }
+
         public static byte[] GetFileData(string fn)
         {
             if (!File.Exists(fn))

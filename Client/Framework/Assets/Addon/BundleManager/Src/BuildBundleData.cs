@@ -1,7 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using LitJsonBM;
+using LitJson;
 
 public enum BundleType
 {

@@ -14,7 +14,7 @@ namespace BM
     /// </summary> 
     public class BMWindow : EditorWindow
     {
-        [MenuItem("Window/Bundle Manager")]
+        //[MenuItem("Window/Bundle Manager")]
         static void Init()
         {
             BMWindow window = (BMWindow)EditorWindow.GetWindow(typeof(BMWindow));
@@ -84,7 +84,7 @@ namespace BM
 
             if (GUILayout.Button("Build"))
             {
-                buildInfoList = BundleBuilder.StartBuild();
+                BundleBuilder.Build();
             }
             //if(buildInfoList != null)
             //{

@@ -12,6 +12,8 @@ namespace BM
     /// </summary> 
     public class BMSettings : ScriptableObject
     {
+        public string resRootDir = "Assets/Res/";
+
         //场景文件夹
         public List<string> scenesFolderList = new List<string>();
         //
@@ -48,6 +50,9 @@ namespace BM
         public string Ignore_Suffix = ".meta,.DS_Store";
         //忽略文件夹
         public string Ignore_Folder = ".svn";
+
+        //拥有依赖性的文件后缀名
+        public List<string> ownerDependenceSuffixs = new List<string>();
 
         Dictionary<string, string> defaultDict;
 
