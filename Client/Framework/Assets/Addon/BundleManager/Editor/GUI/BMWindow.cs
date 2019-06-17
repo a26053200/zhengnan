@@ -84,7 +84,7 @@ namespace BM
 
             if (GUILayout.Button("Build"))
             {
-                BundleBuilder.Build();
+                //BundleBuilder.Build();
             }
             //if(buildInfoList != null)
             //{

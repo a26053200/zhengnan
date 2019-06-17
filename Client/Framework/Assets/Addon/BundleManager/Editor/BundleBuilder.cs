@@ -27,23 +27,38 @@ namespace BM
 
         static JsonData buildInfoJson;
 
-        [MenuItem("Window/Bundle Manager")]
-        public static void Build()
+        static BuildTarget buildTarget;
+
+        [MenuItem("Window/Bundle Manager(IOS)")]
+        public static void BuildIOS()
         {
-            StartBuild(true);
+            StartBuild(true, BuildTarget.iOS);
+        }
+
+        [MenuItem("Window/Bundle Manager(Android)")]
+        public static void BuildAndroid()
+        {
+            StartBuild(true, BuildTarget.Android);
+        }
+
+        [MenuItem("Window/Bundle Manager(Win64)")]
+        public static void BuildWin64()
+        {
+            StartBuild(true, BuildTarget.iOS);
         }
 
         [MenuItem("Window/Bundle Manager_Test")]
         public static void Test()
         {
-            StartBuild(false);
+            StartBuild(false,BuildTarget.StandaloneWindows64);
         }
         //=======================
         // 流程函数
         //=======================
 
-        public static List<BuildInfo> StartBuild(bool generate)
+        public static List<BuildInfo> StartBuild(bool generate,BuildTarget _buildTarget)
         {
+            buildTarget = _buildTarget;
             buildStartTime = EditorApplication.timeSinceStartup;
 
             buildInfoJson = new JsonData();
@@ -81,10 +96,10 @@ namespace BM
         {
             buildInfoList = new List<BuildInfo>();
 
-            //FetchBuildInfoList(settings.bundleFolderList, settings.bundlePattern, settings.bundleCompressType);
+            FetchBuildInfoList(settings.bundleFolderList, settings.bundlePattern, settings.bundleCompressType);
             FetchBuildInfoList(settings.packFolderList, settings.packPattern, settings.packCompressType,true);
-            //FetchBuildInfoList(settings.scenesFolderList, settings.scenesPattern, settings.scenesCompressType, false, true);
-            //FetchBuildInfoList(settings.completeFolderList, settings.completePattern, settings.completeCompressType, false, false, true);
+            FetchBuildInfoList(settings.scenesFolderList, settings.scenesPattern, settings.scenesCompressType, false, true);
+            FetchBuildInfoList(settings.completeFolderList, settings.completePattern, settings.completeCompressType, false, false, true);
         }
 
         static void FetchBuildInfoList(List<string> folders, string searchPattern, CompressType compressType, bool isPack = false, bool isScene = false, bool isCompleteAssets = false)
@@ -190,8 +205,9 @@ namespace BM
                             string name = Path.GetFileNameWithoutExtension(path);
                             string outputPath = string.Format("{0}/{1}.{2}", Output_Path, name, settings.Suffix_Bundle);
                             BuildPipeline.BuildPlayer(new string[] { path },
-                                outputPath, BuildTarget.StandaloneWindows64,
+                                outputPath, buildTarget,
                                 BuildOptions.BuildAdditionalStreamedScenes);
+                                count += 1;
                         }
                         else
                         {
@@ -224,9 +240,9 @@ namespace BM
                         bbOpt = BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.UncompressedAssetBundle;
                         break;
                 }
-                BuildPipeline.BuildAssetBundles(Output_Path, buildAbb.Value.ToArray(), bbOpt, BuildTarget.StandaloneWindows64);
+                BuildPipeline.BuildAssetBundles(Output_Path, buildAbb.Value.ToArray(), bbOpt, buildTarget);
             }
-
+            count += buildAbbMap.Count;
             Logger.Log("Generate Assets Bundle Over. num:{0} time consuming:{1}s", count, EditorApplication.timeSinceStartup - buildStartTime);
         }
 

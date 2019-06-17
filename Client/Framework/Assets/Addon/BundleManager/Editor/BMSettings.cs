@@ -14,6 +14,9 @@ namespace BM
     {
         public string resRootDir = "Assets/Res/";
 
+        //lua文件夹
+        public List<string> luaFolderList = new List<string>();
+
         //场景文件夹
         public List<string> scenesFolderList = new List<string>();
         //
