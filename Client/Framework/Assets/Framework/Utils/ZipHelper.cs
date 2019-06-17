@@ -7,7 +7,7 @@ using ICSharpCode.SharpZipLib.Zip;
 
 namespace BM
 {
-    public class ZipHelper
+    public static class ZipHelper
     {
         /// <summary>
         /// 压缩文件夹
@@ -15,7 +15,7 @@ namespace BM
         /// <param name="dirToZip"></param>
         /// <param name="zipedFileName"></param>
         /// <param name="compressionLevel">压缩率0（无压缩）9（压缩率最高）</param>
-        public void ZipDir(string dirToZip, string zipedFileName, int compressionLevel = 9)
+        public static void ZipDir(string dirToZip, string zipedFileName, int compressionLevel = 9)
         {
             if (Path.GetExtension(zipedFileName) != ".zip")
             {
@@ -46,12 +46,12 @@ namespace BM
                 }
             }
         }
- 
+
         /// <summary>  
         /// 获取所有文件  
         /// </summary>  
         /// <returns></returns>  
-        public Hashtable GetAllFies(string dir)
+        public static Hashtable GetAllFies(string dir)
         {
             Hashtable filesList = new Hashtable();
             DirectoryInfo fileDire = new DirectoryInfo(dir);
@@ -64,13 +64,13 @@ namespace BM
             GetAllDirsFiles(fileDire.GetDirectories(), filesList);
             return filesList;
         }
- 
+
         /// <summary>  
         /// 获取一个文件夹下的所有文件夹里的文件  
         /// </summary>  
         /// <param name="dirs"></param>  
         /// <param name="filesList"></param>  
-        public void GetAllDirsFiles(IEnumerable<DirectoryInfo> dirs, Hashtable filesList)
+        public static void GetAllDirsFiles(IEnumerable<DirectoryInfo> dirs, Hashtable filesList)
         {
             foreach (DirectoryInfo dir in dirs)
             {
@@ -94,14 +94,14 @@ namespace BM
                 filesList.Add(file.FullName, file.LastWriteTime);
             }
         }
- 
+
         /// <summary>  
         /// 功能：解压zip格式的文件。  
         /// </summary>  
         /// <param name="zipFilePath">压缩文件路径</param>  
         /// <param name="unZipDir">解压文件存放路径,为空时默认与压缩文件同一级目录下，跟压缩文件同名的文件夹</param>  
         /// <returns>解压是否成功</returns>  
-        public void UnZip(string zipFilePath, string unZipDir)
+        public static void UnZip(string zipFilePath, string unZipDir)
         {
             if (zipFilePath == string.Empty)
             {
@@ -158,14 +158,14 @@ namespace BM
                 }
             }
         }
- 
+
         /// <summary>
         /// 压缩单个文件
         /// </summary>
         /// <param name="filePath">被压缩的文件名称(包含文件路径)，文件的全路径</param>
         /// <param name="zipedFileName">压缩后的文件名称(包含文件路径)，保存的文件名称</param>
         /// <param name="compressionLevel">压缩率0（无压缩）到 9（压缩率最高）</param>
-        public void ZipFile(string filePath, string zipedFileName, int compressionLevel = 9)
+        public static void ZipFile(string filePath, string zipedFileName, int compressionLevel = 9)
         {
             // 如果文件没有找到，则报错 
             if (!File.Exists(filePath))
@@ -219,13 +219,13 @@ namespace BM
                 streamToZip.Close();
             }
         }
- 
+
         /// <summary> 
         /// 压缩单个文件 
         /// </summary> 
         /// <param name="fileToZip">要进行压缩的文件名，全路径</param> 
         /// <param name="zipedFile">压缩后生成的压缩文件名,全路径</param> 
-        public void ZipFile(string fileToZip, string zipedFile)
+        public static void ZipFile(string fileToZip, string zipedFile)
         {
             // 如果文件没有找到，则报错 
             if (!File.Exists(fileToZip))
@@ -257,7 +257,7 @@ namespace BM
                 }
             }
         }
- 
+
         /// <summary>
         /// 压缩多个目录或文件
         /// </summary>
@@ -265,7 +265,7 @@ namespace BM
         /// <param name="zipedFile">压缩后的文件名，全路径格式</param>
         /// <param name="password">压宿密码</param>
         /// <returns></returns>
-        public bool ZipManyFilesOrDictorys(IEnumerable<string> folderOrFileList, string zipedFile, string password)
+        public static bool ZipManyFilesOrDictorys(IEnumerable<string> folderOrFileList, string zipedFile, string password)
         {
             bool res = true;
             using (var s = new ZipOutputStream(File.Create(zipedFile)))
@@ -293,14 +293,14 @@ namespace BM
                 return res;
             }
         }
- 
+
         /// <summary>
         /// 带压缩流压缩单个文件
         /// </summary>
         /// <param name="fileToZip">要进行压缩的文件名</param>
         /// <param name="zipStream"></param>
         /// <returns></returns>
-        private bool ZipFileWithStream(string fileToZip, ZipOutputStream zipStream)
+        private static bool ZipFileWithStream(string fileToZip, ZipOutputStream zipStream)
         {
             //如果文件没有找到，则报错
             if (!File.Exists(fileToZip))
@@ -341,14 +341,14 @@ namespace BM
             return res;
  
         }
- 
+
         /// <summary>
         /// 递归压缩文件夹方法
         /// </summary>
         /// <param name="folderToZip"></param>
         /// <param name="s"></param>
         /// <param name="parentFolderName"></param>
-        private bool ZipFileDictory(string folderToZip, ZipOutputStream s, string parentFolderName)
+        private static bool ZipFileDictory(string folderToZip, ZipOutputStream s, string parentFolderName)
         {
             bool res = true;
             ZipEntry entry = null;

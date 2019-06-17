@@ -168,7 +168,7 @@ namespace LuaInterface
                     throw new LuaException("can't run in web platform, please switch to other platform");
 #endif
                 }
-
+                //ReadZipFile(fileName);
                 return str;
             }
             else
@@ -249,6 +249,7 @@ namespace LuaInterface
                 fileName += ".bytes";
 #endif
                 zipName = sb.ToString();
+                //Debug.LogWarning(string.Format("lua file:{0}  zip name:{1}", fileName, zipName));
                 zipMap.TryGetValue(zipName, out zipFile);
             }
 
