@@ -12,9 +12,10 @@ namespace BM
     public class BuildInfo
     {
         public string buildName;
-        public bool isCompleteAssets;           //打包整个文件夹
-        public bool isScene;                    //是否是场景
-        public bool isPack;                    //打包每个子目录
+        public BuildType buildType;             //打包类型
+        //public bool isCompleteAssets;           //打包整个文件夹
+        //public bool isScene;                    //是否是场景
+        //public bool isPack;                    //打包每个子目录
         public CompressType compressType;       //压缩类型
         public List<string> assetPaths;
         public Dictionary<string, SubBuildInfo> subBuildInfoMap;
@@ -50,24 +51,21 @@ namespace BM
             {
                 json["assetPaths"].Add(assetPaths[i]);
             }
-            //json["dependenceMap"] = new JsonData();
-            //bool hasDependence = false;
-            //foreach (var dep in dependenceMap)
-            //{
-            //    JsonData depJson = new JsonData();
-            //    depJson["path"] = dep.Key;
-            //    depJson["dependencePaths"] = new JsonData();
-            //    for (int i = 0; i < dep.Value.Length; i++)
-            //    {
-            //        depJson["dependencePaths"].Add(dep.Value[i]);
-            //        hasDependence = true;
-            //    }
-            //    json["dependenceMap"].Add(depJson);
-            //}
-            //if (!hasDependence)
-            //{
-            //    json.Keys.Remove("dependenceMap");
-            //}
+            if(dependenceMap.Count > 0)
+            {
+                //json["dependenceMap"] = new JsonData();
+                foreach (var dep in dependenceMap)
+                {
+                    JsonData depJson = new JsonData();
+                    //depJson["path"] = dep.Key;
+                    json["dependencePaths"] = depJson;
+                    for (int i = 0; i < dep.Value.Length; i++)
+                    {
+                        depJson.Add(dep.Value[i]);
+                    }
+                    //json["dependenceMap"].Add(depJson);
+                }
+            }
             return json;
         }
     }

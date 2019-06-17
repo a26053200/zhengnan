@@ -16,12 +16,17 @@ namespace BM
         //配置路径
         static string BMSettings_Path = "Assets/Res/BMSettings.asset";
 
+        //输出目录
         static string Output_Path;
 
         //配置
         static BMSettings settings;
 
         static List<BuildInfo> buildInfoList;
+        
+        static string[] ignoreSuffixs; //被忽略的文件后缀
+        
+        static string[] ignoreFolders; //被忽略的目录
 
         static double buildStartTime = 0;
 
@@ -63,15 +68,18 @@ namespace BM
 
             buildInfoJson = new JsonData();
 
+            //加载打包配置
+            settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
+            ignoreSuffixs = settings.Ignore_Suffix.Split(',');
+            ignoreFolders = settings.Ignore_Folder.Split(',');
+
             Output_Path = Application.dataPath.Replace("Assets", "TestBundle");
             if (Directory.Exists(Output_Path))
                 BMEditUtility.DelFolder(Output_Path);
             Directory.CreateDirectory(Output_Path);
             //清空控制台日志
             Debug.ClearDeveloperConsole();
-            //加载打包配置
-            settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
-
+            
             //清除AssetBundleName (这步可以不做)
             RemoveAllAssetBundleName();
             //获取所有Build信息
@@ -95,14 +103,15 @@ namespace BM
         static void FetchAllBuildInfo()
         {
             buildInfoList = new List<BuildInfo>();
-
-            FetchBuildInfoList(settings.bundleFolderList, settings.bundlePattern, settings.bundleCompressType);
-            FetchBuildInfoList(settings.packFolderList, settings.packPattern, settings.packCompressType,true);
-            FetchBuildInfoList(settings.scenesFolderList, settings.scenesPattern, settings.scenesCompressType, false, true);
-            FetchBuildInfoList(settings.completeFolderList, settings.completePattern, settings.completeCompressType, false, false, true);
+            
+            //FetchBuildInfoList(settings.singleFolderList,   settings.singlePattern, settings.scenesCompressType, settings.singleBuildType);
+            //FetchBuildInfoList(settings.packFolderList,     settings.packPattern,   settings.packCompressType, settings.packBuildType);
+            FetchBuildInfoList(settings.scenesFolderList,   settings.scenesPattern, settings.scenesCompressType, settings.scenesBuildType);
+            //FetchBuildInfoList(settings.shaderFolderList,   settings.shaderPattern, settings.shaderCompressType, settings.shaderBuildType);
+            FetchBuildInfoList(settings.luaFolderList, settings.luaPattern, settings.luaCompressType, settings.luaBuildType);
         }
 
-        static void FetchBuildInfoList(List<string> folders, string searchPattern, CompressType compressType, bool isPack = false, bool isScene = false, bool isCompleteAssets = false)
+        static void FetchBuildInfoList(List<string> folders, string searchPattern, CompressType compressType, BuildType buildType)
         {
             //包含所有资源的bundle
             for (int i = 0; i < folders.Count; i++)
@@ -110,11 +119,9 @@ namespace BM
                 if (!Directory.Exists(folders[i]))
                     continue;
                 string resDir = BMEditUtility.Relativity2Absolute(folders[i]);
-                BuildInfo buildInfo = FetchBuildInfo(resDir, searchPattern);
+                BuildInfo buildInfo = FetchBuildInfo(resDir, searchPattern, buildType);
                 buildInfo.buildName = folders[i];
-                buildInfo.isCompleteAssets = isCompleteAssets;
-                buildInfo.isPack = isPack;
-                buildInfo.isScene = isScene;
+                buildInfo.buildType = buildType;
                 buildInfo.compressType = compressType;
                 buildInfoList.Add(buildInfo);
             }
@@ -131,17 +138,23 @@ namespace BM
                     string path = buildInfo.assetPaths[j];
                     string dirName = Path.GetDirectoryName(path);
                     string name;
-                    if (buildInfo.isPack)//整包
+                    switch(buildInfo.buildType)
                     {
-                        name = BMEditUtility.Path2Name(dirName);
-                    }
-                    else if (buildInfo.isScene)//场景包
-                    {
-                        name = BMEditUtility.Path2Name(dirName + "/" +Path.GetFileNameWithoutExtension(path));
-                    }
-                    else//一般
-                    {
-                        name = BMEditUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                        case BuildType.Pack:
+                            name = BMEditUtility.Path2Name(dirName);
+                            break;
+                        case BuildType.Scene:
+                            name = BMEditUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                            break;
+                        case BuildType.Shader:
+                            name = BMEditUtility.Path2Name(buildInfo.buildName);
+                            break;
+                        case BuildType.Zip:
+                            name = BMEditUtility.Path2Name(buildInfo.buildName);
+                            break;
+                        default:// BuildType.Single:
+                            name = BMEditUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                            break;
                     }
                     string md5 = StringUtils.EncryptWithMD5(name);
                     SubBuildInfo subInfo = null;
@@ -161,12 +174,7 @@ namespace BM
                         };
                         buildInfo.subBuildInfoMap.Add(md5, subInfo);
                     }
-                    string[] dependencePaths;
-                    if (!subInfo.dependenceMap.TryGetValue(path, out dependencePaths))
-                    {
-                        dependencePaths = AssetDatabase.GetDependencies(path, true);
-                        subInfo.dependenceMap.Add(path, dependencePaths);
-                    }
+                    AddDependence(path, subInfo.dependenceMap);
                     subInfo.assetPaths.Add(path);
                     AssetBundleBuild abb = subInfo.assetBundleBuild;
                     abb.assetNames = subInfo.assetPaths.ToArray();
@@ -198,11 +206,11 @@ namespace BM
                 {
                     for (int j = 0; j < subInfo.assetPaths.Count; j++)
                     {
-                        if (buildInfo.isScene)
+                        if (buildInfo.buildType == BuildType.Scene)
                         {
                             string path = subInfo.assetPaths[j];
                             string dirName = Path.GetDirectoryName(path);
-                            string name = Path.GetFileNameWithoutExtension(path);
+                            string name = BMEditUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
                             string outputPath = string.Format("{0}/{1}.{2}", Output_Path, name, settings.Suffix_Bundle);
                             BuildPipeline.BuildPlayer(new string[] { path },
                                 outputPath, buildTarget,
@@ -251,7 +259,7 @@ namespace BM
         //=======================
 
         //获取Build信息
-        static BuildInfo FetchBuildInfo(string resDir, string searchPattern)
+        static BuildInfo FetchBuildInfo(string resDir, string searchPattern, BuildType buildType)
         {
             BuildInfo buildInfo = new BuildInfo();
             buildInfo.assetPaths = new List<string>();
@@ -276,25 +284,45 @@ namespace BM
                 EditorUtility.DisplayProgressBar("Fetch Build Info...", path, (float)(i + 1.0f) / (float)resFiles.Length);
             }
             //EditorUtility.ClearProgressBar();
+            //if(buildType == BuildType.Zip)
+            //{
+            //    ZipHelper.ZipManyFilesOrDictorys(buildInfo.assetPaths, Output_Path + "", "");
+            //}
             return buildInfo;
         }
 
         //忽略文件
         static bool IgnoreFile(string lowerName, string dirPath)
         {
-            string[] ignoreSuffixs = settings.Ignore_Suffix.Split(',');
             for (int i = 0; i < ignoreSuffixs.Length; i++)
             {
                 if (lowerName.EndsWith(ignoreSuffixs[i]))
                     return true;
             }
-            string[] ignoreFolders = settings.Ignore_Folder.Split(',');
             for (int i = 0; i < ignoreFolders.Length; i++)
             {
                 if (dirPath.IndexOf(ignoreFolders[i]) != -1)
                     return true;
             }
             return false;
+        }
+
+        static void AddDependence(string filePath, Dictionary<string, string[]> dependenceMap)
+        {
+            bool owner = false;
+            for (int i = 0; i < settings.ownerDependenceSuffixs.Count; i++)
+            {
+                if (filePath.EndsWith(settings.ownerDependenceSuffixs[i]))
+                {
+                    owner = true;
+                    break;
+                }
+            }
+            if(owner)
+            {
+                string[] dependencePaths = AssetDatabase.GetDependencies(filePath, true);
+                dependenceMap[filePath] = dependencePaths;
+            }
         }
     }
 }

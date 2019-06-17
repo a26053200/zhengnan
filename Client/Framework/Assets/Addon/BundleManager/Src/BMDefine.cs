@@ -22,6 +22,9 @@ namespace BM
     {
         Single, //单包
         Scene,  //场景
+        Pack,   //整包
+        Shader, //Shader
+        Zip,    //压缩
     }
 
     /// <summary>

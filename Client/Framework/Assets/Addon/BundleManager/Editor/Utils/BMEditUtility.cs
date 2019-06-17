@@ -13,15 +13,13 @@ namespace BM
     /// </summary> 
     public static class BMEditUtility
     {
-        static string PathHead = "assets/res/";
-
         static string Empty = "";
 
-        public static string Path2Name(string path)
+        public static string Path2Name(string path, string head = "assets/res/")
         {
             path = path.ToLower();
             string name = path.Replace("\\", "/");
-            name = name.Replace(PathHead, Empty);
+            name = name.Replace(head, Empty);
             name = name.Replace("/", "_");
             return name;
         }

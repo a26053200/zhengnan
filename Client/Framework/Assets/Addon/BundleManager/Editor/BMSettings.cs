@@ -14,39 +14,57 @@ namespace BM
     {
         public string resRootDir = "Assets/Res/";
 
+        public string lastBuildDate;
+
+        public int zipLevel = 9;
+
         //lua文件夹
         public List<string> luaFolderList = new List<string>();
+        //打包类型
+        public BuildType luaBuildType;
+        //
+        public CompressType luaCompressType;
+        //
+        public string luaPattern = "*.lua";
 
         //场景文件夹
         public List<string> scenesFolderList = new List<string>();
+        //打包类型
+        public BuildType scenesBuildType;             
         //
         public CompressType scenesCompressType;
         //后缀
         public string scenesPattern = "*.unity";
 
         //普通文件夹
-        public List<string> bundleFolderList = new List<string>();
+        public List<string> singleFolderList = new List<string>();
+        //打包类型
+        public BuildType singleBuildType;
         //
-        public CompressType bundleCompressType;
+        public CompressType singleCompressType;
         //后缀
-        public string bundlePattern = "*.*";
+        public string singlePattern = "*.*";
 
         //打包文件夹
         public List<string> packFolderList = new List<string>();
+        //打包类型
+        public BuildType packBuildType;
         //
         public CompressType packCompressType;
         //后缀
         public string packPattern = "*.*";
 
-        //整包文件夹
-        public List<string> completeFolderList = new List<string>();
+        //shader文件夹
+        public List<string> shaderFolderList = new List<string>();
+        //打包类型
+        public BuildType shaderBuildType;
         //
-        public CompressType completeCompressType;
+        public CompressType shaderCompressType;
         //后缀
-        public string completePattern = "*.*";
+        public string shaderPattern = "*.*";
 
         //后缀
-        public string Suffix_Bundle = ".bundle";
+        public string Suffix_Bundle = "bundle";
         //场景文件后缀
         public string Scene_Suffix = "*.unity";
         //忽略后缀文件
