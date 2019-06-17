@@ -31,7 +31,7 @@ namespace ResourceAuditing
         //标准配置文件路径
         static string Norm_Setting_Path = Application.dataPath + "/Norm-Setting.txt";
         //材质贴图 "*.psd|*.tiff|*.jpg|*.jpeg|*.tga|*.png|*.gif"
-        string[] textureFileTypes = new string[] { ".psd", ".tiff", ".jpg", ".tga", ".png", ".gif" };
+        string[] textureFileTypes = new string[] { ".psd", ".tiff", ".jpg", ".tga", ".png", ".gif", ".tif" };
         //材质球 
         string[] materialFileTypes = new string[] { ".mat"};
         //材质球 
