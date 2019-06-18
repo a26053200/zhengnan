@@ -163,6 +163,37 @@ namespace BM
                     File.Delete(path);
             }
         }
+
+        public static void CopyDir(string srcPath, string dstPath)
+        {
+            try
+            {
+                // 检查目标目录是否以目录分割字符结束如果不是则添加之
+                if (dstPath[dstPath.Length - 1] != Path.DirectorySeparatorChar)
+                    dstPath += Path.DirectorySeparatorChar;
+                // 判断目标目录是否存在如果不存在则新建之
+                if (!Directory.Exists(dstPath))
+                    Directory.CreateDirectory(dstPath);
+                // 得到源目录的文件列表，该里面是包含文件以及目录路径的一个数组
+                // 如果你指向copy目标文件下面的文件而不包含目录请使用下面的方法
+                // string[] fileList = Directory.GetFiles(srcPath);
+                string[] fileList = Directory.GetFileSystemEntries(srcPath);
+                // 遍历所有的文件和目录
+                foreach (string file in fileList)
+                {
+                    // 先当作目录处理如果存在这个目录就递归Copy该目录下面的文件
+                    if (Directory.Exists(file))
+                        CopyDir(file, dstPath + Path.GetFileName(file));
+                    // 否则直接Copy文件
+                    else
+                        File.Copy(file, dstPath + Path.GetFileName(file), true);
+                }
+            }
+            catch
+            {
+                Debug.LogErrorFormat("Can not copy! srcPath:{0} dstPath:{1}", srcPath, dstPath);
+            }
+        }
     }
 }
     

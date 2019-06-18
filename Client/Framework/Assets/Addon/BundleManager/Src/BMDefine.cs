@@ -24,7 +24,7 @@ namespace BM
         Scene,  //场景
         Pack,   //整包
         Shader, //Shader
-        Zip,    //压缩
+        Lua,    //Lua
     }
 
     /// <summary>

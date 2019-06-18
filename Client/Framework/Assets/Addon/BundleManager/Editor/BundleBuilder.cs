@@ -34,6 +34,8 @@ namespace BM
 
         static BuildTarget buildTarget;
 
+        static List<string> tempLuaPaths;
+
         [MenuItem("Window/Bundle Manager(IOS)")]
         public static void BuildIOS()
         {
@@ -49,7 +51,7 @@ namespace BM
         [MenuItem("Window/Bundle Manager(Win64)")]
         public static void BuildWin64()
         {
-            StartBuild(true, BuildTarget.iOS);
+            StartBuild(true, BuildTarget.StandaloneWindows64);
         }
 
         [MenuItem("Window/Bundle Manager_Test")]
@@ -65,6 +67,7 @@ namespace BM
         {
             buildTarget = _buildTarget;
             buildStartTime = EditorApplication.timeSinceStartup;
+            tempLuaPaths = new List<string>();
 
             buildInfoJson = new JsonData();
 
@@ -89,6 +92,8 @@ namespace BM
             //生成AssetBundle
             if(generate)
                 GenerateAssetBundle();
+            //移动生成后的所有Bundle
+            MoveAssetBundle();
 
             return buildInfoList;
         }
@@ -106,9 +111,9 @@ namespace BM
             
             //FetchBuildInfoList(settings.singleFolderList,   settings.singlePattern, settings.scenesCompressType, settings.singleBuildType);
             //FetchBuildInfoList(settings.packFolderList,     settings.packPattern,   settings.packCompressType, settings.packBuildType);
-            FetchBuildInfoList(settings.scenesFolderList,   settings.scenesPattern, settings.scenesCompressType, settings.scenesBuildType);
-            //FetchBuildInfoList(settings.shaderFolderList,   settings.shaderPattern, settings.shaderCompressType, settings.shaderBuildType);
-            FetchBuildInfoList(settings.luaFolderList, settings.luaPattern, settings.luaCompressType, settings.luaBuildType);
+            //FetchBuildInfoList(settings.scenesFolderList,   settings.scenesPattern, settings.scenesCompressType, settings.scenesBuildType);
+            FetchBuildInfoList(settings.shaderFolderList,   settings.shaderPattern, settings.shaderCompressType, settings.shaderBuildType);
+            //FetchBuildInfoList(settings.luaFolderList, settings.luaPattern, settings.luaCompressType, settings.luaBuildType);
         }
 
         static void FetchBuildInfoList(List<string> folders, string searchPattern, CompressType compressType, BuildType buildType)
@@ -149,7 +154,7 @@ namespace BM
                         case BuildType.Shader:
                             name = BMEditUtility.Path2Name(buildInfo.buildName);
                             break;
-                        case BuildType.Zip:
+                        case BuildType.Lua:
                             name = BMEditUtility.Path2Name(buildInfo.buildName);
                             break;
                         default:// BuildType.Single:
@@ -198,7 +203,7 @@ namespace BM
         static void GenerateAssetBundle()
         {
             int count = 0;
-            Dictionary<CompressType, List<AssetBundleBuild>> buildAbbMap = new Dictionary<CompressType, List<AssetBundleBuild>>(); 
+            Dictionary<BuildAssetBundleOptions, List<AssetBundleBuild>> buildAbbMap = new Dictionary<BuildAssetBundleOptions, List<AssetBundleBuild>>(); 
             for (int i = 0; i < buildInfoList.Count; i++)
             {
                 BuildInfo buildInfo = buildInfoList[i];
@@ -206,7 +211,7 @@ namespace BM
                 {
                     for (int j = 0; j < subInfo.assetPaths.Count; j++)
                     {
-                        if (buildInfo.buildType == BuildType.Scene)
+                        if(BuildType.Scene == buildInfo.buildType)
                         {
                             string path = subInfo.assetPaths[j];
                             string dirName = Path.GetDirectoryName(path);
@@ -215,43 +220,72 @@ namespace BM
                             BuildPipeline.BuildPlayer(new string[] { path },
                                 outputPath, buildTarget,
                                 BuildOptions.BuildAdditionalStreamedScenes);
-                                count += 1;
+                            count += 1;
                         }
                         else
                         {
+                            BuildAssetBundleOptions opt = BuildAssetBundleOptions.None;
+                            switch (buildInfo.compressType)
+                            {
+                                case CompressType.LZ4:
+                                    opt |= BuildAssetBundleOptions.ChunkBasedCompression;
+                                    break;
+                                case CompressType.None:
+                                    opt |= BuildAssetBundleOptions.UncompressedAssetBundle;
+                                    break;
+                            }
+                            switch (buildInfo.buildType)
+                            {
+                                case BuildType.Pack:
+                                case BuildType.Single:
+                                case BuildType.Shader:
+                                    opt |= BuildAssetBundleOptions.DeterministicAssetBundle;
+                                    break;
+                                case BuildType.Lua:
+                                    opt |= BuildAssetBundleOptions.DeterministicAssetBundle;
+                                    break;
+                            }
+
                             List<AssetBundleBuild> list;
-                            if(!buildAbbMap.TryGetValue(buildInfo.compressType, out list))
+                            if (!buildAbbMap.TryGetValue(opt, out list))
                             {
                                 list = new List<AssetBundleBuild>();
-                                buildAbbMap.Add(buildInfo.compressType, list);
+                                buildAbbMap.Add(opt, list);
                             }
-                            if(!list.Contains(subInfo.assetBundleBuild))
+                            if (!list.Contains(subInfo.assetBundleBuild))
                                 list.Add(subInfo.assetBundleBuild);
                         }
+                        
                     }
                 }
                 
             }
-
-            foreach(var buildAbb in buildAbbMap)
+            foreach (var buildAbb in buildAbbMap)
             {
-                BuildAssetBundleOptions bbOpt = BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression;
-                switch (buildAbb.Key)
-                {
-                    case CompressType.LZ4:
-                        bbOpt = BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.ChunkBasedCompression;
-                        break;
-                    case CompressType.LZMA:
-                        bbOpt = BuildAssetBundleOptions.DeterministicAssetBundle;
-                        break;
-                    case CompressType.None:
-                        bbOpt = BuildAssetBundleOptions.DeterministicAssetBundle | BuildAssetBundleOptions.UncompressedAssetBundle;
-                        break;
-                }
-                BuildPipeline.BuildAssetBundles(Output_Path, buildAbb.Value.ToArray(), bbOpt, buildTarget);
+                count += buildAbb.Value.Count;
+                BuildPipeline.BuildAssetBundles(Output_Path, buildAbb.Value.ToArray(), buildAbb.Key, buildTarget);
             }
-            count += buildAbbMap.Count;
+            foreach (var path in tempLuaPaths)
+            {
+                if (File.Exists(path))
+                    File.Delete(path);
+            }
+            AssetDatabase.Refresh();
             Logger.Log("Generate Assets Bundle Over. num:{0} time consuming:{1}s", count, EditorApplication.timeSinceStartup - buildStartTime);
+        }
+
+        
+        static void MoveAssetBundle()
+        {
+            if(buildTarget == BuildTarget.StandaloneWindows64)
+            {
+                Logger.Log("MoveTo:{0}", Application.persistentDataPath);
+                BMEditUtility.CopyDir(Output_Path, Application.persistentDataPath);
+            }
+            else
+            {
+
+            }
         }
 
         //=======================
@@ -279,15 +313,27 @@ namespace BM
                     continue;
 
                 string path = dirPath + fileInfo.Name; //相对路径
-                buildInfo.assetPaths.Add(path);
+                if (buildType == BuildType.Lua)
+                {
+                    string temp = path + "." + StringUtils.EncryptWithMD5(path) + ".txt";
+                    if (File.Exists(temp))
+                        File.Delete(temp);
+                    File.Copy(path, temp);
+                    buildInfo.assetPaths.Add(temp);
+                    tempLuaPaths.Add(temp);
+                }
+                else
+                {
+                    buildInfo.assetPaths.Add(path);
+                }
                 //Logger.Log("path:{0}", path);
                 EditorUtility.DisplayProgressBar("Fetch Build Info...", path, (float)(i + 1.0f) / (float)resFiles.Length);
             }
             //EditorUtility.ClearProgressBar();
-            //if(buildType == BuildType.Zip)
-            //{
-            //    ZipHelper.ZipManyFilesOrDictorys(buildInfo.assetPaths, Output_Path + "", "");
-            //}
+            if (buildType == BuildType.Lua)
+            {
+                AssetDatabase.Refresh();
+            }
             return buildInfo;
         }
 

@@ -12,7 +12,7 @@ namespace BM
     /// </summary> 
     public class BMSettings : ScriptableObject
     {
-        public string resRootDir = "Assets/Res/";
+        public string luaTempFolder = "Assets/lua_temp/";
 
         public string lastBuildDate;
 
