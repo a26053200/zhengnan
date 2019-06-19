@@ -3,7 +3,30 @@ using UnityEngine;
 
 namespace BM
 {
+    public class BMConfig
+    {
+        public static readonly string BundlDataFile = "BundleData.txt";
 
+        public static readonly string BundleSuffix = "bundle";
+
+        public static readonly string BundlePattern = ".bundle";
+        //只读目录(随包走)
+#if UNITY_EDITOR
+        public static readonly string ReadonlyDir = Application.dataPath + "/StreamingAssets";
+#elif UNITY_IPHONE
+        public static readonly string ReadonlyDir = Application.dataPath +"/Raw";
+#elif UNITY_ANDROID
+        public static readonly string ReadonlyDir = Application.streamingAssetsPath;
+#else
+        public static readonly string ReadonlyDir = Application.dataPath + "/StreamingAssets";
+#endif
+
+        //可读写目录
+        public static readonly string RawDir = Application.persistentDataPath + "/";
+
+        //临时可读写目录
+        public static readonly string tempCacheRawDir = Application.temporaryCachePath + "/";
+    }
     /// <summary>
     /// 语言和地域
     /// </summary>

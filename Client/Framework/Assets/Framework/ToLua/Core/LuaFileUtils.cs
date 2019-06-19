@@ -155,7 +155,7 @@ namespace LuaInterface
 
         public virtual byte[] ReadFile(string fileName)
         {
-            if (!beZip)
+            //if (!beZip)
             {
                 string path = FindFile(fileName);
                 byte[] str = null;
@@ -168,13 +168,13 @@ namespace LuaInterface
                     throw new LuaException("can't run in web platform, please switch to other platform");
 #endif
                 }
-                //ReadZipFile(fileName);
+                ReadZipFile(fileName);
                 return str;
             }
-            else
-            {
-                return ReadZipFile(fileName);
-            }
+            //else
+            //{
+                //return ReadZipFile(fileName);
+            //}
         }
 
         public virtual string FindFileError(string fileName)
@@ -249,8 +249,8 @@ namespace LuaInterface
                 fileName += ".bytes";
 #endif
                 zipName = sb.ToString();
-                //Debug.LogWarning(string.Format("lua file:{0}  zip name:{1}", fileName, zipName));
-                zipMap.TryGetValue(zipName, out zipFile);
+                Debug.LogWarning(string.Format("lua file:{0}  zip name:{1}", fileName, zipName));
+                //zipMap.TryGetValue(zipName, out zipFile);
             }
 
             if (zipFile != null)

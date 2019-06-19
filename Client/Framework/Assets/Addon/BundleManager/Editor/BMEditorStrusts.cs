@@ -20,18 +20,6 @@ namespace BM
         public List<string> assetPaths;
         public Dictionary<string, SubBuildInfo> subBuildInfoMap;
 
-        public JsonData ToJson()
-        {
-            JsonData json = new JsonData();
-            json["buildName"] = buildName;
-            json["subBuildInfoMap"] = new JsonData();
-            foreach(var subInfo in subBuildInfoMap.Values)
-            {
-                json["subBuildInfoMap"].Add(subInfo.ToJson());
-            }
-
-            return json;
-        }
     }
     public class SubBuildInfo
     {

@@ -69,14 +69,20 @@ namespace BM
             buildStartTime = EditorApplication.timeSinceStartup;
             tempLuaPaths = new List<string>();
 
-            buildInfoJson = new JsonData();
-
             //加载打包配置
             settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
+
+            buildInfoJson = new JsonData();
+            buildInfoJson["resDir"] = settings.resDir;
+            buildInfoJson["playform"] = buildTarget.ToString();
+            buildInfoJson["bundles"] = new JsonData();
+
             ignoreSuffixs = settings.Ignore_Suffix.Split(',');
             ignoreFolders = settings.Ignore_Folder.Split(',');
 
-            Output_Path = Application.dataPath.Replace("Assets", "TestBundle");
+            //Output_Path = Application.dataPath.Replace("Assets", "TestBundle");
+            Output_Path = Application.streamingAssetsPath;
+
             if (Directory.Exists(Output_Path))
                 BMEditUtility.DelFolder(Output_Path);
             Directory.CreateDirectory(Output_Path);
@@ -109,11 +115,11 @@ namespace BM
         {
             buildInfoList = new List<BuildInfo>();
             
-            //FetchBuildInfoList(settings.singleFolderList,   settings.singlePattern, settings.scenesCompressType, settings.singleBuildType);
-            //FetchBuildInfoList(settings.packFolderList,     settings.packPattern,   settings.packCompressType, settings.packBuildType);
-            //FetchBuildInfoList(settings.scenesFolderList,   settings.scenesPattern, settings.scenesCompressType, settings.scenesBuildType);
+            FetchBuildInfoList(settings.singleFolderList,   settings.singlePattern, settings.scenesCompressType, settings.singleBuildType);
+            FetchBuildInfoList(settings.packFolderList,     settings.packPattern,   settings.packCompressType, settings.packBuildType);
+            FetchBuildInfoList(settings.scenesFolderList,   settings.scenesPattern, settings.scenesCompressType, settings.scenesBuildType);
             FetchBuildInfoList(settings.shaderFolderList,   settings.shaderPattern, settings.shaderCompressType, settings.shaderBuildType);
-            //FetchBuildInfoList(settings.luaFolderList, settings.luaPattern, settings.luaCompressType, settings.luaBuildType);
+            FetchBuildInfoList(settings.luaFolderList, settings.luaPattern, settings.luaCompressType, settings.luaBuildType);
         }
 
         static void FetchBuildInfoList(List<string> folders, string searchPattern, CompressType compressType, BuildType buildType)
@@ -172,7 +178,7 @@ namespace BM
                             assetBundleBuild = new AssetBundleBuild()
                             {
                                 assetBundleName = name,
-                                assetBundleVariant = settings.Suffix_Bundle,
+                                assetBundleVariant = BMConfig.BundleSuffix,
                             },
                             assetPaths = new List<string>(),
                             dependenceMap = new Dictionary<string, string[]>(),
@@ -192,10 +198,13 @@ namespace BM
             for (int i = 0; i < buildInfoList.Count; i++)
             {
                 BuildInfo buildInfo = buildInfoList[i];
-                buildInfoJson.Add(buildInfo.ToJson());
+                foreach (var sub in buildInfo.subBuildInfoMap.Values)
+                {
+                    buildInfoJson["bundles"].Add(sub.ToJson());
+                }
             }
             string json = buildInfoJson.ToJson();
-            BMEditUtility.SaveUTF8TextFile(Output_Path + "/BundleData.json", JsonFormatter.PrettyPrint(json));
+            BMEditUtility.SaveUTF8TextFile(Output_Path + "/" +BMConfig.BundlDataFile, JsonFormatter.PrettyPrint(json));
 
             Logger.Log("Calc Asset Bundle Infos Over.");
         }
@@ -216,7 +225,7 @@ namespace BM
                             string path = subInfo.assetPaths[j];
                             string dirName = Path.GetDirectoryName(path);
                             string name = BMEditUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
-                            string outputPath = string.Format("{0}/{1}.{2}", Output_Path, name, settings.Suffix_Bundle);
+                            string outputPath = string.Format("{0}/{1}.{2}", Output_Path, name, BMConfig.BundleSuffix);
                             BuildPipeline.BuildPlayer(new string[] { path },
                                 outputPath, buildTarget,
                                 BuildOptions.BuildAdditionalStreamedScenes);
@@ -280,7 +289,7 @@ namespace BM
             if(buildTarget == BuildTarget.StandaloneWindows64)
             {
                 Logger.Log("MoveTo:{0}", Application.persistentDataPath);
-                BMEditUtility.CopyDir(Output_Path, Application.persistentDataPath);
+                //BMEditUtility.CopyDir(Output_Path, Application.persistentDataPath);
             }
             else
             {
