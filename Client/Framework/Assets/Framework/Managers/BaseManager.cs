@@ -11,7 +11,10 @@ namespace Framework
 {
     public class BaseManager : MonoBehaviour
     {
-        
+        public virtual void Initialize()
+        {
+
+        }
     }
 }
 

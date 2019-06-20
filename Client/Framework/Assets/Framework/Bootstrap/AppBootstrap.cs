@@ -16,6 +16,7 @@ public static class AppBootstrap
 
         // Init and add managers
         GameManager.AddManager(client.gameObject.AddComponent<GameManager>());
+        GameManager.AddManager(client.gameObject.AddComponent<ResLoader>());
         GameManager.AddManager(client.gameObject.AddComponent<AssetsManager>());
         GameManager.AddManager(client.gameObject.AddComponent<SceneManager>());
         GameManager.AddManager(client.gameObject.AddComponent<MonoBehaviourManager>());

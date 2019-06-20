@@ -52,6 +52,7 @@ namespace LuaInterface
         public bool beZip = false;
         protected List<string> searchPaths = new List<string>();
         protected Dictionary<string, AssetBundle> zipMap = new Dictionary<string, AssetBundle>();
+        protected Dictionary<string, string> luaNameMap = new Dictionary<string, string>();
 
         protected static LuaFileUtils instance = null;
 
@@ -116,6 +117,11 @@ namespace LuaInterface
             zipMap[name] = bundle;
         }
 
+        public void AddLuaNameMap(string name, string path)
+        {
+            luaNameMap[name] = path;
+        }
+
         public string FindFile(string fileName)
         {
             if (fileName == string.Empty)
@@ -155,7 +161,7 @@ namespace LuaInterface
 
         public virtual byte[] ReadFile(string fileName)
         {
-            //if (!beZip)
+            if (!beZip)
             {
                 string path = FindFile(fileName);
                 byte[] str = null;
@@ -168,13 +174,13 @@ namespace LuaInterface
                     throw new LuaException("can't run in web platform, please switch to other platform");
 #endif
                 }
-                ReadZipFile(fileName);
+                //ReadZipFile(fileName);
                 return str;
             }
-            //else
-            //{
-                //return ReadZipFile(fileName);
-            //}
+            else
+            {
+                return ReadZipFile(fileName);
+            }
         }
 
         public virtual string FindFileError(string fileName)
@@ -223,7 +229,6 @@ namespace LuaInterface
 
         byte[] ReadZipFile(string fileName)
         {
-            AssetBundle zipFile = null;
             byte[] buffer = null;
             string zipName = null;
 
@@ -239,34 +244,29 @@ namespace LuaInterface
                     sb.Append(fileName, 0, pos).ToLower().Replace('/', '_');
                     fileName = fileName.Substring(pos + 1);
                 }
-
+                sb.Append("_");
                 if (!fileName.EndsWith(".lua"))
                 {
                     fileName += ".lua";
                 }
 
 #if UNITY_5 || UNITY_5_3_OR_NEWER
-                fileName += ".bytes";
+                //fileName += ".bytes";
 #endif
                 zipName = sb.ToString();
-                Debug.LogWarning(string.Format("lua file:{0}  zip name:{1}", fileName, zipName));
-                //zipMap.TryGetValue(zipName, out zipFile);
+                Debug.LogWarning(string.Format("lua zip name:{0}  file:{1}", zipName, fileName.ToLower()));
             }
 
-            if (zipFile != null)
+            foreach(var zipFile in zipMap.Values)
             {
-#if UNITY_4_6 || UNITY_4_7
-                TextAsset luaCode = zipFile.Load(fileName, typeof(TextAsset)) as TextAsset;
-#else
-                TextAsset luaCode = zipFile.LoadAsset<TextAsset>(fileName);
-#endif
+                TextAsset luaCode = zipFile.LoadAsset<TextAsset>(luaNameMap[zipName + fileName.ToLower()]);
                 if (luaCode != null)
                 {
                     buffer = luaCode.bytes;
                     Resources.UnloadAsset(luaCode);
+                    break;
                 }
             }
-
             return buffer;
         }
 

@@ -10,8 +10,21 @@ public class GlobalConsts
 {
     public static bool EnableLogNetwork = true;
     /// <summary>
-    /// 是否开启AssetBundle模式
+    /// 是否开启Res AssetBundle模式
     /// </summary>
-    public static bool isAssetBundleMode = false;
+    public static bool isResBundleMode = false;
+    /// <summary>
+    /// 是否开启Res AssetBundle模式
+    /// </summary>
+    public static bool isLuaBundleMode = false;
+
+    /// <summary>
+    /// lua脚本根目录
+    /// </summary>
+    public static string LuaRootDir = "Assets/Lua";
+    /// <summary>
+    /// Tolua脚本根目录
+    /// </summary>
+    public static string ToLuaRootDir = "Assets/Framework/ToLua/Lua";
 }
 

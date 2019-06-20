@@ -30,6 +30,13 @@ namespace Framework
         //编辑器模式下的加载根目录
         private const string EDITOT_MODE_ROOT_PATH = "Assets/Res/";
 
+        private ResLoader resLoader;
+
+        public override void Initialize()
+        {
+            resLoader = GameManager.GetResLoader();
+        }
+
         public string LoadText(string path)
         {
             TextAsset textAsset = LoadAsset<TextAsset>(path);

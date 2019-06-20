@@ -19,6 +19,7 @@ namespace Framework
             if (s_mgrDict == null)
                 s_mgrDict = new Dictionary<string, BaseManager>();
             s_mgrDict.Add(mgr.GetType().Name, mgr);
+            mgr.Initialize();
         }
 
         static T GetManager<T>() where T : BaseManager
@@ -51,6 +52,12 @@ namespace Framework
         {
             return GetManager<NetworkManager>();
         }
+
+        public static ResLoader GetResLoader()
+        {
+            return GetManager<ResLoader>();
+        }
+
     }
 }
 
