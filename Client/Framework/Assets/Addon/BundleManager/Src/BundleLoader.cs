@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using LitJson;
 using System.IO;
+using System.Collections;
+using UnityEngine.Events;
 
 namespace BM
 {
@@ -13,7 +15,6 @@ namespace BM
     /// </summary> 
     public class BundleLoader : MonoBehaviour
     {
-
         private JsonData bundleJsonData;
 
         private List<BundleInfo> bundleInfos;
@@ -45,45 +46,82 @@ namespace BM
                     dependencePaths = BMUtility.JsonToArray(bundleInfoJson[i], "dependencePaths"),
                 };
                 bundleInfos.Add(bundleInfo);
-
-                for (int j = 0; j < bundleInfo.assetPaths.Count; j++)
-                {
-                    bundleInfoDict.Add(bundleInfo.assetPaths[j], bundleInfo);
-                }
+                bundleInfoDict.Add(bundleInfo.bundleName, bundleInfo);
             }
         }
 
-        public AssetBundle LoadAssetBundle(string assetPath)
+        public IEnumerator LoadAssetBundleAsync(BundleLoadInfo bundleLoadInfo, bool path2name = false)
         {
-            BundleInfo bundleInfo;
-            if(bundleInfoDict.TryGetValue(assetPath, out bundleInfo))
-            {
-                string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
-                AssetBundle assetBundle;
-                if (assetBundleDict.TryGetValue(path, out assetBundle))
-                {
+            string bundleName = bundleLoadInfo.bundleName;
+            if (path2name)
+                bundleName = BMUtility.Path2Name(bundleName);
+            BundleInfo bundleInfo = GetBundleInfo(bundleName);
+            if(bundleInfo != null)
+                yield return LoadBundleAsync(bundleInfo.bundleName, bundleLoadInfo);
+        }
 
-                }
-                else
-                {
-                    assetBundle = AssetBundle.LoadFromFile(getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern));
-                    if (assetBundle == null)
-                    {
-                        Debug.LogErrorFormat("The AssetBundle '{0}' load fail!", assetPath);
-                        return null;
-                    }
-                    assetBundleDict.Add(path, assetBundle);
-                }
-                return assetBundle;
+        public AssetBundle LoadAssetBundle(string assetPath, bool path2name = false)
+        {
+            if (path2name)
+                assetPath = BMUtility.Path2Name(assetPath);
+            BundleInfo bundleInfo = GetBundleInfo(assetPath);
+            return LoadBundleSync(bundleInfo.bundleName);
+        }
+
+        private AssetBundle LoadBundleSync(string bundleName)
+        {
+            AssetBundle assetBundle;
+            string path = getFilePath(bundleName + BMConfig.BundlePattern);
+            if (!assetBundleDict.TryGetValue(path , out assetBundle))
+                assetBundle = AssetBundle.LoadFromFile(getFilePath(bundleName + BMConfig.BundlePattern));
+            if (assetBundle == null)
+            {
+                Debug.LogErrorFormat("The AssetBundle '{0}' load fail!", path);
+                return null;
+            }
+            return assetBundle;
+        }
+
+        private IEnumerator LoadBundleAsync(string bundleName, BundleLoadInfo bundleLoadInfo)
+        {
+            AssetBundle assetBundle;
+            string path = getFilePath(bundleName + BMConfig.BundlePattern);
+            if (assetBundleDict.TryGetValue(path, out assetBundle))
+            {//就算 缓存池里面有 也要模拟异步加载
+                yield return new WaitForEndOfFrame();
+                bundleLoadInfo.OnAssetBundleLoaded(assetBundle);
             }
             else
             {
-                Debug.LogErrorFormat("No path is '{0}' bundle.", assetPath);
+                AssetBundleCreateRequest assetBundleCreateRequest = AssetBundle.LoadFromFileAsync(path);
+                yield return assetBundleCreateRequest;
+                if (assetBundleCreateRequest.assetBundle == null)
+                {
+                    Debug.LogErrorFormat("Failed to load AssetBundle '{0}' !", path);
+                }
+                bundleLoadInfo.OnAssetBundleLoaded(assetBundleCreateRequest.assetBundle);
             }
+        }
+        
+        //同步加载依赖
+
+        //异步加载依赖
+
+        //获取BundleInfo
+        private BundleInfo GetBundleInfo(string assetPath)
+        {
+            BundleInfo bundleInfo;
+            if (bundleInfoDict.TryGetValue(assetPath, out bundleInfo))
+                return bundleInfo;
+            else
+                Debug.LogErrorFormat("No path is '{0}' bundle.", assetPath);
             return null;
         }
+        //=======================
+        // 工具函数
+        //=======================
 
-        private string getFilePath(string fileName)
+        string getFilePath(string fileName)
         {
             string path = Path.Combine(BMConfig.RawDir, fileName);
             if (!BMUtility.FileExists(path))
@@ -91,7 +129,12 @@ namespace BM
             return path;
         }
 
-        private void OnDestroy()
+
+        //=======================
+        // 行为函数
+        //=======================
+
+        void OnDestroy()
         {
             if(assetBundleDict != null)
             {

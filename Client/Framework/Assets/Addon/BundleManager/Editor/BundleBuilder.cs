@@ -152,19 +152,19 @@ namespace BM
                     switch(buildInfo.buildType)
                     {
                         case BuildType.Pack:
-                            name = BMEditUtility.Path2Name(dirName);
+                            name = BMUtility.Path2Name(dirName);
                             break;
                         case BuildType.Scene:
-                            name = BMEditUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                            name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
                             break;
                         case BuildType.Shader:
-                            name = BMEditUtility.Path2Name(buildInfo.buildName);
+                            name = BMUtility.Path2Name(buildInfo.buildName);
                             break;
                         case BuildType.Lua:
-                            name = BMEditUtility.Path2Name(buildInfo.buildName);
+                            name = BMUtility.Path2Name(buildInfo.buildName);
                             break;
                         default:// BuildType.Single:
-                            name = BMEditUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                            name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
                             break;
                     }
                     string md5 = StringUtils.EncryptWithMD5(name);
@@ -186,7 +186,7 @@ namespace BM
                         buildInfo.subBuildInfoMap.Add(md5, subInfo);
                     }
                     AddDependence(path, subInfo.dependenceMap);
-                    subInfo.assetPaths.Add(path);
+                    subInfo.assetPaths.Add(path.ToLower());
                     AssetBundleBuild abb = subInfo.assetBundleBuild;
                     abb.assetNames = subInfo.assetPaths.ToArray();
                     //abb.addressableNames = subInfo.assetPaths.ToArray();
@@ -224,7 +224,7 @@ namespace BM
                         {
                             string path = subInfo.assetPaths[j];
                             string dirName = Path.GetDirectoryName(path);
-                            string name = BMEditUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                            string name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
                             string outputPath = string.Format("{0}/{1}.{2}", Output_Path, name, BMConfig.BundleSuffix);
                             BuildPipeline.BuildPlayer(new string[] { path },
                                 outputPath, buildTarget,
@@ -288,7 +288,7 @@ namespace BM
         {
             if(buildTarget == BuildTarget.StandaloneWindows64)
             {
-                Logger.Log("MoveTo:{0}", Application.persistentDataPath);
+                //Logger.Log("MoveTo:{0}", Application.persistentDataPath);
                 //BMEditUtility.CopyDir(Output_Path, Application.persistentDataPath);
             }
             else

@@ -15,6 +15,24 @@ namespace BM
     /// </summary>
     public class BMUtility
     {
+        static string Empty = "";
+
+        public static string Path2Name(string path, string head = "assets/res/")
+        {
+            path = path.ToLower();
+            string name = path.Replace("\\", "/");
+            name = name.Replace(head, Empty);
+            name = name.Replace("/", "_");
+            return name;
+        }
+
+        public static string Name2Path(string name, string head = "assets/res/")
+        {
+            name = name.ToLower();
+            string path = name.Replace("_", "/");
+            return path;
+        }
+
         public static bool FileExists(string path)
         {
 #if UNITY_ANDROID

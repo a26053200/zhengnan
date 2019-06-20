@@ -13,22 +13,13 @@ namespace BM
     /// </summary> 
     public static class BMEditUtility
     {
-        static string Empty = "";
-
-        public static string Path2Name(string path, string head = "assets/res/")
-        {
-            path = path.ToLower();
-            string name = path.Replace("\\", "/");
-            name = name.Replace(head, Empty);
-            name = name.Replace("/", "_");
-            return name;
-        }
+        
         /// <summary>
         /// 创建asset配置文件
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
-            public static void CreateAsset<T>(string path) where T : ScriptableObject
+        public static void CreateAsset<T>(string path) where T : ScriptableObject
         {
             T asset = ScriptableObject.CreateInstance<T>();
             if (string.IsNullOrEmpty(path))
