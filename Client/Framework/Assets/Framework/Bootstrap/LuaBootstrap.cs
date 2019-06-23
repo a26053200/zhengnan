@@ -42,7 +42,7 @@ public class LuaBootstrap : LuaClient
     protected void LoadLuaScriptBundle(string luaRootDir)
     {
         ResLoader resLoader = GameManager.GetResLoader();
-        AssetBundle luaBundle = resLoader.GetBundle(luaRootDir.ToLower(), true);
+        AssetBundle luaBundle = resLoader.GetBundleByBundleName(BMUtility.Path2Name(luaRootDir.ToLower()));
         LuaFileUtils.Instance.AddSearchBundle(luaRootDir.ToLower(), luaBundle);
         string[] allNames = luaBundle.GetAllAssetNames();
         for (int i = 0; i < allNames.Length; i++)

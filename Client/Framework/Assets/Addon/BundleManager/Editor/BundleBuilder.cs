@@ -100,6 +100,10 @@ namespace BM
                 GenerateAssetBundle();
             //移动生成后的所有Bundle
             MoveAssetBundle();
+            //计算Bundle文件大小
+            CalcBundleFileSize();
+            //写入Bundle信息
+            SaveBundleInfo();
 
             return buildInfoList;
         }
@@ -115,11 +119,11 @@ namespace BM
         {
             buildInfoList = new List<BuildInfo>();
             
-            FetchBuildInfoList(settings.singleFolderList,   settings.singlePattern, settings.scenesCompressType, settings.singleBuildType);
+            //FetchBuildInfoList(settings.singleFolderList,   settings.singlePattern, settings.scenesCompressType, settings.singleBuildType);
             FetchBuildInfoList(settings.packFolderList,     settings.packPattern,   settings.packCompressType, settings.packBuildType);
-            FetchBuildInfoList(settings.scenesFolderList,   settings.scenesPattern, settings.scenesCompressType, settings.scenesBuildType);
-            FetchBuildInfoList(settings.shaderFolderList,   settings.shaderPattern, settings.shaderCompressType, settings.shaderBuildType);
-            FetchBuildInfoList(settings.luaFolderList, settings.luaPattern, settings.luaCompressType, settings.luaBuildType);
+            //FetchBuildInfoList(settings.scenesFolderList,   settings.scenesPattern, settings.scenesCompressType, settings.scenesBuildType);
+            //FetchBuildInfoList(settings.shaderFolderList,   settings.shaderPattern, settings.shaderCompressType, settings.shaderBuildType);
+            //FetchBuildInfoList(settings.luaFolderList, settings.luaPattern, settings.luaCompressType, settings.luaBuildType);
         }
 
         static void FetchBuildInfoList(List<string> folders, string searchPattern, CompressType compressType, BuildType buildType)
@@ -175,6 +179,7 @@ namespace BM
                         {
                             bundleName = name,
                             buildMd5 = md5,
+                            buildType = buildInfo.buildType,
                             assetBundleBuild = new AssetBundleBuild()
                             {
                                 assetBundleName = name,
@@ -185,6 +190,7 @@ namespace BM
                         };
                         buildInfo.subBuildInfoMap.Add(md5, subInfo);
                     }
+                    //添加依赖关系
                     AddDependence(path, subInfo.dependenceMap);
                     subInfo.assetPaths.Add(path.ToLower());
                     AssetBundleBuild abb = subInfo.assetBundleBuild;
@@ -195,16 +201,7 @@ namespace BM
                 }
             }
             EditorUtility.ClearProgressBar();
-            for (int i = 0; i < buildInfoList.Count; i++)
-            {
-                BuildInfo buildInfo = buildInfoList[i];
-                foreach (var sub in buildInfo.subBuildInfoMap.Values)
-                {
-                    buildInfoJson["bundles"].Add(sub.ToJson());
-                }
-            }
-            string json = buildInfoJson.ToJson();
-            BMEditUtility.SaveUTF8TextFile(Output_Path + "/" +BMConfig.BundlDataFile, JsonFormatter.PrettyPrint(json));
+            
 
             Logger.Log("Calc Asset Bundle Infos Over.");
         }
@@ -297,6 +294,40 @@ namespace BM
             }
         }
 
+        static void CalcBundleFileSize()
+        {
+            for (int i = 0; i < buildInfoList.Count; i++)
+            {
+                BuildInfo buildInfo = buildInfoList[i];
+                
+                foreach (var subInfo in buildInfo.subBuildInfoMap.Values)
+                {
+                    string path = Path.Combine(Output_Path, subInfo.bundleName + BMConfig.BundlePattern);
+                    subInfo.size = new FileInfo(path).Length;
+                    uint crc;
+                    BuildPipeline.GetCRCForAssetBundle(path, out crc);
+                    subInfo.crc = crc;
+                    AssetBundle ab = AssetBundle.LoadFromFile(path);
+                    EditorUtility.DisplayProgressBar("Calc Bundle Size...", path, (float)(i + 1.0f) / (float)buildInfoList.Count);
+                }
+            }
+            EditorUtility.ClearProgressBar();
+        }
+
+        static void SaveBundleInfo()
+        {
+            for (int i = 0; i < buildInfoList.Count; i++)
+            {
+                BuildInfo buildInfo = buildInfoList[i];
+                foreach (var sub in buildInfo.subBuildInfoMap.Values)
+                {
+                    buildInfoJson["bundles"].Add(sub.ToJson());
+                }
+            }
+            string json = buildInfoJson.ToJson();
+            BMEditUtility.SaveUTF8TextFile(Output_Path + "/" + BMConfig.BundlDataFile, JsonFormatter.PrettyPrint(json));
+        }
+
         //=======================
         // 工具函数
         //=======================
@@ -376,7 +407,14 @@ namespace BM
             if(owner)
             {
                 string[] dependencePaths = AssetDatabase.GetDependencies(filePath, true);
-                dependenceMap[filePath] = dependencePaths;
+                List<string> list = new List<string>(dependencePaths);
+                list.Remove(filePath);
+                for (int i = 0; i < list.Count; i++)
+                {
+                    list[i] = list[i].ToLower();
+                }
+                if(list.Count > 0)
+                    dependenceMap[filePath] = list.ToArray();
             }
         }
     }

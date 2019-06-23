@@ -42,54 +42,70 @@ namespace BM
                 {
                     bundleName = bundleInfoJson[i]["bundleName"].ToString(),
                     buildMd5 = bundleInfoJson[i]["buildMd5"].ToString(),
+                    buildType = (BuildType)Enum.Parse(typeof(BuildType), bundleInfoJson[i]["buildType"].ToString()),
                     assetPaths = BMUtility.JsonToArray(bundleInfoJson[i], "assetPaths"),
                     dependencePaths = BMUtility.JsonToArray(bundleInfoJson[i], "dependencePaths"),
                 };
                 bundleInfos.Add(bundleInfo);
-                bundleInfoDict.Add(bundleInfo.bundleName, bundleInfo);
+                
+                for (int j = 0; j < bundleInfo.assetPaths.Count; j++)
+                {
+                    bundleInfoDict.Add(bundleInfo.assetPaths[j], bundleInfo);
+                }
             }
+            
         }
 
-        public IEnumerator LoadAssetBundleAsync(BundleLoadInfo bundleLoadInfo, bool path2name = false)
-        {
-            string bundleName = bundleLoadInfo.bundleName;
-            if (path2name)
-                bundleName = BMUtility.Path2Name(bundleName);
-            BundleInfo bundleInfo = GetBundleInfo(bundleName);
-            if(bundleInfo != null)
-                yield return LoadBundleAsync(bundleInfo.bundleName, bundleLoadInfo);
-        }
+        //=======================
+        // 同步加载
+        //=======================
 
-        public AssetBundle LoadAssetBundle(string assetPath, bool path2name = false)
+        public AssetBundle LoadAssetBundle(string assetPath)
         {
-            if (path2name)
-                assetPath = BMUtility.Path2Name(assetPath);
             BundleInfo bundleInfo = GetBundleInfo(assetPath);
+            //如果该资源有依赖,则优先加载依赖
+            for (int i = 0; i < bundleInfo.dependencePaths.Count; i++)
+            {
+                LoadAssetBundle(bundleInfo.dependencePaths[i]);
+            }
             return LoadBundleSync(bundleInfo.bundleName);
         }
 
-        private AssetBundle LoadBundleSync(string bundleName)
+        public AssetBundle LoadBundleSync(string bundleName)
         {
             AssetBundle assetBundle;
             string path = getFilePath(bundleName + BMConfig.BundlePattern);
-            if (!assetBundleDict.TryGetValue(path , out assetBundle))
+            if (!assetBundleDict.TryGetValue(path, out assetBundle))
                 assetBundle = AssetBundle.LoadFromFile(getFilePath(bundleName + BMConfig.BundlePattern));
             if (assetBundle == null)
             {
                 Debug.LogErrorFormat("The AssetBundle '{0}' load fail!", path);
                 return null;
             }
+            Debug.LogFormat("The AssetBundle '{0}' load success!", path);
             return assetBundle;
         }
 
-        private IEnumerator LoadBundleAsync(string bundleName, BundleLoadInfo bundleLoadInfo)
+        //=======================
+        // 异步加载
+        //=======================
+
+        public IEnumerator LoadAssetBundleAsync(string bundleName, UnityAction<AssetBundle> OnAssetBundleLoaded)
+        {
+            BundleInfo bundleInfo = GetBundleInfo(bundleName);
+            if(bundleInfo != null)
+                yield return LoadBundleAsync(bundleInfo.bundleName, OnAssetBundleLoaded);
+        }
+
+
+        public IEnumerator LoadBundleAsync(string bundleName, UnityAction<AssetBundle> OnAssetBundleLoaded)
         {
             AssetBundle assetBundle;
             string path = getFilePath(bundleName + BMConfig.BundlePattern);
             if (assetBundleDict.TryGetValue(path, out assetBundle))
             {//就算 缓存池里面有 也要模拟异步加载
                 yield return new WaitForEndOfFrame();
-                bundleLoadInfo.OnAssetBundleLoaded(assetBundle);
+                OnAssetBundleLoaded(assetBundle);
             }
             else
             {
@@ -99,7 +115,7 @@ namespace BM
                 {
                     Debug.LogErrorFormat("Failed to load AssetBundle '{0}' !", path);
                 }
-                bundleLoadInfo.OnAssetBundleLoaded(assetBundleCreateRequest.assetBundle);
+                OnAssetBundleLoaded(assetBundleCreateRequest.assetBundle);
             }
         }
         

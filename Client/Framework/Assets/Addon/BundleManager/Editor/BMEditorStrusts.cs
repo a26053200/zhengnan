@@ -13,9 +13,6 @@ namespace BM
     {
         public string buildName;
         public BuildType buildType;             //打包类型
-        //public bool isCompleteAssets;           //打包整个文件夹
-        //public bool isScene;                    //是否是场景
-        //public bool isPack;                    //打包每个子目录
         public CompressType compressType;       //压缩类型
         public List<string> assetPaths;
         public Dictionary<string, SubBuildInfo> subBuildInfoMap;
@@ -25,6 +22,9 @@ namespace BM
     {
         public string bundleName;
         public string buildMd5;
+        public BuildType buildType;
+        public uint crc;
+        public long size;
         public List<string> assetPaths;
         public AssetBundleBuild assetBundleBuild;
         public Dictionary<string, string[]> dependenceMap;
@@ -34,6 +34,9 @@ namespace BM
             JsonData json = new JsonData();
             json["bundleName"] = bundleName;
             json["buildMd5"] = buildMd5;
+            json["buildType"] = buildType.ToString();
+            json["crc"] = crc;
+            json["size"] = size;
             json["assetPaths"] = new JsonData();
             for (int i = 0; i < assetPaths.Count; i++)
             {

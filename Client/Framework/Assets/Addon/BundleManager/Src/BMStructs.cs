@@ -9,14 +9,17 @@ namespace BM
     {
         public string bundleName;
         public string buildMd5;
+        public BuildType buildType;
         public List<string> assetPaths;
         public List<string> dependencePaths;
     }
 
-    public class BundleLoadInfo
+    public class BundleReferenceInfo
     {
         public string bundleName;
-        public UnityAction<AssetBundle> OnAssetBundleLoaded;
+        public BundleType bundleType;
+        public int count;//引用计数
+        public AssetBundle assetBundle;
     }
 }
     

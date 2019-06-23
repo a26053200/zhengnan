@@ -2,6 +2,8 @@
 using UnityEngine;
 using System.Collections.Generic;
 using BM;
+using UnityEngine.Events;
+using System.Collections;
 
 namespace Framework
 {
@@ -20,9 +22,20 @@ namespace Framework
             bundleLoader.LoadBundleData();
         }
 
-        public AssetBundle GetBundle(string bundleName, bool path2name = false)
+
+        public AssetBundle GetBundleByAssetPath(string assetPath)
         {
-            return bundleLoader.LoadAssetBundle(bundleName, path2name);
+            return bundleLoader.LoadAssetBundle(assetPath);
+        }
+
+        public AssetBundle GetBundleByBundleName(string bundleName)
+        {
+            return bundleLoader.LoadBundleSync(bundleName);
+        }
+
+        public IEnumerator LoadAssetBundleAsync(string bundleName, UnityAction<AssetBundle> OnAssetBundleLoaded)
+        {
+            yield return bundleLoader.LoadAssetBundleAsync(bundleName, OnAssetBundleLoaded);
         }
     }
 }
