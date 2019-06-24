@@ -44,7 +44,7 @@ public static class CustomWrap
         //_GT(typeof(Text)),
         //_GT(typeof(Image)),
         //_GT(typeof(Slider)),
-        //_GT(typeof(CanvasGroup)),
+        _GT(typeof(Sprite)),
         _GT(typeof(InputField)),
         _GT(typeof(ScrollRect)),
         _GT(typeof(Button)),

@@ -25,7 +25,13 @@ namespace Framework
 
         public AssetBundle GetBundleByAssetPath(string assetPath)
         {
-            return bundleLoader.LoadAssetBundle(assetPath);
+            if (BundleLoadState.Loading == bundleLoader.GetBundleStateByAssetPath(assetPath))
+            {
+                Logger.LogError("Bundle: {0} is Loading, You can't load bundle when the bundle is loading by other task!!!", assetPath);
+                return null;
+            }
+            else
+                return bundleLoader.LoadAssetBundle(assetPath);
         }
 
         public AssetBundle GetBundleByBundleName(string bundleName)
@@ -33,9 +39,12 @@ namespace Framework
             return bundleLoader.LoadBundleSync(bundleName);
         }
 
-        public IEnumerator LoadAssetBundleAsync(string bundleName, UnityAction<AssetBundle> OnAssetBundleLoaded)
+        public IEnumerator LoadAssetBundleAsync(string assetPath, UnityAction<AssetBundle> OnAssetBundleLoaded)
         {
-            yield return bundleLoader.LoadAssetBundleAsync(bundleName, OnAssetBundleLoaded);
+            if (BundleLoadState.Loading == bundleLoader.GetBundleStateByAssetPath(assetPath))
+                Logger.Info("Bundle: {0} is Loading", assetPath);
+            else
+                yield return bundleLoader.LoadAssetBundleAsync(assetPath, OnAssetBundleLoaded); 
         }
     }
 }

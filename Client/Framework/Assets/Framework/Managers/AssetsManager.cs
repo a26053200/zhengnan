@@ -45,6 +45,11 @@ namespace Framework
             return LoadAsset<UnityEngine.Object>(path);
         }
 
+        public void LoadObjectAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<UnityEngine.Object>(path, callback);
+        }
+
         public string LoadText(string path)
         {
             TextAsset textAsset = LoadAsset<TextAsset>(path);
@@ -104,12 +109,12 @@ namespace Framework
 #else
             //加载bundle;
             string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
-            Logger.Log("Load Asset:'{0}' ", assetPath);
+            Logger.Info("Load Asset:'{0}' ", assetPath);
             AssetBundle assetBundle = resLoader.GetBundleByAssetPath(assetPath);
             T t = assetBundle.LoadAsset<T>(assetPath);
             if(t)
             {
-                Logger.Log("Asset:'{0}' has found", path);
+                Logger.Info("Asset:'{0}' has loaded", path);
                 return t;
             }
             else
@@ -127,38 +132,54 @@ namespace Framework
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="path"></param>
-        void LoadAssetAsyn<T>(string path, LuaFunction luaFunc) where T : UnityEngine.Object
+        void LoadAssetAsync<T>(string path, LuaFunction luaFunc) where T : UnityEngine.Object
         {
-            StartCoroutine(DoLoadAssetAsynCo<T>(path, luaFunc));
+            StartCoroutine(DoLoadAssetAsyncCo<T>(path, luaFunc));
         }
 
-        IEnumerator DoLoadAssetAsynCo<T>(string path, LuaFunction luaFunc) where T : UnityEngine.Object
+        IEnumerator DoLoadAssetAsyncCo<T>(string path, LuaFunction luaFunc) where T : UnityEngine.Object
         {
+            if(luaFunc == null)
+            {
+                Logger.LogError("Load Asset {0} Async must has callback function!", path);
+                yield break;
+            }
 #if UNITY_EDITOR1
             yield return new WaitForEndOfFrame();
             T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
             if (t == default(T))
                 Logger.LogError("Asset:'{0}' has not found", path);
-            if (luaFunc != null)
-            {
-                luaFunc.BeginPCall();
-                luaFunc.Push(t);
-                luaFunc.EndPCall();
-            }
+            luaFunc.BeginPCall();
+            luaFunc.Push(t);
+            luaFunc.PCall();
+            luaFunc.EndPCall();
 #else
             //加载bundle;
             string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
-            Logger.Log("Load Asset:'{0}' ", assetPath);
+            Logger.Info("Load Asset:'{0}' ", assetPath);
             yield return resLoader.LoadAssetBundleAsync(assetPath, delegate(AssetBundle assetBundle)
             {
-                T t = assetBundle.LoadAsset<T>(assetPath);
-                if (t)
-                {
-                    Logger.Log("Asset:'{0}' has found", path);
+                if(assetBundle.isStreamedSceneAssetBundle)
+                {//场景Bundle
+                    Logger.Info("Scene bundle:'{0}' has loaded", path);
+                    luaFunc.BeginPCall();
+                    luaFunc.PCall();
+                    luaFunc.EndPCall();
                 }
                 else
                 {
-                    Logger.LogError("Asset:'{0}' has not found", path);
+                    T t = assetBundle.LoadAsset<T>(assetPath);
+                    if (t)
+                    {
+                        Logger.Info("Asset:'{0}' has loaded", path);
+                        luaFunc.BeginPCall();
+                        luaFunc.PCall();
+                        luaFunc.EndPCall();
+                    }
+                    else
+                    {
+                        Logger.LogError("Asset:'{0}' has not found", path);
+                    }
                 }
             });
 #endif
