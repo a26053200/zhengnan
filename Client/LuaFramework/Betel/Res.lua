@@ -10,6 +10,18 @@ assetsMgr = Framework.GameManager.GetAssetsManager()
 
 
 ---@param path string
+---@return UnityEngine.Material
+function Res.LoadObject(path)
+    return assetsMgr:LoadObject(path);
+end
+
+---@param path string
+---@return UnityEngine.Material
+function Res.LoadObjectAsync(path, callback)
+    return assetsMgr:LoadObjectAsync(path, callback);
+end
+
+---@param path string
 ---@return string
 function Res.LoadText(path)
     return assetsMgr:LoadText(path);
