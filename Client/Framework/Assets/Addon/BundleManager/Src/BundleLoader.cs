@@ -20,6 +20,7 @@ namespace BM
         private List<BundleInfo> bundleInfos;
         private Dictionary<string, BundleInfo> bundleInfoDict;
         private Dictionary<string, AssetBundle> assetBundleDict;
+        private Dictionary<string, BundleReferenceInfo> bundleReferenceInfoDict;
         private void Awake()
         {
             
@@ -34,6 +35,7 @@ namespace BM
             bundleInfos = new List<BundleInfo>();
             bundleInfoDict = new Dictionary<string, BundleInfo>();
             assetBundleDict = new Dictionary<string, AssetBundle>();
+            bundleReferenceInfoDict = new Dictionary<string, BundleReferenceInfo>();
 
             JsonData bundleInfoJson = jsonData["bundles"];
             for (int i = 0; i < bundleInfoJson.Count; i++)
@@ -68,19 +70,53 @@ namespace BM
             {
                 LoadAssetBundle(bundleInfo.dependencePaths[i]);
             }
-            return LoadBundleSync(bundleInfo.bundleName);
+            return LoadBundle(bundleInfo);
         }
 
         public AssetBundle LoadBundleSync(string bundleName)
         {
-            AssetBundle assetBundle;
-            string path = getFilePath(bundleName + BMConfig.BundlePattern);
-            if (!assetBundleDict.TryGetValue(path, out assetBundle))
-                assetBundle = AssetBundle.LoadFromFile(getFilePath(bundleName + BMConfig.BundlePattern));
-            if (assetBundle == null)
+            BundleInfo bundleInfo = null;
+            for (int i = 0; i < bundleInfos.Count; i++)
             {
-                Debug.LogErrorFormat("The AssetBundle '{0}' load fail!", path);
+                if (bundleInfos[i].bundleName == bundleName)
+                {
+                    bundleInfo = bundleInfos[i];
+                }
+            }
+            if (bundleInfo != null)
+                return LoadBundle(bundleInfo);
+            else
                 return null;
+        }
+
+        private AssetBundle LoadBundle(BundleInfo bundleInfo)
+        {
+            AssetBundle assetBundle = null;
+            BundleReferenceInfo bundleReferenceInfo;
+            string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
+            if (!bundleReferenceInfoDict.TryGetValue(path, out bundleReferenceInfo))
+            {
+                assetBundle = AssetBundle.LoadFromFile(getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern));
+                if (assetBundle == null)
+                {
+                    Debug.LogErrorFormat("The AssetBundle '{0}' load fail!", path);
+                    return null;
+                }
+                else
+                {
+                    bundleReferenceInfo = new BundleReferenceInfo()
+                    {
+                        assetBundle = assetBundle,
+                        count = 1,
+                        buildType = bundleInfo.buildType,
+                        state = BundleLoadState.LoadComplete,
+                    };
+                    bundleReferenceInfoDict.Add(path, bundleReferenceInfo);
+                }
+            }
+            else
+            {
+                assetBundle = bundleReferenceInfo.assetBundle;
             }
             Debug.LogFormat("The AssetBundle '{0}' load success!", path);
             return assetBundle;
@@ -90,38 +126,43 @@ namespace BM
         // 异步加载
         //=======================
 
-        public IEnumerator LoadAssetBundleAsync(string bundleName, UnityAction<AssetBundle> OnAssetBundleLoaded)
+        public IEnumerator LoadAssetBundleAsync(string assetPath, UnityAction<AssetBundle> OnAssetBundleLoaded)
         {
-            BundleInfo bundleInfo = GetBundleInfo(bundleName);
-            if(bundleInfo != null)
-                yield return LoadBundleAsync(bundleInfo.bundleName, OnAssetBundleLoaded);
+            BundleInfo bundleInfo = GetBundleInfo(assetPath);
+            if (bundleInfo != null)
+                yield return LoadBundleAsync(bundleInfo, OnAssetBundleLoaded);
         }
 
 
-        public IEnumerator LoadBundleAsync(string bundleName, UnityAction<AssetBundle> OnAssetBundleLoaded)
+        public IEnumerator LoadBundleAsync(BundleInfo bundleInfo, UnityAction<AssetBundle> OnAssetBundleLoaded)
         {
-            AssetBundle assetBundle;
-            string path = getFilePath(bundleName + BMConfig.BundlePattern);
-            if (assetBundleDict.TryGetValue(path, out assetBundle))
+            BundleReferenceInfo bundleReferenceInfo;
+            string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
+            if (bundleReferenceInfoDict.TryGetValue(path, out bundleReferenceInfo))
             {//就算 缓存池里面有 也要模拟异步加载
                 yield return new WaitForEndOfFrame();
-                OnAssetBundleLoaded(assetBundle);
+                OnAssetBundleLoaded(bundleReferenceInfo.assetBundle);
             }
             else
             {
+                bundleReferenceInfo = new BundleReferenceInfo()
+                {
+                    state = BundleLoadState.Loading,
+                    count = 1,
+                    buildType = bundleInfo.buildType,
+                };
+                bundleReferenceInfoDict.Add(path, bundleReferenceInfo);
                 AssetBundleCreateRequest assetBundleCreateRequest = AssetBundle.LoadFromFileAsync(path);
                 yield return assetBundleCreateRequest;
                 if (assetBundleCreateRequest.assetBundle == null)
                 {
                     Debug.LogErrorFormat("Failed to load AssetBundle '{0}' !", path);
                 }
+                bundleReferenceInfo.assetBundle = assetBundleCreateRequest.assetBundle;
+                bundleReferenceInfo.state = BundleLoadState.LoadComplete;
                 OnAssetBundleLoaded(assetBundleCreateRequest.assetBundle);
             }
         }
-        
-        //同步加载依赖
-
-        //异步加载依赖
 
         //获取BundleInfo
         private BundleInfo GetBundleInfo(string assetPath)
@@ -137,6 +178,16 @@ namespace BM
         // 工具函数
         //=======================
 
+        public BundleLoadState GetBundleStateByAssetPath(string assetPath)
+        {
+            BundleInfo bundleInfo = GetBundleInfo(assetPath);
+            BundleReferenceInfo bundleReferenceInfo;
+            string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
+            if (bundleReferenceInfoDict.TryGetValue(path, out bundleReferenceInfo))
+                return bundleReferenceInfo.state;
+            else
+                return BundleLoadState.None;
+        }
         string getFilePath(string fileName)
         {
             string path = Path.Combine(BMConfig.RawDir, fileName);
@@ -159,6 +210,11 @@ namespace BM
                     item.Value.Unload(true);
                 }
             }
+        }
+
+        public void SmartGC()
+        {
+
         }
     }
 }

@@ -17,7 +17,8 @@ namespace BM
     public class BundleReferenceInfo
     {
         public string bundleName;
-        public BundleType bundleType;
+        public BuildType buildType;
+        public BundleLoadState state;
         public int count;//引用计数
         public AssetBundle assetBundle;
     }

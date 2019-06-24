@@ -50,14 +50,11 @@ namespace BM
         Lua,    //Lua
     }
 
-    public enum BundleType
+    public enum BundleLoadState
     {
-        Scene       = 0, //场景
-        Lua         = 1, //Lua
-        Shader      = 2,
-        Atlas       = 4,
-        Share       = 8, //内存共享
-        Instantiable = 16,   //可实例化
+        None,
+        Loading,
+        LoadComplete,
     }
 
     /// <summary>
