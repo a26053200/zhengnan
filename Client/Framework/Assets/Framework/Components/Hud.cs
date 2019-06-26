@@ -24,11 +24,11 @@ namespace Framework
 
         public Hud(string txt, float hud)
         {
+            assets = GameManager.GetAssetsManager();
             _txt = txt;
             _hud = hud;
             CreateBlood();
             CreateText();
-            assets = GameManager.GetAssetsManager();
         }
 
         public Transform transform

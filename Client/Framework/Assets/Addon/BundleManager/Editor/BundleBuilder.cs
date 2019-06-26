@@ -119,7 +119,7 @@ namespace BM
         {
             buildInfoList = new List<BuildInfo>();
             
-            FetchBuildInfoList(settings.singleFolderList,   settings.singlePattern, settings.scenesCompressType, settings.singleBuildType);
+            FetchBuildInfoList(settings.singleFolderList,   settings.singlePattern, settings.singleCompressType, settings.singleBuildType);
             FetchBuildInfoList(settings.packFolderList,     settings.packPattern,   settings.packCompressType, settings.packBuildType);
             FetchBuildInfoList(settings.scenesFolderList,   settings.scenesPattern, settings.scenesCompressType, settings.scenesBuildType);
             FetchBuildInfoList(settings.shaderFolderList,   settings.shaderPattern, settings.shaderCompressType, settings.shaderBuildType);

@@ -14,12 +14,20 @@ namespace Framework
     /// </summary> 
     public class ResLoader : BaseManager
     {
-        BundleLoader bundleLoader;
+        class ResLoaderInfo
+        {
+            public string assetPath;
+            public UnityAction<AssetBundle> OnAssetBundleLoaded;
+        }
 
+        BundleLoader bundleLoader;
+        Queue<ResLoaderInfo> loadQueue;
+        ResLoaderInfo currLoadInfo;
         public override void Initialize()
         {
             bundleLoader = gameObject.AddComponent<BundleLoader>();
             bundleLoader.LoadBundleData();
+            loadQueue = new Queue<ResLoaderInfo>();
         }
 
 
@@ -39,12 +47,55 @@ namespace Framework
             return bundleLoader.LoadBundleSync(bundleName);
         }
 
+        public IEnumerator AddLoadAssetBundleAsync(string assetPath, UnityAction<AssetBundle> OnAssetBundleLoaded)
+        {
+            ResLoaderInfo info = new ResLoaderInfo()
+            {
+                assetPath = assetPath,
+                OnAssetBundleLoaded = OnAssetBundleLoaded,
+            };
+            loadQueue.Enqueue(info);
+            if (currLoadInfo == null)
+            {
+                yield return StartCoroutine(LoadNext());
+            }
+            
+        }
+
+        public IEnumerator LoadNext()
+        {
+            if (loadQueue.Count > 0)
+            {
+                currLoadInfo = loadQueue.Dequeue();
+                if (BundleLoadState.Loading == bundleLoader.GetBundleStateByAssetPath(currLoadInfo.assetPath))
+                {
+                    Logger.Log("Bundle: {0} is Loading", currLoadInfo.assetPath);
+                    loadQueue.Enqueue(currLoadInfo);//重新排队列
+                }
+                else
+                {
+                    yield return bundleLoader.LoadAssetBundleAsync(currLoadInfo.assetPath, currLoadInfo.OnAssetBundleLoaded);
+                    
+                }
+                yield return StartCoroutine(LoadNext());
+            }
+            else
+            {
+                currLoadInfo = null;
+            }
+        }
+            
+
         public IEnumerator LoadAssetBundleAsync(string assetPath, UnityAction<AssetBundle> OnAssetBundleLoaded)
         {
+            ResLoaderInfo info = new ResLoaderInfo()
+            {
+                assetPath = assetPath,
+                OnAssetBundleLoaded = OnAssetBundleLoaded,
+            };
+            yield return bundleLoader.LoadAssetBundleAsync(assetPath, OnAssetBundleLoaded);
             if (BundleLoadState.Loading == bundleLoader.GetBundleStateByAssetPath(assetPath))
-                Logger.Info("Bundle: {0} is Loading", assetPath);
-            else
-                yield return bundleLoader.LoadAssetBundleAsync(assetPath, OnAssetBundleLoaded); 
+                Logger.Log("Bundle: {0} is Loading", assetPath);
         }
     }
 }

@@ -39,69 +39,108 @@ namespace Framework
             resLoader = GameManager.GetResLoader();
         }
 
-
+        // 通用资源
         public UnityEngine.Object LoadObject(string path)
         {
             return LoadAsset<UnityEngine.Object>(path);
         }
-
         public void LoadObjectAsync(string path, LuaFunction callback)
         {
             LoadAssetAsync<UnityEngine.Object>(path, callback);
         }
 
+        //文本或者二进制文件
         public string LoadText(string path)
         {
             TextAsset textAsset = LoadAsset<TextAsset>(path);
             return textAsset.text;
         }
+        public void LoadTextAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<TextAsset>(path, callback);
+        }
 
+        //Sprite
         public Sprite LoadSprite(string path)
         {
             return LoadAsset<Sprite>(path);
         }
+        public void LoadSpriteAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<Sprite>(path, callback);
+        }
 
+        //Texture
         public Texture LoadTexture(string path)
         {
             return LoadAsset<Texture>(path);
+        }
+        public void LoadTextureAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<Sprite>(path, callback);
         }
 
         public GameObject LoadPrefab(string path)
         {
             return LoadAsset<GameObject>(path);
         }
+        public void LoadPrefabAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<GameObject>(path, callback);
+        }
 
         public Material LoadMaterial(string path)
         {
             return LoadAsset<Material>(path);
+        }
+        public void LoadMaterialAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<Material>(path, callback);
         }
 
         public AnimationClip LoadAnimationClip(string path)
         {
             return LoadAsset<AnimationClip>(path);
         }
+        public void LoadAnimationClipAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<AnimationClip>(path, callback);
+        }
 
         public RuntimeAnimatorController LoadAnimatorController(string path)
         {
             return LoadAsset<RuntimeAnimatorController>(path);
+        }
+        public void LoadRuntimeAnimatorControllerAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<RuntimeAnimatorController>(path, callback);
         }
 
         public Shader LoadShader(string path)
         {
             return LoadAsset<Shader>(path);
         }
+        public void LoadShaderAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<Shader>(path, callback);
+        }
 
         public AudioClip LoadAudioClip(string path)
         {
             return LoadAsset<AudioClip>(path);
         }
+        public void LoadAudioClipAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<AudioClip>(path, callback);
+        }
+
         /// <summary>
         /// 同步加载资源
         /// </summary>
         /// <returns>T</returns>
         T LoadAsset<T>(string path) where T : UnityEngine.Object
         {
-#if UNITY_EDITOR
+#if UNITY_EDITOR1
             T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
             if (t == default(T))
                 Logger.LogError("Asset:'{0}' has not found", path);
@@ -125,7 +164,6 @@ namespace Framework
             
 #endif
         }
-
 
         /// <summary>
         /// 异步加载
@@ -157,7 +195,7 @@ namespace Framework
             //加载bundle;
             string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
             Logger.Info("Load Asset:'{0}' ", assetPath);
-            yield return resLoader.LoadAssetBundleAsync(assetPath, delegate(AssetBundle assetBundle)
+            yield return resLoader.AddLoadAssetBundleAsync(assetPath, delegate(AssetBundle assetBundle)
             {
                 if(assetBundle.isStreamedSceneAssetBundle)
                 {//场景Bundle
