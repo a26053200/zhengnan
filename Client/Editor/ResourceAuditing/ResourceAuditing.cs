@@ -40,9 +40,9 @@ namespace ResourceAuditing
         string[] DetailsStrings = { "Textures", "Materials", "Meshes" };
        
         //变量
-        Dictionary<string, TextureDetails> allTexDict = new Dictionary<string, TextureDetails>();
-        Dictionary<string, MaterialDetails> allMatDict = new Dictionary<string, MaterialDetails>();
-        Dictionary<string, ModelDetails> allModelDict = new Dictionary<string, ModelDetails>();
+        Dictionary<string, TextureDetails> allTexDict;
+        Dictionary<string, MaterialDetails> allMatDict;
+        Dictionary<string, ModelDetails> allModelDict;
         List<string> allAssetsPaths = new List<string>();
 
         DetailsType currSelectDetailsType;
@@ -70,29 +70,45 @@ namespace ResourceAuditing
                 Close();
             }
         }
+
+        const string Title_Norm = "Norm Setting:";
+        const string Title_Tex_Format_Recommend_IOS     = "Rec Format IOS";
+        const string Title_Tex_Format_Forbid_IOS = "Fbd Format IOS";
+        const string Title_Tex_Format_Recommend_Android = "Rec Format Android";
+        const string Title_Tex_Format_Forbid_Android = "Fbd Format Android";
+        const string Title_Tex_Max_Size = "Max Texture Size";
+        const string Title_Tex_Recommend_Size = "Rec Texture Size";
+        const string Title_Mesh_Max_TrisNum = "Max Mesh Tris Num";
+        const string Title_Mesh_Recommend_TrisNum = "Rec Mesh Tris Num";
+        const string Title_Shader_Forbid = "Fbd Shader";
+
+        const string Button_Default = "Default";
+        const string Button_Save = "Save";
+
         void OnGUI()
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Norm Setting:");
-            norm.Tex_Format_Recommend_IOS = EditorGUILayout.TextField("Rec Format IOS", norm.Tex_Format_Recommend_IOS);
-            norm.Tex_Format_Forbid_IOS = EditorGUILayout.TextField("Fbd Format IOS", norm.Tex_Format_Forbid_IOS);
-            norm.Tex_Format_Recommend_Android = EditorGUILayout.TextField("Rec Format Android", norm.Tex_Format_Recommend_Android);
-            norm.Tex_Format_Forbid_Android = EditorGUILayout.TextField("Fbd Format Android", norm.Tex_Format_Forbid_Android);
-            norm.Tex_Max_Size = EditorGUILayout.IntField("Max Texture Size", norm.Tex_Max_Size);
-            norm.Tex_Recommend_Size = EditorGUILayout.IntField("Rec Texture Size", norm.Tex_Recommend_Size);
-            norm.Mesh_Max_TrisNum = EditorGUILayout.IntField("Max Mesh Tris Num ", norm.Mesh_Max_TrisNum);
-            norm.Mesh_Recommend_TrisNum = EditorGUILayout.IntField("Rec Mesh Tris Num ", norm.Mesh_Recommend_TrisNum);
-            norm.Shader_Forbid = EditorGUILayout.TextField("Fbd Shader ", norm.Shader_Forbid);
+            EditorGUILayout.LabelField(Title_Norm);
+            norm.Tex_Format_Recommend_IOS      = EditorGUILayout.TextField(Title_Tex_Format_Recommend_IOS, norm.Tex_Format_Recommend_IOS);
+            norm.Tex_Format_Forbid_IOS         = EditorGUILayout.TextField(Title_Tex_Format_Forbid_IOS, norm.Tex_Format_Forbid_IOS);
+            norm.Tex_Format_Recommend_Android   = EditorGUILayout.TextField(Title_Tex_Format_Recommend_Android, norm.Tex_Format_Recommend_Android);
+            norm.Tex_Format_Forbid_Android     = EditorGUILayout.TextField(Title_Tex_Format_Forbid_Android, norm.Tex_Format_Forbid_Android);
+            norm.Tex_Max_Size                 = EditorGUILayout.IntField(Title_Tex_Max_Size, norm.Tex_Max_Size);
+            norm.Tex_Recommend_Size            = EditorGUILayout.IntField(Title_Tex_Recommend_Size, norm.Tex_Recommend_Size);
+            norm.Mesh_Max_TrisNum              = EditorGUILayout.IntField(Title_Mesh_Max_TrisNum, norm.Mesh_Max_TrisNum);
+            norm.Mesh_Recommend_TrisNum        = EditorGUILayout.IntField(Title_Mesh_Recommend_TrisNum, norm.Mesh_Recommend_TrisNum);
+            norm.Shader_Forbid                 = EditorGUILayout.TextField(Title_Shader_Forbid, norm.Shader_Forbid);
+
             EditorGUILayout.Space();
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField("","",GUILayout.Width(position.width * 0.618f));
-            if (GUILayout.Button("Default"))
+            if (GUILayout.Button(Button_Default))
             {
                 GUI.FocusControl(null);
                 Repaint();
                 norm.ResetToDefault();
             }
-            if (GUILayout.Button("Save "))
+            if (GUILayout.Button(Button_Save))
             {
                 norm.SaveNorm(Norm_Setting_Path);
             }
@@ -138,7 +154,8 @@ namespace ResourceAuditing
         /// </summary>
         void FetchAllTextures()
         {
-            allTexDict = FetchAllResources<TextureDetails, TextureResource>(textureFileTypes);
+            if (allTexDict == null)
+                allTexDict = FetchAllResources<TextureDetails, TextureResource>(textureFileTypes);
             textureTree = new ResourceTree<TextureDetails>(this, allTexDict, allAssetsPaths);
         }
         /// <summary>
@@ -146,7 +163,8 @@ namespace ResourceAuditing
         /// </summary>
         void FetchAllMaterials()
         {
-            allMatDict = FetchAllResources<MaterialDetails, MaterialResource>(materialFileTypes);
+            if (allMatDict == null)
+                allMatDict = FetchAllResources<MaterialDetails, MaterialResource>(materialFileTypes);
             materialTree = new ResourceTree<MaterialDetails>(this, allMatDict, allAssetsPaths);
         }
         /// <summary>
@@ -154,7 +172,8 @@ namespace ResourceAuditing
         /// </summary>
         void FetchAllModels()
         {
-            allModelDict = FetchAllResources<ModelDetails, ModelResource>(modelFileTypes);
+            if (allModelDict == null)
+                allModelDict = FetchAllResources<ModelDetails, ModelResource>(modelFileTypes);
             modelTree = new ResourceTree<ModelDetails>(this, allModelDict, allAssetsPaths);
         }
 

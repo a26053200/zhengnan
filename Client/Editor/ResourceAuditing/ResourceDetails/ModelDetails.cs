@@ -48,13 +48,20 @@ namespace ResourceAuditing
                 }
             }
         }
+        const string Title_Platform = "Platform";
+
+        const string Title_ReadAndWrite = "Read & Write";
+        const string Title_OptimizeMesh = "Optimize Mesh";
+
+        const string Title_TrisNum = "Tris num";
+        const string Format_TrisNum = "Max tris num is {0}";
 
         public override void OnResourceGUI()
         {
             EditorGUILayout.BeginHorizontal();
             GameObject modelGameObject = modelOrgObj as GameObject;
-            ResUtils.ColorLabelField("Read & Write", modelImporter.isReadable.ToString(), !modelImporter.isReadable);
-            ResUtils.ColorLabelField("Optimize Mesh", modelImporter.optimizeMesh.ToString(), modelImporter.optimizeMesh ? 1 : 0);
+            ResUtils.ColorLabelField(Title_ReadAndWrite, modelImporter.isReadable.ToString(), !modelImporter.isReadable);
+            ResUtils.ColorLabelField(Title_OptimizeMesh, modelImporter.optimizeMesh.ToString(), modelImporter.optimizeMesh ? 1 : 0);
             EditorGUILayout.EndHorizontal();
 
             Renderer[] renderers = modelGameObject.GetComponentsInChildren<Renderer>();
@@ -96,7 +103,7 @@ namespace ResourceAuditing
                 level = 1;
             else if (mesh.triangles.Length > Norm.GetIntance().Mesh_Max_TrisNum)
                 level = 2;
-            ResUtils.ColorLabelFieldTooltip("Tris num", mesh.triangles.Length.ToString(), "Max tris num is "+ Norm.GetIntance().Mesh_Max_TrisNum, level);
+            ResUtils.ColorLabelFieldTooltip(Title_TrisNum, mesh.triangles.Length.ToString(), string.Format(Format_TrisNum, Norm.GetIntance().Mesh_Max_TrisNum), level);
             EditorGUILayout.EndHorizontal();
         }
 

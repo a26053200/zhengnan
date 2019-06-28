@@ -23,6 +23,14 @@ namespace ResourceAuditing
 
     public class TextureResource : Resource
     {
+        const string Title_ReadAndWrite = "Read & Write";
+        const string Formnat_ReadAndWrite = "Read & Write is not enable";
+
+        const string Title_TextureRealSize = "Texture Real Size";
+        const string Formnat_TextureRealSize = "Texture Real Size Max is %d";
+
+       
+
         private Texture2D texture;
         private TextureImporter textureImporter;
         private int textureSize;
@@ -64,8 +72,8 @@ namespace ResourceAuditing
 
         public override void OnResourceGUI()
         {
-            ResUtils.ColorLabelFieldTooltip("Read & Write", textureImporter.isReadable.ToString(), string.Format("Read & Write is not enable"), !textureImporter.isReadable, 150);
-            ResUtils.ColorLabelFieldTooltip("Texture Real Size", textureSize.ToString(), string.Format("Texture Real Size Max is %d", Norm.GetIntance().Tex_Max_Size), textureSizeLevel, 150);
+            ResUtils.ColorLabelFieldTooltip(Title_ReadAndWrite, textureImporter.isReadable.ToString(), string.Format(Formnat_ReadAndWrite), !textureImporter.isReadable, 150);
+            ResUtils.ColorLabelFieldTooltip(Title_TextureRealSize, textureSize.ToString(), string.Format(Formnat_TextureRealSize, Norm.GetIntance().Tex_Max_Size), textureSizeLevel, 150);
             EditorGUILayout.BeginVertical();
             DisplayPlatformSetting(standalone_setting);
             DisplayPlatformSetting(ios_setting);
@@ -117,14 +125,22 @@ namespace ResourceAuditing
             return tpn;
         }
 
+        const string Platform = "Platform";
+
+        const string Title_Format = "Texture Format";
+        const string Formnat_Format = "Texture Real Size Max is %d";
+
+        const string Title_MaxSize = "Max Texture Size";
+        const string Formnat_MaxSize = "Max Size is %d";
+
         public void DisplayPlatformSetting(TexturePlatformNorm tpn)
         {
             EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("Platform", tpn.setting.name);
+            EditorGUILayout.LabelField(Platform, tpn.setting.name);
             //format
             string format = tpn.setting.format.ToString();
-            ResUtils.ColorLabelFieldTooltip("Texture Format", format, string.Format("Recommend Format is %d", tpn.normRecommend), tpn.formatLevel);
-            ResUtils.ColorLabelFieldTooltip("Max Texture Size", tpn.setting.maxTextureSize.ToString(), string.Format("Max Size is %d", tpn.setting.maxTextureSize), tpn.maxSizeLevel);
+            ResUtils.ColorLabelFieldTooltip(Title_Format, format, string.Format(Formnat_Format, tpn.normRecommend), tpn.formatLevel);
+            ResUtils.ColorLabelFieldTooltip(Title_MaxSize, tpn.setting.maxTextureSize.ToString(), string.Format(Formnat_MaxSize, tpn.setting.maxTextureSize), tpn.maxSizeLevel);
             EditorGUILayout.EndHorizontal();
         }
 

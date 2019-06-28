@@ -60,7 +60,7 @@ namespace ResourceAuditing
             else if (level == 2)
                 labelStyle = labelRed;
             //EditorGUI.BeginDisabledGroup(true);
-            EditorGUILayout.LabelField(new GUIContent(title), new GUIContent(content, tooltip), labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+            EditorGUILayout.LabelField(new GUIContent(title), new GUIContent(content), labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
             //EditorGUILayout.TextField(new GUIContent(title, tooltip), content, labelStyle, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
             //EditorGUI.EndDisabledGroup();
         }
@@ -79,7 +79,7 @@ namespace ResourceAuditing
                 labelGreen = new GUIStyle();
                 labelGreen.normal.textColor = Color.green;
             }
-            EditorGUILayout.LabelField(new GUIContent(title, tooltip), new GUIContent(content, tooltip), vaild ? labelGreen : labelRed, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
+            EditorGUILayout.LabelField(new GUIContent(title), new GUIContent(content), vaild ? labelGreen : labelRed, width == 0 ? GUILayout.ExpandWidth(true) : GUILayout.Width(width));
         }
         #region 获取相同的文件
         /// <summary>

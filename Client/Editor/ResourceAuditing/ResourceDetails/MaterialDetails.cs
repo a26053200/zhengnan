@@ -41,12 +41,15 @@ namespace ResourceAuditing
                 }
             }
         }
+        const string Title_Empty = "Platform";
 
+        const string Title_Shader = "Tris num";
+        const string Format_Shader = "Shader Forbid: %d";
         public override void OnResourceGUI()
         {
             EditorGUILayout.BeginHorizontal();
-            ResUtils.ColorLabelFieldTooltip("Shader", shader.name, string.Format("Shader Forbid: %d", Norm.GetIntance().Shader_Forbid), shaderLevel);
-            EditorGUILayout.ObjectField("", mat.shader, typeof(Shader), false);
+            ResUtils.ColorLabelFieldTooltip(Title_Shader, shader.name, string.Format(Format_Shader, Norm.GetIntance().Shader_Forbid), shaderLevel);
+            EditorGUILayout.ObjectField(Title_Empty, mat.shader, typeof(Shader), false);
             EditorGUILayout.EndHorizontal();
         }
     }
