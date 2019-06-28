@@ -13,7 +13,7 @@ namespace BM
         //只读目录(随包走)
 #if UNITY_EDITOR
         public static readonly string ReadonlyDir = Application.dataPath + "/StreamingAssets";
-#elif UNITY_IPHONE
+#elif UNITY_IOS
         public static readonly string ReadonlyDir = Application.dataPath +"/Raw";
 #elif UNITY_ANDROID
         public static readonly string ReadonlyDir = Application.streamingAssetsPath;
