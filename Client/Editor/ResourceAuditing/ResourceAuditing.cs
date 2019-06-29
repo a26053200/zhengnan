@@ -27,9 +27,9 @@ namespace ResourceAuditing
         };
 
         //资源目录
-        static string Res_Root_Path = Application.dataPath + "/Res";
+        static string Res_Root_Path;
         //标准配置文件路径
-        static string Norm_Setting_Path = Application.dataPath + "/Norm-Setting.txt";
+        static string Norm_Setting_Path;
         //材质贴图 "*.psd|*.tiff|*.jpg|*.jpeg|*.tga|*.png|*.gif"
         string[] textureFileTypes = new string[] { ".psd", ".tiff", ".jpg", ".tga", ".png", ".gif", ".tif" };
         //材质球 
@@ -55,6 +55,8 @@ namespace ResourceAuditing
         Norm norm;
         void ResetView()
         {
+            Res_Root_Path = Application.dataPath + "/Res";
+            Norm_Setting_Path = Application.dataPath + "/Norm-Setting.txt";
             GetAllAssets();
             FetchAllTextures();
 
