@@ -29,7 +29,7 @@ namespace ResourceAuditing
             mat = obj as Material;
             shader = mat.shader;
 
-            string[] forbid_shaders = Norm.GetIntance().Shader_Forbid.Split(',');
+            string[] forbid_shaders = ResourceAuditingSetting.GetIntance().Shader_Forbid.Split(',');
             shaderLevel = 0;
             for (int i = 0; i < forbid_shaders.Length; i++)
             {
@@ -41,14 +41,14 @@ namespace ResourceAuditing
                 }
             }
         }
-        const string Title_Empty = "Platform";
+        const string Title_Empty = "";
 
-        const string Title_Shader = "Tris num";
+        const string Title_Shader = "Shader Name";
         const string Format_Shader = "Shader Forbid: %d";
         public override void OnResourceGUI()
         {
             EditorGUILayout.BeginHorizontal();
-            ResUtils.ColorLabelFieldTooltip(Title_Shader, shader.name, string.Format(Format_Shader, Norm.GetIntance().Shader_Forbid), shaderLevel);
+            ResUtils.ColorLabelFieldTooltip(Title_Shader, shader.name, string.Format(Format_Shader, ResourceAuditingSetting.GetIntance().Shader_Forbid), shaderLevel);
             EditorGUILayout.ObjectField(Title_Empty, mat.shader, typeof(Shader), false);
             EditorGUILayout.EndHorizontal();
         }

@@ -29,16 +29,10 @@ namespace ResourceAuditing
         //资源目录
         static string Res_Root_Path;
         //标准配置文件路径
-        static string Norm_Setting_Path;
-        //材质贴图 "*.psd|*.tiff|*.jpg|*.jpeg|*.tga|*.png|*.gif"
-        string[] textureFileTypes = new string[] { ".psd", ".tiff", ".jpg", ".tga", ".png", ".gif", ".tif" };
-        //材质球 
-        string[] materialFileTypes = new string[] { ".mat"};
-        //材质球 
-        string[] modelFileTypes = new string[] { ".fbx", ".obj" };
+        static string Resource_Auditing_Setting_Path;
         //常量 
-        string[] DetailsStrings = { "Textures", "Materials", "Meshes" };
-       
+        static string[] DetailsStrings = { "Textures", "Materials", "Meshes" };
+
         //变量
         Dictionary<string, TextureDetails> allTexDict;
         Dictionary<string, MaterialDetails> allMatDict;
@@ -52,72 +46,50 @@ namespace ResourceAuditing
         ResourceTree<MaterialDetails> materialTree;
         ResourceTree<ModelDetails> modelTree;
 
-        Norm norm;
+        bool isCloseWhenLostFocus;
+
+        ResourceAuditingSetting setting;
+
         void ResetView()
         {
+
             Res_Root_Path = Application.dataPath + "/Res";
-            Norm_Setting_Path = Application.dataPath + "/Norm-Setting.txt";
+            Resource_Auditing_Setting_Path = "Assets/Res/ResourceAuditingSetting.asset";
+
+            if (!File.Exists(Resource_Auditing_Setting_Path))
+                ResUtils.CreateAsset<ResourceAuditingSetting>(Resource_Auditing_Setting_Path);
+            setting = AssetDatabase.LoadAssetAtPath<ResourceAuditingSetting>(Resource_Auditing_Setting_Path);
+            ResourceAuditingSetting.s_Instance = setting;
+
             GetAllAssets();
             FetchAllTextures();
-
-            
-
-            Norm.GetIntance().LoadNorm(Norm_Setting_Path);
-            norm = Norm.GetIntance();
         }
+
         private void OnLostFocus()
         {
-            if(!isSearching)
+            if(!isSearching && isCloseWhenLostFocus)
             {
                 Close();
             }
         }
 
-        const string Title_Norm = "Norm Setting:";
-        const string Title_Tex_Format_Recommend_IOS     = "Rec Format IOS";
-        const string Title_Tex_Format_Forbid_IOS = "Fbd Format IOS";
-        const string Title_Tex_Format_Recommend_Android = "Rec Format Android";
-        const string Title_Tex_Format_Forbid_Android = "Fbd Format Android";
-        const string Title_Tex_Max_Size = "Max Texture Size";
-        const string Title_Tex_Recommend_Size = "Rec Texture Size";
-        const string Title_Mesh_Max_TrisNum = "Max Mesh Tris Num";
-        const string Title_Mesh_Recommend_TrisNum = "Rec Mesh Tris Num";
-        const string Title_Shader_Forbid = "Fbd Shader";
+        //const string Title_Norm = "Norm Setting:";
+        //const string Title_Tex_Format_Recommend_IOS     = "Rec Format IOS";
+        //const string Title_Tex_Format_Forbid_IOS = "Fbd Format IOS";
+        //const string Title_Tex_Format_Recommend_Android = "Rec Format Android";
+        //const string Title_Tex_Format_Forbid_Android = "Fbd Format Android";
+        //const string Title_Tex_Max_Size = "Max Texture Size";
+        //const string Title_Tex_Recommend_Size = "Rec Texture Size";
+        //const string Title_Mesh_Max_TrisNum = "Max Mesh Tris Num";
+        //const string Title_Mesh_Recommend_TrisNum = "Rec Mesh Tris Num";
+        //const string Title_Shader_Forbid = "Fbd Shader";
 
-        const string Button_Default = "Default";
-        const string Button_Save = "Save";
+        //const string Button_Default = "Default";
+        //const string Button_Save = "Save";
 
         void OnGUI()
         {
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField(Title_Norm);
-            norm.Tex_Format_Recommend_IOS      = EditorGUILayout.TextField(Title_Tex_Format_Recommend_IOS, norm.Tex_Format_Recommend_IOS);
-            norm.Tex_Format_Forbid_IOS         = EditorGUILayout.TextField(Title_Tex_Format_Forbid_IOS, norm.Tex_Format_Forbid_IOS);
-            norm.Tex_Format_Recommend_Android   = EditorGUILayout.TextField(Title_Tex_Format_Recommend_Android, norm.Tex_Format_Recommend_Android);
-            norm.Tex_Format_Forbid_Android     = EditorGUILayout.TextField(Title_Tex_Format_Forbid_Android, norm.Tex_Format_Forbid_Android);
-            norm.Tex_Max_Size                 = EditorGUILayout.IntField(Title_Tex_Max_Size, norm.Tex_Max_Size);
-            norm.Tex_Recommend_Size            = EditorGUILayout.IntField(Title_Tex_Recommend_Size, norm.Tex_Recommend_Size);
-            norm.Mesh_Max_TrisNum              = EditorGUILayout.IntField(Title_Mesh_Max_TrisNum, norm.Mesh_Max_TrisNum);
-            norm.Mesh_Recommend_TrisNum        = EditorGUILayout.IntField(Title_Mesh_Recommend_TrisNum, norm.Mesh_Recommend_TrisNum);
-            norm.Shader_Forbid                 = EditorGUILayout.TextField(Title_Shader_Forbid, norm.Shader_Forbid);
-
-            EditorGUILayout.Space();
-            EditorGUILayout.BeginHorizontal();
-            EditorGUILayout.LabelField("","",GUILayout.Width(position.width * 0.618f));
-            if (GUILayout.Button(Button_Default))
-            {
-                GUI.FocusControl(null);
-                Repaint();
-                norm.ResetToDefault();
-            }
-            if (GUILayout.Button(Button_Save))
-            {
-                norm.SaveNorm(Norm_Setting_Path);
-            }
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.Space();
-
             EditorGUI.BeginChangeCheck();
             DetailsType old = currSelectDetailsType;
             currSelectDetailsType = (DetailsType)GUILayout.Toolbar((int)currSelectDetailsType, DetailsStrings);
@@ -157,7 +129,7 @@ namespace ResourceAuditing
         void FetchAllTextures()
         {
             if (allTexDict == null)
-                allTexDict = FetchAllResources<TextureDetails, TextureResource>(textureFileTypes);
+                allTexDict = FetchAllResources<TextureDetails, TextureResource>(setting.Texture_FileTypes);
             textureTree = new ResourceTree<TextureDetails>(this, allTexDict, allAssetsPaths);
         }
         /// <summary>
@@ -166,7 +138,7 @@ namespace ResourceAuditing
         void FetchAllMaterials()
         {
             if (allMatDict == null)
-                allMatDict = FetchAllResources<MaterialDetails, MaterialResource>(materialFileTypes);
+                allMatDict = FetchAllResources<MaterialDetails, MaterialResource>(setting.Material_FileTypes);
             materialTree = new ResourceTree<MaterialDetails>(this, allMatDict, allAssetsPaths);
         }
         /// <summary>
@@ -175,7 +147,7 @@ namespace ResourceAuditing
         void FetchAllModels()
         {
             if (allModelDict == null)
-                allModelDict = FetchAllResources<ModelDetails, ModelResource>(modelFileTypes);
+                allModelDict = FetchAllResources<ModelDetails, ModelResource>(setting.Model_FileTypes);
             modelTree = new ResourceTree<ModelDetails>(this, allModelDict, allAssetsPaths);
         }
 

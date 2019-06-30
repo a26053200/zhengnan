@@ -52,18 +52,18 @@ namespace ResourceAuditing
             textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
 
             //format
-            standalone_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.Standalone),"","");
-            ios_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.iPhone), Norm.GetIntance().Tex_Format_Recommend_IOS, Norm.GetIntance().Tex_Format_Forbid_IOS); 
-            android_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.Android), Norm.GetIntance().Tex_Format_Recommend_Android, Norm.GetIntance().Tex_Format_Forbid_Android); 
+            standalone_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.Standalone),new TextuteFormatKey[] { }, new TextuteFormatKey[] { });
+            ios_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.iPhone), ResourceAuditingSetting.GetIntance().Tex_Format_Recommend_IOS, ResourceAuditingSetting.GetIntance().Tex_Format_Forbid_IOS); 
+            android_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.Android), ResourceAuditingSetting.GetIntance().Tex_Format_Recommend_Android, ResourceAuditingSetting.GetIntance().Tex_Format_Forbid_Android); 
             //maxSize
             textureSize = Mathf.Max(texture.width, texture.height);
             textureSizeLevel = 0;
-            if (textureSize >= Norm.GetIntance().Tex_Recommend_Size && textureSize < Norm.GetIntance().Tex_Max_Size)
+            if (textureSize >= ResourceAuditingSetting.GetIntance().Tex_Recommend_Size && textureSize < ResourceAuditingSetting.GetIntance().Tex_Max_Size)
             {
                 textureSizeLevel = 1;
                 warnNum++;
             }
-            else if (textureSize >= Norm.GetIntance().Tex_Max_Size)
+            else if (textureSize >= ResourceAuditingSetting.GetIntance().Tex_Max_Size)
             {
                 textureSizeLevel = 2;
                 errorNum++;
@@ -73,7 +73,7 @@ namespace ResourceAuditing
         public override void OnResourceGUI()
         {
             ResUtils.ColorLabelFieldTooltip(Title_ReadAndWrite, textureImporter.isReadable.ToString(), string.Format(Formnat_ReadAndWrite), !textureImporter.isReadable, 150);
-            ResUtils.ColorLabelFieldTooltip(Title_TextureRealSize, textureSize.ToString(), string.Format(Formnat_TextureRealSize, Norm.GetIntance().Tex_Max_Size), textureSizeLevel, 150);
+            ResUtils.ColorLabelFieldTooltip(Title_TextureRealSize, textureSize.ToString(), string.Format(Formnat_TextureRealSize, ResourceAuditingSetting.GetIntance().Tex_Max_Size), textureSizeLevel, 150);
             EditorGUILayout.BeginVertical();
             DisplayPlatformSetting(standalone_setting);
             DisplayPlatformSetting(ios_setting);
@@ -81,22 +81,19 @@ namespace ResourceAuditing
             EditorGUILayout.EndVertical();
         }
 
-        public TexturePlatformNorm GetPlatformNorm(TextureImporterPlatformSettings setting, string normRecommend, string normForbid)
+        public TexturePlatformNorm GetPlatformNorm(TextureImporterPlatformSettings setting, TextuteFormatKey[] normRecommend, TextuteFormatKey[] normForbid)
         {
             TexturePlatformNorm tpn = new TexturePlatformNorm()
             {
                 setting = setting,
                 normRecommend = normRecommend,
             };
-            string[] recommend_formats = normRecommend.Split(',');
-            string[] forbid_formats = normForbid.Split(',');
-            //format
             string format = setting.format.ToString();
-            if (isInclude(recommend_formats, format))
+            if (isInclude(normRecommend, format))
             {
                 tpn.formatLevel = 0;
             }
-            else if (isInclude(forbid_formats, format))
+            else if (isInclude(normForbid, format))
             {
                 tpn.formatLevel = 2;
                 errorNum++;
@@ -111,12 +108,12 @@ namespace ResourceAuditing
             int maxSize = setting.maxTextureSize;
             if (maxSize <= textureSize)
             {
-                if (maxSize >= Norm.GetIntance().Tex_Recommend_Size && maxSize < Norm.GetIntance().Tex_Max_Size)
+                if (maxSize >= ResourceAuditingSetting.GetIntance().Tex_Recommend_Size && maxSize < ResourceAuditingSetting.GetIntance().Tex_Max_Size)
                 {
                     tpn.maxSizeLevel = 1;
                     warnNum++;
                 }
-                else if (maxSize >= Norm.GetIntance().Tex_Max_Size)
+                else if (maxSize >= ResourceAuditingSetting.GetIntance().Tex_Max_Size)
                 {
                     tpn.maxSizeLevel = 2;
                     errorNum++;
@@ -144,11 +141,11 @@ namespace ResourceAuditing
             EditorGUILayout.EndHorizontal();
         }
 
-        private bool isInclude(string[] formats, string format)
+        private bool isInclude(TextuteFormatKey[] formats, string format)
         {
             for (int i = 0; i < formats.Length; i++)
             {
-                if (format.StartsWith(formats[i]))
+                if (format.StartsWith(formats[i].ToString()))
                     return true;
             }
             return false;
@@ -160,7 +157,7 @@ namespace ResourceAuditing
     {
         public TextureImporterPlatformSettings setting;
 
-        public string normRecommend;
+        public TextuteFormatKey[] normRecommend;
 
         public int formatLevel = 1;
         public int maxSizeLevel = 1;

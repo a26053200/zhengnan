@@ -13,7 +13,7 @@ namespace ResourceAuditing
     /// </summary> 
     public abstract class Resource 
     {
-        public bool isUsedOpen = true;
+        public bool isUsedOpen = false;
 
         public string name;
         public string path;

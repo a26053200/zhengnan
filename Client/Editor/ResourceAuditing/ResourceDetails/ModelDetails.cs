@@ -89,9 +89,9 @@ namespace ResourceAuditing
 
         private void MeshInfo(Mesh mesh)
         {
-            if (mesh.triangles.Length > Norm.GetIntance().Mesh_Recommend_TrisNum && mesh.triangles.Length <= Norm.GetIntance().Mesh_Max_TrisNum)
+            if (mesh.triangles.Length > ResourceAuditingSetting.GetIntance().Mesh_Recommend_TrisNum && mesh.triangles.Length <= ResourceAuditingSetting.GetIntance().Mesh_Max_TrisNum)
                 warnNum++;
-            else if (mesh.triangles.Length > Norm.GetIntance().Mesh_Max_TrisNum)
+            else if (mesh.triangles.Length > ResourceAuditingSetting.GetIntance().Mesh_Max_TrisNum)
                 errorNum++;
         }
         private void DrawMeshInfo(Mesh mesh)
@@ -99,11 +99,11 @@ namespace ResourceAuditing
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.ObjectField("", mesh, typeof(Mesh), false);
             int level = 0;
-            if (mesh.triangles.Length > Norm.GetIntance().Mesh_Recommend_TrisNum && mesh.triangles.Length <= Norm.GetIntance().Mesh_Max_TrisNum)
+            if (mesh.triangles.Length > ResourceAuditingSetting.GetIntance().Mesh_Recommend_TrisNum && mesh.triangles.Length <= ResourceAuditingSetting.GetIntance().Mesh_Max_TrisNum)
                 level = 1;
-            else if (mesh.triangles.Length > Norm.GetIntance().Mesh_Max_TrisNum)
+            else if (mesh.triangles.Length > ResourceAuditingSetting.GetIntance().Mesh_Max_TrisNum)
                 level = 2;
-            ResUtils.ColorLabelFieldTooltip(Title_TrisNum, mesh.triangles.Length.ToString(), string.Format(Format_TrisNum, Norm.GetIntance().Mesh_Max_TrisNum), level);
+            ResUtils.ColorLabelFieldTooltip(Title_TrisNum, mesh.triangles.Length.ToString(), string.Format(Format_TrisNum, ResourceAuditingSetting.GetIntance().Mesh_Max_TrisNum), level);
             EditorGUILayout.EndHorizontal();
         }
 

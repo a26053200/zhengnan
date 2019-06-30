@@ -17,5 +17,14 @@ namespace ResourceAuditing
         public const string Nintendo_3DS = "Nintendo 3DS";
         public const string tvOS = "tvOS";
     }
+
+    public enum TextuteFormatKey
+    {
+        None,
+        ETC,
+        PVRTC,
+        ASTC,
+        DXT,
+    }
 }
    

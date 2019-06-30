@@ -96,7 +96,7 @@ namespace ResourceAuditing
                 {
                     EditorGUI.indentLevel+=2;
                     var res = rd.resources[i];
-                    //EditorGUILayout.ObjectField("", res.resObj, typeof(Object), false);
+                    EditorGUILayout.ObjectField("", res.resObj, typeof(Object), false);
                     res.OnResourceGUI();
                     res.isUsedOpen = EditorGUILayout.Foldout(res.isUsedOpen, Title_Repeat);
                     if (res.isUsedOpen)
@@ -135,7 +135,7 @@ namespace ResourceAuditing
             EditorGUILayout.BeginHorizontal();
             {
                 EditorGUILayout.LabelField("", GUILayout.Width(wnd.position.width * (1 - 0.618f)));
-                EditorGUILayout.BeginHorizontal(GUILayout.Width(wnd.position.width * 0.618f));
+                EditorGUILayout.BeginHorizontal(GUILayout.Width(wnd.position.width * 0.60f));
                 {
                     for (int i = 0; i < sorts.Length; i++)
                     {
