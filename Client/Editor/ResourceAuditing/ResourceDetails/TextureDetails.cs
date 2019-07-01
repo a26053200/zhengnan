@@ -23,10 +23,13 @@ namespace ResourceAuditing
 
     public class TextureResource : Resource
     {
+        const string Title_FileType = "File type";
+        const string Formnat_FileType = "File type Forbid:%s";
+
         const string Title_ReadAndWrite = "Read & Write";
         const string Formnat_ReadAndWrite = "Read & Write is not enable";
 
-        const string Title_TextureRealSize = "Texture Real Size";
+        const string Title_TextureRealSize = "Real Size";
         const string Formnat_TextureRealSize = "Texture Real Size Max is %d";
 
        
@@ -35,6 +38,9 @@ namespace ResourceAuditing
         private TextureImporter textureImporter;
         private int textureSize;
         private int textureSizeLevel;
+
+        private string fileType;
+        private int fileLevel;
 
         private TexturePlatformNorm standalone_setting;
         private TexturePlatformNorm ios_setting;
@@ -68,10 +74,23 @@ namespace ResourceAuditing
                 textureSizeLevel = 2;
                 errorNum++;
             }
+            string[] fs = ResourceAuditingSetting.GetIntance().Forbid_Texture_FileTypes;
+            fileType = Path.GetFileName(path);
+            // file type
+            for (int i = 0; i < fs.Length; i++)
+            {
+                if(path.EndsWith(fs[i]))
+                {
+                    fileLevel = 2;
+                    errorNum++;
+                    break;
+                }
+            }
         }
 
         public override void OnResourceGUI()
         {
+            ResUtils.ColorLabelFieldTooltip(Title_FileType, fileType, Formnat_FileType, fileLevel, 150);
             ResUtils.ColorLabelFieldTooltip(Title_ReadAndWrite, textureImporter.isReadable.ToString(), string.Format(Formnat_ReadAndWrite), !textureImporter.isReadable, 150);
             ResUtils.ColorLabelFieldTooltip(Title_TextureRealSize, textureSize.ToString(), string.Format(Formnat_TextureRealSize, ResourceAuditingSetting.GetIntance().Tex_Max_Size), textureSizeLevel, 150);
             EditorGUILayout.BeginVertical();
@@ -122,12 +141,12 @@ namespace ResourceAuditing
             return tpn;
         }
 
-        const string Platform = "Platform";
+        const string Platform = "Platform:";
 
-        const string Title_Format = "Texture Format";
+        const string Title_Format = "Format:";
         const string Formnat_Format = "Texture Real Size Max is %d";
 
-        const string Title_MaxSize = "Max Texture Size";
+        const string Title_MaxSize = "Max Size:";
         const string Formnat_MaxSize = "Max Size is %d";
 
         public void DisplayPlatformSetting(TexturePlatformNorm tpn)
