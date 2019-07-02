@@ -23,7 +23,7 @@ namespace ResourceAuditing
         }
         enum DetailsType
         {
-            Textures, Materials, Meshes, Missing
+            Textures, Materials, Meshes, Audios, Missing
         };
 
         //资源目录
@@ -31,12 +31,13 @@ namespace ResourceAuditing
         //标准配置文件路径
         static string Resource_Auditing_Setting_Path;
         //常量 
-        static string[] DetailsStrings = { "Textures", "Materials", "Meshes" };
+        static string[] DetailsStrings = { "Textures", "Materials", "Meshes", "Audios" };
 
         //变量
         Dictionary<string, TextureDetails> allTexDict;
         Dictionary<string, MaterialDetails> allMatDict;
         Dictionary<string, ModelDetails> allModelDict;
+        Dictionary<string, AudioDetails> allAudioDict;
         List<string> allAssetsPaths = new List<string>();
 
         DetailsType currSelectDetailsType;
@@ -45,6 +46,7 @@ namespace ResourceAuditing
         ResourceTree<TextureDetails> textureTree;
         ResourceTree<MaterialDetails> materialTree;
         ResourceTree<ModelDetails> modelTree;
+        ResourceTree<AudioDetails> audioTree;
 
         bool isCloseWhenLostFocus;
 
@@ -106,6 +108,9 @@ namespace ResourceAuditing
                     case DetailsType.Meshes:
                         FetchAllModels();
                         break;
+                    case DetailsType.Audios:
+                        FetchAllSounds();
+                        break;
                 }
             }
             EditorGUILayout.Space();
@@ -119,6 +124,9 @@ namespace ResourceAuditing
                     break;
                 case DetailsType.Meshes:
                     modelTree.OnGUI();
+                    break;
+                case DetailsType.Audios:
+                    audioTree.OnGUI();
                     break;
             }
         }
@@ -149,6 +157,16 @@ namespace ResourceAuditing
             if (allModelDict == null)
                 allModelDict = FetchAllResources<ModelDetails, ModelResource>(setting.Model_FileTypes);
             modelTree = new ResourceTree<ModelDetails>(this, allModelDict, allAssetsPaths);
+        }
+
+        /// <summary>
+        /// 获取音频文件,(网格信息和动作)
+        /// </summary>
+        void FetchAllSounds()
+        {
+            if (allAudioDict == null)
+                allAudioDict = FetchAllResources<AudioDetails, AudioResource>(setting.Sound_FileTypes);
+            audioTree = new ResourceTree<AudioDetails>(this, allAudioDict, allAssetsPaths);
         }
 
         #region 获取所有的asset

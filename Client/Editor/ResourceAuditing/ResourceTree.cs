@@ -26,6 +26,12 @@ namespace ResourceAuditing
         private int currPage = 0;
         private int sortBy = 0;
 
+
+        const string Button_Pre = "Up";
+        const string Button_Next = "Down";
+        const string Button_Top = "Top";
+        const string Button_Bottom = "Bottom";
+
         public ResourceTree(ResourceAuditing wnd, Dictionary<string, T> allResourceDetailDict, List<string> allAssetsPaths)
         {
             this.wnd = wnd;
@@ -54,36 +60,36 @@ namespace ResourceAuditing
                     //EditorGUILayout.EndVertical();
                 }
                 EditorGUILayout.BeginHorizontal();
-                EditorGUILayout.LabelField("", GUILayout.Width(wnd.position.width * (0.618f)));
+                EditorGUILayout.LabelField("", GUILayout.ExpandWidth(true));
                 EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
                 {
                     EditorGUILayout.BeginHorizontal(GUILayout.ExpandWidth(true));
                     {
-                        if (GUILayout.Button(Button_Pre, GUILayout.ExpandWidth(true)))
-                        {
+                        if (GUILayout.Button(Button_Top, GUILayout.Width(wnd.position.width * 0.1f)))
+                            currPage = 0;
+                        if (GUILayout.Button(Button_Pre, GUILayout.Width(wnd.position.width * 0.1f)))
                             currPage = Mathf.Max(0, currPage - 1);
-                        }
                         EditorGUILayout.LabelField((currPage + 1) + "/" + totalPage, EditorStyles.centeredGreyMiniLabel);
-                        if (GUILayout.Button(Button_Next, GUILayout.ExpandWidth(true)))
-                        {
+                        if (GUILayout.Button(Button_Next, GUILayout.Width(wnd.position.width * 0.1f)))
                             currPage = Mathf.Min(totalPage - 1, currPage + 1);
-                        }
+                        if (GUILayout.Button(Button_Bottom, GUILayout.Width(wnd.position.width * 0.1f)))
+                            currPage = totalPage - 1;
                     }
                     EditorGUILayout.EndHorizontal();
                 }
                 EditorGUILayout.EndHorizontal();
+                EditorGUILayout.LabelField("", GUILayout.ExpandWidth(true));
                 EditorGUILayout.EndHorizontal();
 
                 EditorGUILayout.EndScrollView();
             }
         }
 
+        const string Title_Reference = "Reference";
         const string Title_Repeat = "Repeat";
         const string Title_Warning = "Warning";
         const string Title_Error = "Error";
 
-        const string Button_Pre = "Up";
-        const string Button_Next = "Down";
 
         void DrawFoldoutContent(ResourceDetail rd)
         {
@@ -100,7 +106,7 @@ namespace ResourceAuditing
                     EditorGUI.indentLevel++;
                     res.OnResourceGUI();
                     EditorGUI.indentLevel--;
-                    res.isUsedOpen = EditorGUILayout.Foldout(res.isUsedOpen, Title_Repeat);
+                    res.isUsedOpen = EditorGUILayout.Foldout(res.isUsedOpen, Title_Reference);
                     if (res.isUsedOpen)
                     {
                         string[] _TempArray = ResUtils.GetUseAssetPaths(res.path, allAssetsPaths);

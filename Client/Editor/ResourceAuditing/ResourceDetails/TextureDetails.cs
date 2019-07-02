@@ -24,13 +24,13 @@ namespace ResourceAuditing
     public class TextureResource : Resource
     {
         const string Title_FileType = "File type";
-        const string Formnat_FileType = "File type Forbid:%s";
+        const string Formnat_FileType = "File type Forbid:{0}";
 
         const string Title_ReadAndWrite = "Read & Write";
         const string Formnat_ReadAndWrite = "Read & Write is not enable";
 
         const string Title_TextureRealSize = "Real Size";
-        const string Formnat_TextureRealSize = "Texture Real Size Max is %d";
+        const string Formnat_TextureRealSize = "Texture Real Size Max is {0}";
 
        
 
@@ -144,10 +144,10 @@ namespace ResourceAuditing
         const string Platform = "Platform:";
 
         const string Title_Format = "Format:";
-        const string Formnat_Format = "Texture Real Size Max is %d";
+        const string Formnat_Format = "Texture Real Size Max is {0}";
 
         const string Title_MaxSize = "Max Size:";
-        const string Formnat_MaxSize = "Max Size is %d";
+        const string Formnat_MaxSize = "Max Size is {0}";
 
         public void DisplayPlatformSetting(TexturePlatformNorm tpn)
         {

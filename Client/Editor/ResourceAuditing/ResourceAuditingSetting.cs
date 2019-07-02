@@ -70,6 +70,26 @@ namespace ResourceAuditing
         public string[] Material_FileTypes = new string[] { ".mat" };
         //模型文件
         public string[] Model_FileTypes = new string[] { ".fbx", ".obj" };
+
+        //音频方案
+        //1.大点的音频: Streaming,不预加载，Vorbis
+        //2.小点的音频DecompressOnLoad 不预加载  ，Vorbis
+
+        //声音大小阈值
+        public float autioLengthThreshold = 5.0f;
+
+        public AudioClipLoadType audioClipLoadType_Short_Ios;
+        public AudioCompressionFormat compressionFormat_Short_Ios;
+        public AudioClipLoadType audioClipLoadType_Long_Ios;
+        public AudioCompressionFormat compressionFormat_Long_Ios;
+
+        public AudioClipLoadType audioClipLoadType_Short_Android;
+        public AudioCompressionFormat compressionFormat_Short_Android;
+        public AudioClipLoadType audioClipLoadType_Long_Android;
+        public AudioCompressionFormat compressionFormat_Long_Android;
+
+        public string[] Sound_FileTypes = new string[] { ".aif", ".wav", ".mp3", ".ogg" };
+
     }
 }
 
