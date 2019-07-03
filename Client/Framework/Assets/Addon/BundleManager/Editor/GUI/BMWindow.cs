@@ -72,7 +72,7 @@ namespace BM
             {
                 GUI.FocusControl(null);
                 Repaint();
-                settings.ResetToDefault();
+                //settings.ResetToDefault();
             }
             if (GUILayout.Button("Save"))
             {

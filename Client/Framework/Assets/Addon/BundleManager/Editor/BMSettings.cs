@@ -75,75 +75,10 @@ namespace BM
         //拥有依赖性的文件后缀名
         public List<string> ownerDependenceSuffixs = new List<string>();
 
-        Dictionary<string, string> defaultDict;
+        //SpriteAtlas文件夹
+        public List<string> atlasSpriteFolderList = new List<string>();
 
-        public void LoadSettings()
-        {
-            defaultDict = new Dictionary<string, string>();
-            FieldInfo[] fields = GetType().GetFields(BindingFlags.Public);
-            for (int i = 0; i < fields.Length; i++)
-            {
-                FieldInfo field = fields[i];
-                defaultDict.Add(field.Name, field.GetValue(this).ToString());
-            }
-
-            Dictionary<string, string> settingsDict = new Dictionary<string, string>();
-            if (settingsDict == null)
-                settingsDict = new Dictionary<string, string>();
-            else
-            {
-                for (int i = 0; i < fields.Length; i++)
-                {
-                    FieldInfo field = fields[i];
-                    string value = null;
-                    if (settingsDict.TryGetValue(field.Name, out value))
-                    {
-                        if (field.FieldType == typeof(int))
-                        {
-                            field.SetValue(this, int.Parse(value));
-                        }
-                        else if (field.FieldType == typeof(string))
-                        {
-                            field.SetValue(this, value);
-                        }
-                    }
-                }
-            }
-        }
-
-        public void ResetToDefault()
-        {
-            FieldInfo[] fields = GetType().GetFields(BindingFlags.Public);
-            for (int i = 0; i < fields.Length; i++)
-            {
-                FieldInfo field = fields[i];
-                string value = null;
-                if (defaultDict.TryGetValue(field.Name, out value))
-                {
-                    if (field.FieldType == typeof(int))
-                    {
-                        field.SetValue(this, int.Parse(value));
-                    }
-                    else if (field.FieldType == typeof(string))
-                    {
-                        field.SetValue(this, value);
-                    }
-                    Debug.Log(field.FieldType + " - " + value);
-                }
-            }
-        }
-
-        public void SaveSettings()
-        {
-            Dictionary<string, string> settingsDict = new Dictionary<string, string>();
-            FieldInfo[] fields = GetType().GetFields(BindingFlags.Public);
-            for (int i = 0; i < fields.Length; i++)
-            {
-                FieldInfo field = fields[i];
-                settingsDict.Add(field.Name, field.GetValue(this).ToString());
-            }
-            //BMEditUtility.SaveDictionary(BMSettings_Path, settingsDict);
-        }
+        public string atlasSpritePrefabDir;
     }
 }
     
