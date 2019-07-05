@@ -171,7 +171,7 @@ namespace BM
                             name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
                             break;
                     }
-                    string md5 = StringUtils.EncryptWithMD5(name);
+                    string md5 = BMUtility.EncryptWithMD5(name);
                     SubBuildInfo subInfo = null;
                     if (!buildInfo.subBuildInfoMap.TryGetValue(md5, out subInfo))
                     {
@@ -355,7 +355,7 @@ namespace BM
                 string path = dirPath + fileInfo.Name; //相对路径
                 if (buildType == BuildType.Lua)
                 {
-                    string temp = path + "." + StringUtils.EncryptWithMD5(path) + ".txt";
+                    string temp = path + "." + BMUtility.EncryptWithMD5(path) + ".txt";
                     if (File.Exists(temp))
                         File.Delete(temp);
                     File.Copy(path, temp);

@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+using Object = UnityEngine.Object;
 
 namespace BM
 {
@@ -184,6 +185,77 @@ namespace BM
             {
                 Debug.LogErrorFormat("Can not copy! srcPath:{0} dstPath:{1}", srcPath, dstPath);
             }
+        }
+
+        /// <summary>
+        /// 获取文件的MD5值
+        /// </summary>
+        /// <param name="_PathValue"></param>
+        /// <returns></returns>
+        public static string GetFileMD5(string _PathValue)
+        {
+            //判断是否为本地资源   因为本地文件里有文件名称 但是在资源名称又不能重复  于是需要去掉名称 来检测md5值
+            Object _ObejctValue = AssetDatabase.LoadAssetAtPath<Object>(_PathValue);
+            bool _isNative = AssetDatabase.IsNativeAsset(_ObejctValue);
+            string _FileMD5 = "";
+            string _TemPath = Application.dataPath.Replace("Assets", "");
+
+            if (_isNative)
+            {
+                string _TempFileText = File.ReadAllText(_TemPath + _PathValue).Replace("m_Name: " + _ObejctValue.name, "");
+
+                System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+                //将字符串转换为字节数组  
+                byte[] fromData = System.Text.Encoding.Unicode.GetBytes(_TempFileText);
+                //计算字节数组的哈希值  
+                byte[] toData = md5.ComputeHash(fromData);
+                _FileMD5 = "";
+                for (int i = 0; i < toData.Length; i++)
+                {
+                    _FileMD5 += toData[i].ToString("x2");
+                }
+            }
+            else
+            {
+                _FileMD5 = "";
+                //外部文件的MD5值
+                try
+                {
+
+                    FileStream fs = new FileStream(_TemPath + _PathValue, FileMode.Open);
+
+                    System.Security.Cryptography.MD5 md5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+                    byte[] retVal = md5.ComputeHash(fs);
+                    fs.Close();
+                    for (int i = 0; i < retVal.Length; i++)
+                    {
+                        _FileMD5 += retVal[i].ToString("x2");
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.Log(ex);
+                }
+                //因为外部文件还存在不同的设置问题，还需要检测一下外部资源的.meta文件
+                if (_FileMD5 != "")
+                {
+                    string _MetaPath = AssetDatabase.GetTextMetaFilePathFromAssetPath(_PathValue);
+                    string _ObjectGUID = AssetDatabase.AssetPathToGUID(_PathValue);
+                    //去掉guid来检测
+                    string _TempFileText = File.ReadAllText(_TemPath + _MetaPath).Replace("guid: " + _ObjectGUID, "");
+
+                    System.Security.Cryptography.MD5 _MetaMd5 = new System.Security.Cryptography.MD5CryptoServiceProvider();
+                    //将字符串转换为字节数组  
+                    byte[] fromData = System.Text.Encoding.Unicode.GetBytes(_TempFileText);
+                    //计算字节数组的哈希值  
+                    byte[] toData = _MetaMd5.ComputeHash(fromData);
+                    for (int i = 0; i < toData.Length; i++)
+                    {
+                        _FileMD5 += toData[i].ToString("x2");
+                    }
+                }
+            }
+            return _FileMD5;
         }
     }
 }
