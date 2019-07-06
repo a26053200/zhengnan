@@ -57,7 +57,7 @@ namespace BM
                 for (int i = 0; i < resFiles.Length; i++)
                 {
                     FileInfo info = resFiles[i];
-                    if (info.FullName.EndsWith(".meta") || info.FullName.EndsWith(".txt"))
+                    if (info.FullName.EndsWith(".meta", StringComparison.Ordinal) || info.FullName.EndsWith(".txt", StringComparison.Ordinal))
                         continue;
                     string spriteFileName = Path.GetFileName(info.FullName);
                     string oldmd5;
@@ -91,7 +91,7 @@ namespace BM
             for (int j = 0; j < resFiles.Length; j++)
             {
                 FileInfo info = resFiles[j];
-                if (info.FullName.EndsWith(".meta") || info.FullName.EndsWith(".txt"))
+                if (info.FullName.EndsWith(".meta", StringComparison.Ordinal) || info.FullName.EndsWith(".txt", StringComparison.Ordinal))
                     continue;
                 string spriteFileName = Path.GetFileName(info.FullName);
                 string md5 = BMEditUtility.GetFileMD5(Path.Combine(atlasDir, spriteFileName));

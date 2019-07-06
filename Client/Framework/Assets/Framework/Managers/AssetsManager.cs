@@ -161,7 +161,6 @@ namespace Framework
                 Logger.LogError("Asset:'{0}' has not found", path);
                 return default(T);
             }
-            
 #endif
         }
 

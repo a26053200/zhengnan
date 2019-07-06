@@ -92,9 +92,8 @@ namespace BM
         private AssetBundle LoadBundle(BundleInfo bundleInfo)
         {
             AssetBundle assetBundle = null;
-            BundleReferenceInfo bundleReferenceInfo;
             string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
-            if (!bundleReferenceInfoDict.TryGetValue(path, out bundleReferenceInfo))
+            if (!bundleReferenceInfoDict.TryGetValue(path, out BundleReferenceInfo bundleReferenceInfo))
             {
                 assetBundle = AssetBundle.LoadFromFile(getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern));
                 if (assetBundle == null)
@@ -136,9 +135,8 @@ namespace BM
 
         public IEnumerator LoadBundleAsync(BundleInfo bundleInfo, UnityAction<AssetBundle> OnAssetBundleLoaded)
         {
-            BundleReferenceInfo bundleReferenceInfo;
             string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
-            if (bundleReferenceInfoDict.TryGetValue(path, out bundleReferenceInfo))
+            if (bundleReferenceInfoDict.TryGetValue(path, out BundleReferenceInfo bundleReferenceInfo))
             {//就算 缓存池里面有 也要模拟异步加载
                 yield return new WaitForEndOfFrame();
                 OnAssetBundleLoaded(bundleReferenceInfo.assetBundle);
@@ -181,9 +179,8 @@ namespace BM
         public BundleLoadState GetBundleStateByAssetPath(string assetPath)
         {
             BundleInfo bundleInfo = GetBundleInfo(assetPath);
-            BundleReferenceInfo bundleReferenceInfo;
             string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
-            if (bundleReferenceInfoDict.TryGetValue(path, out bundleReferenceInfo))
+            if (bundleReferenceInfoDict.TryGetValue(path, out BundleReferenceInfo bundleReferenceInfo))
                 return bundleReferenceInfo.state;
             else
                 return BundleLoadState.None;
