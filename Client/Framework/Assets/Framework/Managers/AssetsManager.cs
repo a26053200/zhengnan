@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using UnityEditor;
 using LuaInterface;
 using System.Collections;
+using System.IO;
+using UnityEngine.UI;
 /// <summary>
 /// <para>资源管理,资源加载和缓存</para>
 /// <para>Author: zhengnan</para>
@@ -60,15 +62,6 @@ namespace Framework
             LoadAssetAsync<TextAsset>(path, callback);
         }
 
-        //Sprite
-        public Sprite LoadSprite(string path)
-        {
-            return LoadAsset<Sprite>(path);
-        }
-        public void LoadSpriteAsync(string path, LuaFunction callback)
-        {
-            LoadAssetAsync<Sprite>(path, callback);
-        }
 
         //Texture
         public Texture LoadTexture(string path)
@@ -140,28 +133,35 @@ namespace Framework
         /// <returns>T</returns>
         T LoadAsset<T>(string path) where T : UnityEngine.Object
         {
-#if UNITY_EDITOR1
-            T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
-            if (t == default(T))
-                Logger.LogError("Asset:'{0}' has not found", path);
-            return t;
-#else
-            //加载bundle;
-            string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
-            Logger.Info("Load Asset:'{0}' ", assetPath);
-            AssetBundle assetBundle = resLoader.GetBundleByAssetPath(assetPath);
-            T t = assetBundle.LoadAsset<T>(assetPath);
-            if(t)
+            if (GlobalConsts.isRuningInMobileDevice || GlobalConsts.isResBundleMode)
             {
-                Logger.Info("Asset:'{0}' has loaded", path);
-                return t;
+                //加载bundle;
+                string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
+                Logger.Info("Load Asset:'{0}' ", assetPath);
+                AssetBundle assetBundle = resLoader.GetBundleByAssetPath(assetPath);
+                T t = assetBundle.LoadAsset<T>(assetPath);
+                if (t)
+                {
+                    Logger.Info("Asset:'{0}' has loaded", path);
+                    return t;
+                }
+                else
+                {
+                    Logger.LogError("Asset:'{0}' has not found", path);
+                    return default(T);
+                }
             }
             else
             {
-                Logger.LogError("Asset:'{0}' has not found", path);
-                return default(T);
-            }
+#if UNITY_EDITOR
+                T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
+                if (t == default(T))
+                    Logger.LogError("Asset:'{0}' has not found", path);
+                return t;
+#else
+                return null;
 #endif
+            }
         }
 
         /// <summary>
@@ -181,48 +181,106 @@ namespace Framework
                 Logger.LogError("Load Asset {0} Async must has callback function!", path);
                 yield break;
             }
-#if UNITY_EDITOR1
-            yield return new WaitForEndOfFrame();
-            T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
-            if (t == default(T))
-                Logger.LogError("Asset:'{0}' has not found", path);
-            luaFunc.BeginPCall();
-            luaFunc.Push(t);
-            luaFunc.PCall();
-            luaFunc.EndPCall();
-#else
-            //加载bundle;
-            string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
-            Logger.Info("Load Asset:'{0}' ", assetPath);
-            yield return resLoader.AddLoadAssetBundleAsync(assetPath, delegate(AssetBundle assetBundle)
+            if (GlobalConsts.isRuningInMobileDevice || GlobalConsts.isResBundleMode)
             {
-                if(assetBundle.isStreamedSceneAssetBundle)
-                {//场景Bundle
-                    Logger.Info("Scene bundle:'{0}' has loaded", path);
-                    luaFunc.BeginPCall();
-                    luaFunc.PCall();
-                    luaFunc.EndPCall();
-                }
-                else
+                //加载bundle;
+                string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
+                Logger.Info("Load Asset:'{0}' ", assetPath);
+                yield return resLoader.AddLoadAssetBundleAsync(assetPath, delegate (AssetBundle assetBundle)
                 {
-                    T t = assetBundle.LoadAsset<T>(assetPath);
-                    if (t)
-                    {
-                        Logger.Info("Asset:'{0}' has loaded", path);
+                    if (assetBundle.isStreamedSceneAssetBundle)
+                    {//场景Bundle
+                        Logger.Info("Scene bundle:'{0}' has loaded", path);
                         luaFunc.BeginPCall();
                         luaFunc.PCall();
                         luaFunc.EndPCall();
                     }
                     else
                     {
-                        Logger.LogError("Asset:'{0}' has not found", path);
+                        T t = assetBundle.LoadAsset<T>(assetPath);
+                        if (t)
+                        {
+                            Logger.Info("Asset:'{0}' has loaded", path);
+                            luaFunc.BeginPCall();
+                            luaFunc.PCall();
+                            luaFunc.EndPCall();
+                        }
+                        else
+                        {
+                            Logger.LogError("Asset:'{0}' has not found", path);
+                        }
                     }
-                }
-            });
+                });
+            }
+            else if (GlobalConsts.isRuningInEditor)
+            {
+#if UNITY_EDITOR
+                yield return new WaitForEndOfFrame();
+                T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
+                if (t == default(T))
+                    Logger.LogError("Asset:'{0}' has not found", path);
+                luaFunc.BeginPCall();
+                luaFunc.Push(t);
+                luaFunc.PCall();
+                luaFunc.EndPCall();
 #endif
-
+            }
         }
 
+        #region 加载 Sprite 特殊处理
+
+        private string GetSpritePrefabPath(string path)
+        {
+            int len = path.LastIndexOf('/');
+            string dirName = Path.GetFileName(path.Substring(0, len));
+            string fileName = Path.GetFileNameWithoutExtension(path);
+            string spritePrefabPath = GlobalConsts.SpritePrefabDir + dirName + "/" + fileName + ".prefab";
+            return spritePrefabPath;
+        }
+        //Sprite
+        public Sprite LoadSprite(string path)
+        {
+            if (GlobalConsts.isRuningInMobileDevice || GlobalConsts.isResBundleMode)
+            {
+                string spritePrefabPath = GetSpritePrefabPath(path);
+                Debug.LogFormat("Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
+                GameObject prefab = LoadPrefab(spritePrefabPath);
+                return prefab.GetComponent<Image>().sprite;
+            }else
+            {
+#if UNITY_EDITOR
+                return LoadAsset<Sprite>(path);
+#else
+                return null;
+#endif
+            }
+        }
+
+        public void LoadSpriteAsync(string path, LuaFunction luaFunc)
+        {
+            if (GlobalConsts.isRuningInMobileDevice || GlobalConsts.isResBundleMode)
+            {
+                string spritePrefabPath = GetSpritePrefabPath(path);
+                StartCoroutine(resLoader.AddLoadAssetBundleAsync(spritePrefabPath, delegate(AssetBundle assetBundle)
+                {
+                    GameObject prefab = assetBundle.LoadAsset<GameObject>(spritePrefabPath);
+                    Sprite sp = prefab.GetComponent<Image>().sprite;
+
+                    luaFunc.BeginPCall();
+                    luaFunc.Push(sp);
+                    luaFunc.PCall();
+                    luaFunc.EndPCall();
+                }));
+                Debug.LogFormat("Async Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
+            }
+            else
+            {
+#if UNITY_EDITOR
+                LoadAssetAsync<Sprite>(path, luaFunc);
+#endif
+            }
+        }
+        #endregion
     }
 }
 

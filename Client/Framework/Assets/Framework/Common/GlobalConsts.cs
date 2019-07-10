@@ -13,7 +13,7 @@ public class GlobalConsts
     /// <summary>
     /// 是否开启Res AssetBundle模式
     /// </summary>
-    public static bool isResBundleMode = false;
+    public static bool isResBundleMode = true;
 
     /// <summary>
     /// 是否开启Res AssetBundle模式
@@ -34,5 +34,36 @@ public class GlobalConsts
     /// Tolua脚本根目录
     /// </summary>
     public static string ToLuaRootDir = "Assets/Framework/ToLua/Lua";
+
+    /// <summary>
+    /// AtlasSprite根目录
+    /// </summary>
+    public static string SpritePrefabDir = "Prefabs/AtlasSprite/";
+    /// <summary>
+    /// 是否在编辑器模式下运行
+    /// </summary>
+    public static bool isRuningInEditor
+    {
+        get
+        {
+            return Application.platform == RuntimePlatform.WindowsEditor ||
+                Application.platform == RuntimePlatform.LinuxEditor ||
+                Application.platform == RuntimePlatform.OSXEditor;
+        }
+    }
+
+
+    /// <summary>
+    /// 是否在移动设备下运行
+    /// </summary>
+    public static bool isRuningInMobileDevice
+    {
+        get
+        {
+            return Application.platform == RuntimePlatform.IPhonePlayer ||
+                Application.platform == RuntimePlatform.LinuxEditor ||
+                Application.platform == RuntimePlatform.OSXEditor;
+        }
+    }
 }
 

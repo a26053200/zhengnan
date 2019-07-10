@@ -47,7 +47,7 @@ namespace BM
         public static string LoadText(string path)
         {
 #if UNITY_ANDROID
-
+            //java实现的加载
 #else
             return File.ReadAllText(path);
 #endif
