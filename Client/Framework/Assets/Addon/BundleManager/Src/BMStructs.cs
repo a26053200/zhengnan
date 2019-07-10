@@ -12,6 +12,9 @@ namespace BM
         public BuildType buildType;
         public List<string> assetPaths;
         public List<string> dependencePaths;
+        public List<BundleInfo> children;
+        public BundleInfo parent;
+        public BundleReferenceInfo bundleReference;
     }
 
     public class BundleReferenceInfo
