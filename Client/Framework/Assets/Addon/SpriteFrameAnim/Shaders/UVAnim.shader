@@ -51,16 +51,18 @@
                 o.pos = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.texcoord, _MainTex);
 
-                //float time = floor(_Time.y * _Speed) / 64;
-                //int idx = floor(fmod(time, 64));
-                float4 rect = _Rects[1];
-                o.uv = o.uv * rect.zw + float2(rect.y,-rect.x);
+               
 
                 return o;
             }
 
             fixed4 frag(v2f i) : SV_Target
             {
+                float time = floor(_Time.y  / 64 * _Speed);
+                int idx = floor(fmod(time, 64));
+                float4 rect = _Rects[idx];
+                float2 uv = i.uv * rect.zw + float2(rect.y, -rect.x);
+
                 //float time = floor(_Time.y * _Speed);
                 //float row = floor(time / _HorizontalAmount);
                 //float colum = time - row * _HorizontalAmount;
@@ -68,7 +70,7 @@
                 //uv.x /=  _HorizontalAmount;
                 //uv.y /=  _VerticalAmount;
 
-                fixed4 c = tex2D(_MainTex,i.uv);
+                fixed4 c = tex2D(_MainTex, uv);
                 c.rgb += _Color;
                 return c;
             }
