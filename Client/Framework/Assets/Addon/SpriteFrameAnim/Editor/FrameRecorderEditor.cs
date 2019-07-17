@@ -133,17 +133,16 @@ namespace SFA
             if(old)
                 DestroyImmediate(old.gameObject);
             GameObject uvOrgPrefab = new GameObject(prefabName);
+            uvOrgPrefab.layer = LayerMask.NameToLayer("UI");
             uvOrgPrefab.transform.SetParent(canvas.transform);
             uvOrgPrefab.transform.localPosition = Vector3.zero;
             uvOrgPrefab.transform.localScale = Vector3.one;
             Image img = uvOrgPrefab.AddComponent<Image>();
             SpriteAnim anim = uvOrgPrefab.AddComponent<SpriteAnim>();
             string texPath = frameRecorder.exportPath + prefabName + ".png";
-            Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
-            anim.texture = tex;
             //这样加载才可以加载所有的Sprite;数组第一个为整张材质贴图
             UnityEngine.Object[] objs = AssetDatabase.LoadAllAssetsAtPath(texPath);
-            Sprite[] sprites = new Sprite[objs.Length];
+            Sprite[] sprites = new Sprite[objs.Length - 1];
             for (int i = 0; i < objs.Length - 1; i++)
             {
                 Sprite sp = objs[i + 1] as Sprite;

@@ -13,12 +13,11 @@ namespace SFA
     [RequireComponent(typeof(Image))]
     public class SpriteAnim : MonoBehaviour
     {
-        
+        private LuaFunction completeAction;
         private Image ImageSource;
-        private int mCurFrame = 0;
+        private int mCurrFrame = 0;
         private float mDelta = 0;
 
-        public Texture2D texture;
         [SerializeField]
         public List<Sprite> SpriteFrames;
         public float FPS = 15;
@@ -31,7 +30,6 @@ namespace SFA
         [HideInInspector]public float FadeInTime = 0.0f;
         [HideInInspector]public float FadeOutTime = 0.0f;
 
-        private LuaFunction completeAction;
         public int FrameCount
         {
             get
@@ -40,12 +38,20 @@ namespace SFA
             }
         }
 
+        public int CurrFrame
+        {
+            get
+            {
+                return mCurrFrame;
+            }
+        }
+
         public void OnComplete(LuaFunction func)
         {
             completeAction = func;
         }
 
-        void Awake()
+        public void Awake()
         {
             ImageSource = GetComponent<Image>();
 #if UNITY_EDITOR
@@ -69,7 +75,7 @@ namespace SFA
             }
         }
 
-        private void SetSprite(int idx)
+        public void SetSprite(int idx)
         {
             ImageSource.sprite = SpriteFrames[idx];
             if(AutoSize)
@@ -116,18 +122,18 @@ namespace SFA
                 mDelta = 0;
                 if (Foward)
                 {
-                    mCurFrame++;
+                    mCurrFrame++;
                 }
                 else
                 {
-                    mCurFrame--;
+                    mCurrFrame--;
                 }
 
-                if (mCurFrame >= FrameCount)
+                if (mCurrFrame >= FrameCount)
                 {
                     if (Loop)
                     {
-                        mCurFrame = 0;
+                        mCurrFrame = 0;
                     }
                     else
                     {
@@ -145,7 +151,7 @@ namespace SFA
                         }
                         if (ReturnStartFrame)
                         {
-                            mCurFrame = 0;
+                            mCurrFrame = 0;
                         }
                         else
                         {
@@ -154,11 +160,11 @@ namespace SFA
 
                     }
                 }
-                else if (mCurFrame < 0)
+                else if (mCurrFrame < 0)
                 {
                     if (Loop)
                     {
-                        mCurFrame = FrameCount - 1;
+                        mCurrFrame = FrameCount - 1;
                     }
                     else
                     {
@@ -167,7 +173,7 @@ namespace SFA
                     }
                 }
 
-                SetSprite(mCurFrame);
+                SetSprite(mCurrFrame);
             }
         }
 
@@ -196,15 +202,15 @@ namespace SFA
 
         public void Stop()
         {
-            mCurFrame = 0;
-            SetSprite(mCurFrame);
+            mCurrFrame = 0;
+            SetSprite(mCurrFrame);
             IsPlaying = false;
         }
 
         public void Rewind()
         {
-            mCurFrame = 0;
-            SetSprite(mCurFrame);
+            mCurrFrame = 0;
+            SetSprite(mCurrFrame);
             Play();
         }
 
@@ -212,8 +218,8 @@ namespace SFA
         {
             if (ReturnStartFrame)
             {
-                mCurFrame = 0;
-                SetSprite(mCurFrame);
+                mCurrFrame = 0;
+                SetSprite(mCurrFrame);
             }
 #if UNITY_EDITOR
             EditorApplication.update -= OnEditUpdate;
