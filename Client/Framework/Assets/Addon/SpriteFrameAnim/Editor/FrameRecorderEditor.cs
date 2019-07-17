@@ -80,6 +80,15 @@ namespace SFA
                 string pngFilePath = frameRecorder.exportPath + prefabName + ".png";
                 SFAUtility.SaveTexture2PNG(spriteSheet, pngFilePath);
                 AssetDatabase.Refresh();
+                
+                // meta 文件
+                for (int i = 0; i < texRects.Length; i++)
+                {
+                    Texture2D tex = textures[i];
+                    float newX = texRects[i].x * spriteSheet.width;
+                    float newY = texRects[i].y * spriteSheet.height;
+                    texRects[i] = new Rect(newX, newY, (float)tex.width, (float)tex.height);
+                }
                 TextureImporter texImporter = (TextureImporter)AssetImporter.GetAtPath(pngFilePath);
                 if (texImporter != null)
                 {
@@ -88,21 +97,22 @@ namespace SFA
                     texImporter.maxTextureSize = maxAtlasSize;
                     texImporter.wrapMode = TextureWrapMode.Repeat;
 
-                    //int texCount = textures.Count;
-                    //SpriteMetaData[] metaData = new SpriteMetaData[texCount];
-                    //for (int i = 0; i < texCount; i++)
-                    //{
-                    //    metaData[i].name = prefabName + i;
-                    //    metaData[i].rect = texRects[i];
-                    //    metaData[i].alignment = (int)SpriteAlignment.Custom;
-                    //    metaData[i].pivot = new Vector2(0.5f, 0.5f);
-                    //}
-                    //texImporter.spritesheet = metaData;
+                    int texCount = textures.Count;
+                    SpriteMetaData[] metaData = new SpriteMetaData[texCount];
+                    for (int i = 0; i < texCount; i++)
+                    {
+                        metaData[i].name = prefabName + i;
+                        metaData[i].rect = texRects[i];
+                        metaData[i].alignment = (int)SpriteAlignment.Custom;
+                        metaData[i].pivot = new Vector2(0.5f,0.5f);
+                    }
+                    texImporter.spritesheet = metaData;
+                    texImporter.SaveAndReimport();
 
                     AssetDatabase.ImportAsset(pngFilePath);
                 }
-
-                SaveSpriteAnimPrefab(texRects, frameRecorder.exportPath);
+                AssetDatabase.Refresh();
+                SaveSpriteAnimPrefab(frameRecorder.exportPath);
                 //SaveSpriteUVAnimPrefab(texRects, frameRecorder.exportPath, "sheet");
 
                 AssetDatabase.Refresh();
@@ -113,7 +123,7 @@ namespace SFA
             }
         }
 
-        private void SaveSpriteAnimPrefab(Rect[] texRects, string filePath)
+        private void SaveSpriteAnimPrefab(string filePath)
         {
             GameObject canvas = GameObject.Find("Canvas");
             string path = Path.Combine(filePath, prefabName + ".prefab");
@@ -128,22 +138,21 @@ namespace SFA
             uvOrgPrefab.transform.localScale = Vector3.one;
             Image img = uvOrgPrefab.AddComponent<Image>();
             SpriteAnim anim = uvOrgPrefab.AddComponent<SpriteAnim>();
-            Sprite[] sprites = new Sprite[texRects.Length];
-            Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(frameRecorder.exportPath + prefabName + ".png");
+            string texPath = frameRecorder.exportPath + prefabName + ".png";
+            Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(texPath);
             anim.texture = tex;
-            for (int i = 0; i < texRects.Length; i++)
+            //这样加载才可以加载所有的Sprite;数组第一个为整张材质贴图
+            UnityEngine.Object[] objs = AssetDatabase.LoadAllAssetsAtPath(texPath);
+            Sprite[] sprites = new Sprite[objs.Length];
+            for (int i = 0; i < objs.Length - 1; i++)
             {
-                Rect r = texRects[i];
-                Rect rect = new Rect(r.x * tex.width, r.y * tex.height, r.width * tex.width, r.height * tex.height);
-                //Debug.LogFormat(string.Format("{0} - {1}", r, rect));
-                Sprite sp = Sprite.Create(tex, rect, new Vector2(0.5f, 0.5f));
-                if(!img.sprite)
-                    img.sprite = sp;
+                Sprite sp = objs[i + 1] as Sprite;
                 sprites[i] = sp;
             }
+            img.sprite = sprites[0];
             anim.SpriteFrames = new List<Sprite>(sprites);
-            //PrefabUtility.SaveAsPrefabAssetAndConnect(uvOrgPrefab, path, InteractionMode.AutomatedAction);
-            //DestroyImmediate(uvOrgPrefab);
+            PrefabUtility.SaveAsPrefabAssetAndConnect(uvOrgPrefab, path, InteractionMode.AutomatedAction);
+            DestroyImmediate(uvOrgPrefab);
         }
 
         //private void SaveSpriteUVAnimPrefab(Rect[] texRects, string filePath, string fileName)
