@@ -3,19 +3,27 @@ using UnityEditor;
 using System.Collections.Generic;
 using System.IO;
 using System;
+using UnityEngine.UI;
 
 namespace SFA
 {
     [CustomEditor(typeof(FrameRecorder))]
     public class FrameRecorderEditor : Editor
     {
-
+        static string ExportPath = "Assets/Res/Effects/SpriteFrames/";
         FrameRecorder frameRecorder;
         List<Texture2D> textures;
+        string prefabPath;
+        string prefabName;
 
         private void OnEnable()
         {
             frameRecorder = target as FrameRecorder;
+            prefabPath = SFAUtility.GetPrefabPath(frameRecorder.gameObject);
+            prefabName = Path.GetFileNameWithoutExtension(prefabPath);
+            frameRecorder.exportPath = ExportPath + prefabName + "/";
+            if (!Directory.Exists(ExportPath))
+                Directory.CreateDirectory(ExportPath);
         }
 
         public override void OnInspectorGUI()
@@ -25,38 +33,35 @@ namespace SFA
             SFAUtility.Space();
 
             EditorGUILayout.BeginHorizontal();
-
             EditorGUILayout.PrefixLabel("Output Path:");
-            GUIStyle style01 = new GUIStyle("button");
-            style01.fixedWidth = 30;
-            if (GUILayout.Button("...", style01))
+            if (GUILayout.Button("Explorer"))
             {
-                frameRecorder.exportPath = EditorUtility.OpenFolderPanel("", "", "");
+                if (Directory.Exists(frameRecorder.exportPath))
+                    EditorUtility.RevealInFinder(frameRecorder.exportPath);
+                //Application.OpenURL("file://" + SFAUtility.Relativity2Absolute(frameRecorder.exportPath));
+                else
+                    Debug.Log("Not yet started recording");
             }
-
             GUIStyle style02 = new GUIStyle("label");
             style02.fontStyle = FontStyle.Italic;
             EditorGUILayout.LabelField(frameRecorder.exportPath, style02);
-
+            
             EditorGUILayout.EndHorizontal();
             if (GUILayout.Button("Record"))
             {
+                if (!Directory.Exists(frameRecorder.exportPath))
+                    Directory.CreateDirectory(frameRecorder.exportPath);
                 frameRecorder.StartRecord(BakeSpriteSheet);
             }
-                
-            if (GUILayout.Button("Open Export Folder"))
-            {
-                Application.OpenURL("file://" + frameRecorder.exportPath);
-            }
 
-            if (GUILayout.Button("Create Quad Mesh"))
-            {
-                GameObject quad = GameObject.Find("Quad");
-                MeshFilter mf = quad.GetComponent<MeshFilter>();
-                Mesh mesh = Instantiate(mf.sharedMesh) as Mesh;
-                AssetDatabase.CreateAsset(mesh, SFAUtility.Absolute2Relativity(frameRecorder.exportPath + "/quad.mesh"));
-                AssetDatabase.SaveAssets();
-            }
+            //if (GUILayout.Button("Create Quad Mesh"))
+            //{
+            //    GameObject quad = GameObject.Find("Quad");
+            //    MeshFilter mf = quad.GetComponent<MeshFilter>();
+            //    Mesh mesh = Instantiate(mf.sharedMesh) as Mesh;
+            //    AssetDatabase.CreateAsset(mesh, frameRecorder.exportPath + "/quad.mesh");
+            //    AssetDatabase.SaveAssets();
+            //}
             if (frameRecorder.cam)
             {
                 frameRecorder.cam.orthographicSize = (1 / frameRecorder.recordScale) * FrameRecorder.StandOrthographicSize;
@@ -72,48 +77,35 @@ namespace SFA
 
                 Rect[] texRects = spriteSheet.PackTextures(textures.ToArray(), 0, maxAtlasSize);
 
-                SFAUtility.SaveTexture2PNG(spriteSheet, frameRecorder.exportPath + "/sheet.png");
+                string pngFilePath = frameRecorder.exportPath + prefabName + ".png";
+                SFAUtility.SaveTexture2PNG(spriteSheet, pngFilePath);
+                AssetDatabase.Refresh();
+                TextureImporter texImporter = (TextureImporter)AssetImporter.GetAtPath(pngFilePath);
+                if (texImporter != null)
+                {
+                    texImporter.textureType = TextureImporterType.Sprite;
+                    texImporter.spriteImportMode = SpriteImportMode.Multiple;
+                    texImporter.maxTextureSize = maxAtlasSize;
+                    texImporter.wrapMode = TextureWrapMode.Repeat;
 
-                SaveSpriteUVAnimPrefab(texRects, frameRecorder.exportPath, "sheet");
+                    //int texCount = textures.Count;
+                    //SpriteMetaData[] metaData = new SpriteMetaData[texCount];
+                    //for (int i = 0; i < texCount; i++)
+                    //{
+                    //    metaData[i].name = prefabName + i;
+                    //    metaData[i].rect = texRects[i];
+                    //    metaData[i].alignment = (int)SpriteAlignment.Custom;
+                    //    metaData[i].pivot = new Vector2(0.5f, 0.5f);
+                    //}
+                    //texImporter.spritesheet = metaData;
+
+                    AssetDatabase.ImportAsset(pngFilePath);
+                }
+
+                SaveSpriteAnimPrefab(texRects, frameRecorder.exportPath);
+                //SaveSpriteUVAnimPrefab(texRects, frameRecorder.exportPath, "sheet");
 
                 AssetDatabase.Refresh();
-                return;
-                // meta 文件
-                //for (int i = 0; i < texRects.Length; i++)
-                //{
-                //    Texture2D tex = textures[i];
-                //    float newX = texRects[i].x * spriteSheet.width;
-                //    float newY = texRects[i].y * spriteSheet.height;
-                //    texRects[i] = new Rect(newX, newY, (float)tex.width, (float)tex.height);
-                //}
-
-                //string filePath = Path.Combine(frameRecorder.exportPath, "/sheet.png");
-                //int assetIndex = filePath.IndexOf("Assets");
-                //if (assetIndex < 0)
-                //    return;
-                //filePath = filePath.Substring(assetIndex, filePath.Length - assetIndex);
-
-                //TextureImporter texImporter = (TextureImporter)AssetImporter.GetAtPath(filePath);
-                //if (texImporter != null)
-                //{
-                //    texImporter.textureType = TextureImporterType.Sprite;
-                //    texImporter.spriteImportMode = SpriteImportMode.Multiple;
-                //    texImporter.maxTextureSize = maxAtlasSize;
-
-                //    int texCount = textures.Count;
-                //    SpriteMetaData[] metaData = new SpriteMetaData[texCount];
-                //    for (int i = 0; i < texCount; i++)
-                //    {
-                //        metaData[i].name = "sheet" + i;
-                //        metaData[i].rect = texRects[i];
-                //        metaData[i].alignment = (int)SpriteAlignment.Custom;
-                //        metaData[i].pivot = new Vector2((float)pivots[i].x / (float)textures[i].width,
-                //                                        (float)pivots[i].y / (float)textures[i].height);
-                //    }
-                //    texImporter.spritesheet = metaData;
-
-                //    AssetDatabase.ImportAsset(filePath);
-                //}
             }
             catch (Exception e)
             {
@@ -121,32 +113,64 @@ namespace SFA
             }
         }
 
-
-        private void SaveSpriteUVAnimPrefab(Rect[] texRects, string filePath, string fileName)
+        private void SaveSpriteAnimPrefab(Rect[] texRects, string filePath)
         {
-            GameObject old = GameObject.Find("fileName");
-            DestroyImmediate(old);
-            string path = Path.Combine(filePath, fileName + ".prefab");
+            GameObject canvas = GameObject.Find("Canvas");
+            string path = Path.Combine(filePath, prefabName + ".prefab");
             if (File.Exists(path))
                 File.Delete(path);
-            GameObject uvOrgPrefab = new GameObject(fileName);
-            MeshFilter mf = uvOrgPrefab.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = uvOrgPrefab.AddComponent<MeshRenderer>();
-            mf.sharedMesh = AssetDatabase.LoadAssetAtPath<Mesh>(SFAUtility.Absolute2Relativity(frameRecorder.exportPath + "/quad.mesh"));
-            SpriteUVAnim anim = uvOrgPrefab.AddComponent<SpriteUVAnim>();
-            anim.spriteRects = SFAUtility.Rects2Vector4Array(texRects);
-            string matPath = Path.Combine(filePath, fileName + ".mat");
-            SaveSpriteAnimMaterial(texRects, frameRecorder.exportPath + "/sheet.png", matPath);
-            meshRenderer.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(SFAUtility.Absolute2Relativity(matPath));
-            //PrefabUtility.SaveAsPrefabAsset(uvOrgPrefab, path);
+            Transform old = canvas.transform.Find(prefabName);
+            if(old)
+                DestroyImmediate(old.gameObject);
+            GameObject uvOrgPrefab = new GameObject(prefabName);
+            uvOrgPrefab.transform.SetParent(canvas.transform);
+            uvOrgPrefab.transform.localPosition = Vector3.zero;
+            uvOrgPrefab.transform.localScale = Vector3.one;
+            Image img = uvOrgPrefab.AddComponent<Image>();
+            SpriteAnim anim = uvOrgPrefab.AddComponent<SpriteAnim>();
+            Sprite[] sprites = new Sprite[texRects.Length];
+            Texture2D tex = AssetDatabase.LoadAssetAtPath<Texture2D>(frameRecorder.exportPath + prefabName + ".png");
+            anim.texture = tex;
+            for (int i = 0; i < texRects.Length; i++)
+            {
+                Rect r = texRects[i];
+                Rect rect = new Rect(r.x * tex.width, r.y * tex.height, r.width * tex.width, r.height * tex.height);
+                //Debug.LogFormat(string.Format("{0} - {1}", r, rect));
+                Sprite sp = Sprite.Create(tex, rect, new Vector2(0.5f, 0.5f));
+                if(!img.sprite)
+                    img.sprite = sp;
+                sprites[i] = sp;
+            }
+            anim.SpriteFrames = new List<Sprite>(sprites);
+            //PrefabUtility.SaveAsPrefabAssetAndConnect(uvOrgPrefab, path, InteractionMode.AutomatedAction);
+            //DestroyImmediate(uvOrgPrefab);
         }
+
+        //private void SaveSpriteUVAnimPrefab(Rect[] texRects, string filePath, string fileName)
+        //{
+        //    GameObject old = GameObject.Find("fileName");
+        //    DestroyImmediate(old);
+        //    string path = Path.Combine(filePath, fileName + ".prefab");
+        //    if (File.Exists(path))
+        //        File.Delete(path);
+        //    GameObject uvOrgPrefab = new GameObject(fileName);
+        //    MeshFilter mf = uvOrgPrefab.AddComponent<MeshFilter>();
+        //    MeshRenderer meshRenderer = uvOrgPrefab.AddComponent<MeshRenderer>();
+        //    mf.sharedMesh = AssetDatabase.LoadAssetAtPath<Mesh>(frameRecorder.exportPath + "/quad.mesh");
+        //    SpriteUVAnim anim = uvOrgPrefab.AddComponent<SpriteUVAnim>();
+        //    anim.spriteRects = SFAUtility.Rects2Vector4Array(texRects);
+        //    string matPath = Path.Combine(filePath, fileName + ".mat");
+        //    SaveSpriteAnimMaterial(texRects, frameRecorder.exportPath + "/sheet.png", matPath);
+        //    meshRenderer.sharedMaterial = AssetDatabase.LoadAssetAtPath<Material>(matPath);
+        //    PrefabUtility.SaveAsPrefabAsset(uvOrgPrefab, path);
+        //}
 
         private void SaveSpriteAnimMaterial(Rect[] texRects, string texturePath, string matPath)
         {
             if (File.Exists(matPath))
                 File.Delete(matPath);
             Material mat = new Material(Shader.Find("SFA/UVAnim"));
-            mat.mainTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(SFAUtility.Absolute2Relativity(texturePath));
+            mat.mainTexture = AssetDatabase.LoadAssetAtPath<Texture2D>(texturePath);
             mat.SetFloat("_Speed", 2);
             mat.SetVectorArray("_Rects", SFAUtility.Rects2Vector4Array(texRects));
             AssetDatabase.CreateAsset(mat, SFAUtility.Absolute2Relativity(matPath));

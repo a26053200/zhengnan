@@ -11,6 +11,7 @@ namespace SFA
 {
     public class SFAUtility
     {
+        
         public static void AdjustCamera()
         {
             if (Camera.main == null || !Camera.main.orthographic)
@@ -369,6 +370,27 @@ namespace SFA
         }
 
 #if UNITY_EDITOR
+        /// <summary>
+        /// 创建asset配置文件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        public static void CreateAsset<T>(string path) where T : ScriptableObject
+        {
+            T asset = ScriptableObject.CreateInstance<T>();
+            if (string.IsNullOrEmpty(path))
+            {
+                Debug.LogError("Not select files, select files first! ");
+                return;
+            }
+            string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(path);
+            AssetDatabase.CreateAsset(asset, assetPathAndName);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            EditorUtility.FocusProjectWindow();
+            Selection.activeObject = asset;
+        }
+
         public static void DrawOutline(Rect rect, Color color, float lineWidth)
         {
             Texture2D tex = Texture2D.whiteTexture;
@@ -378,6 +400,15 @@ namespace SFA
             GUI.DrawTexture(new Rect(rect.xMin, rect.yMin, rect.width, lineWidth), tex);
             GUI.DrawTexture(new Rect(rect.xMin, rect.yMax - lineWidth, rect.width, lineWidth), tex);
             GUI.color = Color.white;
+        }
+
+        public static string GetPrefabPath(GameObject targetGameObject)
+        {
+            var prefab = PrefabUtility.GetCorrespondingObjectFromSource(targetGameObject);
+            if (prefab != null)
+                return PrefabUtility.GetPrefabAssetPathOfNearestInstanceRoot(prefab);
+            else
+                return null;
         }
 
         public static void Space()

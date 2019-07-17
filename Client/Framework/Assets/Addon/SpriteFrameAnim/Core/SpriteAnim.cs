@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace SFA
 {
@@ -15,15 +18,18 @@ namespace SFA
         private int mCurFrame = 0;
         private float mDelta = 0;
 
-        public float FPS = 5;
+        public Texture2D texture;
+        [SerializeField]
         public List<Sprite> SpriteFrames;
+        public float FPS = 15;
         public bool IsPlaying = false;
         public bool Foward = true;
-        public bool AutoPlay = false;
-        public bool Loop = false;
+        public bool AutoPlay = true;
+        public bool Loop = true;
         public bool ReturnStartFrame = false;
-        public float FadeInTime = 0.0f;
-        public float FadeOutTime = 0.0f;
+        public bool AutoSize = true;
+        [HideInInspector]public float FadeInTime = 0.0f;
+        [HideInInspector]public float FadeOutTime = 0.0f;
 
         private LuaFunction completeAction;
         public int FrameCount
@@ -42,6 +48,10 @@ namespace SFA
         void Awake()
         {
             ImageSource = GetComponent<Image>();
+#if UNITY_EDITOR
+            EditorApplication.update -= OnEditUpdate;
+            EditorApplication.update += OnEditUpdate;
+#endif
         }
 
         void Start()
@@ -62,7 +72,8 @@ namespace SFA
         private void SetSprite(int idx)
         {
             ImageSource.sprite = SpriteFrames[idx];
-            ImageSource.SetNativeSize();
+            if(AutoSize)
+                ImageSource.SetNativeSize();
         }
 
         public void Play()
@@ -91,6 +102,7 @@ namespace SFA
             Foward = false;
         }
 
+        
         void Update()
         {
             if (!IsPlaying || 0 == FrameCount)
@@ -203,6 +215,24 @@ namespace SFA
                 mCurFrame = 0;
                 SetSprite(mCurFrame);
             }
+#if UNITY_EDITOR
+            EditorApplication.update -= OnEditUpdate;
+#endif
         }
+#if UNITY_EDITOR
+        void OnEditUpdate()
+        {
+            if(!Application.isPlaying)
+                Update();
+        }
+        void OnDestroy()
+        {
+            EditorApplication.update -= OnEditUpdate;
+        }
+        void OnApplicationQuit()
+        {
+            EditorApplication.update -= OnEditUpdate;
+        }
+#endif
     }
 }

@@ -30,7 +30,7 @@ namespace SFA
 
         private void Update()
         {
-            DebugVector4();
+            //DebugVector4();
         }
     }
 }

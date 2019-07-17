@@ -23,7 +23,7 @@ namespace SFA
         public float recordScale = 1;
 
         //导出路径
-        [HideInInspector] public string exportPath;
+        [HideInInspector]public string exportPath;
 
         int rangeStart;
         int rangeEnd;
