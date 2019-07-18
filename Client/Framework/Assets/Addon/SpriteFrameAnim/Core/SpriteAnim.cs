@@ -1,6 +1,5 @@
 ﻿using DG.Tweening;
 using LuaInterface;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -54,12 +53,13 @@ namespace SFA
         public void Awake()
         {
             ImageSource = GetComponent<Image>();
+        
 #if UNITY_EDITOR
+        
             EditorApplication.update -= OnEditUpdate;
             EditorApplication.update += OnEditUpdate;
-#endif
         }
-
+#endif
         void Start()
         {
             if (AutoPlay)
@@ -108,15 +108,19 @@ namespace SFA
             Foward = false;
         }
 
-        
-        void Update()
+
+        public void Update()
         {
             if (!IsPlaying || 0 == FrameCount)
             {
                 return;
             }
-
+#if UNITY_EDITOR
+            mDelta += Time.fixedDeltaTime;
+#else
             mDelta += Time.deltaTime;
+#endif
+
             if (mDelta > 1 / FPS)
             {
                 mDelta = 0;
@@ -221,15 +225,15 @@ namespace SFA
                 mCurrFrame = 0;
                 SetSprite(mCurrFrame);
             }
-#if UNITY_EDITOR
-            EditorApplication.update -= OnEditUpdate;
-#endif
         }
 #if UNITY_EDITOR
         void OnEditUpdate()
         {
-            if(!Application.isPlaying)
-                Update();
+            Update();
+            EditorUtility.SetDirty(gameObject);
+            SceneView.RepaintAll();
+            if (SceneView.lastActiveSceneView)
+                SceneView.lastActiveSceneView.Repaint();
         }
         void OnDestroy()
         {
