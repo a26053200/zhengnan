@@ -19,7 +19,7 @@ namespace SFA
         public Vector2Int cutSize = new Vector2Int(128,128);
         public int FPS = 30;
         public int frameCount = 10;
-        [Range(0.1f, 10)]
+        [Range(0.01f, 10)]
         public float recordScale = 1;
 
         //导出路径

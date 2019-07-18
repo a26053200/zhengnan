@@ -10,7 +10,7 @@ namespace SFA
     [CustomEditor(typeof(FrameRecorder))]
     public class FrameRecorderEditor : Editor
     {
-        static string ExportPath = "Assets/Res/Effects/SpriteFrames/";
+        static string ExportPath = "Assets/Res/Effect/SpriteFrames/";
         FrameRecorder frameRecorder;
         List<Texture2D> textures;
         string prefabPath;

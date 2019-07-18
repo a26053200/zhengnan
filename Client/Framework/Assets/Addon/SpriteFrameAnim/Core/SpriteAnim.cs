@@ -55,13 +55,14 @@ namespace SFA
         public void Awake()
         {
             ImageSource = GetComponent<Image>();
-
+        
 #if UNITY_EDITOR
-
+        
             EditorApplication.update -= OnEditUpdate;
             EditorApplication.update += OnEditUpdate;
-        }
 #endif
+        }
+
         void Start()
         {
             if (AutoPlay)
@@ -80,7 +81,7 @@ namespace SFA
         public void SetSprite(int idx)
         {
             ImageSource.sprite = SpriteFrames[idx];
-            if (AutoSize)
+            if(AutoSize)
                 ImageSource.SetNativeSize();
         }
 
@@ -213,6 +214,8 @@ namespace SFA
 #if UNITY_EDITOR
         void OnEditUpdate()
         {
+            if (!this)
+                return;
             Update();
             EditorUtility.SetDirty(gameObject);
             SceneView.RepaintAll();
