@@ -1,10 +1,12 @@
-﻿using DG.Tweening;
+﻿#if USE_SFA_LUA
 using LuaInterface;
+#endif
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor;
+using System;
 #endif
 
 namespace SFA
@@ -12,12 +14,14 @@ namespace SFA
     [RequireComponent(typeof(Image))]
     public class SpriteAnim : MonoBehaviour
     {
+#if USE_SFA_LUA
         private LuaFunction completeAction;
+#endif
         private Image ImageSource;
         private int mCurrFrame = 0;
         private float mDelta = 0;
 
-        [SerializeField]
+        public Action overHandler;
         public List<Sprite> SpriteFrames;
         public float FPS = 15;
         public bool IsPlaying = false;
@@ -26,8 +30,6 @@ namespace SFA
         public bool Loop = true;
         public bool ReturnStartFrame = false;
         public bool AutoSize = true;
-        [HideInInspector]public float FadeInTime = 0.0f;
-        [HideInInspector]public float FadeOutTime = 0.0f;
 
         public int FrameCount
         {
@@ -44,18 +46,18 @@ namespace SFA
                 return mCurrFrame;
             }
         }
-
+#if USE_SFA_LUA
         public void OnComplete(LuaFunction func)
         {
             completeAction = func;
         }
-
+#endif
         public void Awake()
         {
             ImageSource = GetComponent<Image>();
-        
+
 #if UNITY_EDITOR
-        
+
             EditorApplication.update -= OnEditUpdate;
             EditorApplication.update += OnEditUpdate;
         }
@@ -78,28 +80,14 @@ namespace SFA
         public void SetSprite(int idx)
         {
             ImageSource.sprite = SpriteFrames[idx];
-            if(AutoSize)
+            if (AutoSize)
                 ImageSource.SetNativeSize();
         }
 
         public void Play()
         {
-            ///淡入效果
-            if (FadeInTime > 0)
-            {
-                Color color = ImageSource.color;
-                color.a = 0;
-                ImageSource.color = color;
-                ImageSource.DOFade(1, FadeInTime).OnComplete(delegate {
-                    IsPlaying = true;
-                    Foward = true;
-                });
-            }
-            else
-            {
-                IsPlaying = true;
-                Foward = true;
-            }
+            IsPlaying = true;
+            Foward = true;
         }
 
         public void PlayReverse()
@@ -142,17 +130,7 @@ namespace SFA
                     else
                     {
                         IsPlaying = false;
-                        ///淡出效果
-                        if (FadeOutTime > 0)
-                        {
-                            ImageSource.DOFade(0, FadeOutTime).OnComplete(delegate {
-                                EndAction();
-                            });
-                        }
-                        else
-                        {
-                            EndAction();
-                        }
+                        EndAction();
                         if (ReturnStartFrame)
                         {
                             mCurrFrame = 0;
@@ -183,12 +161,18 @@ namespace SFA
 
         private void EndAction()
         {
-            ///lua结束回调
+            if (overHandler != null)
+                overHandler();
+#if USE_SFA_LUA
+                ///lua结束回调
             if (completeAction != null)
             {
-                completeAction.Call();
+                completeAction.BeginPCall();
+                completeAction.PCall();
+                completeAction.EndPCall();
                 completeAction.Dispose();
             }
+#endif
         }
 
         public void Pause()
