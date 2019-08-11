@@ -7,6 +7,8 @@ namespace BM
     {
         public static readonly string BundlDataFile = "BundleData.txt";
 
+        public static readonly string VersionFile = "Version.txt";
+
         public static readonly string BundleSuffix = "bundle";
 
         public static readonly string BundlePattern = ".bundle";

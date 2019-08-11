@@ -25,7 +25,9 @@ namespace Framework
         ResLoaderInfo currLoadInfo;
         public override void Initialize()
         {
-            bundleLoader = gameObject.AddComponent<BundleLoader>();
+            GameObject obj = new GameObject("[BM]");
+            DontDestroyOnLoad(obj);
+            bundleLoader = obj.AddComponent<BundleLoader>();
             bundleLoader.LoadBundleData();
             loadQueue = new Queue<ResLoaderInfo>();
         }

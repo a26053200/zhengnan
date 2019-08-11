@@ -1,4 +1,6 @@
 ﻿using LitJson;
+using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
@@ -13,14 +15,30 @@ namespace BM
     /// </summary> 
     public static class BundleBuilder
     {
-        //配置路径
-        static string BMSettings_Path = "Assets/Res/BMSettings.asset";
-
-        //输出目录
-        static string Output_Path;
+        //打包版本记录
+        const string BM_Build_Version = "BM_Build_Version";
 
         //配置
-        static BMSettings settings;
+        public static BMSettings settings;
+
+        //历史记录
+        public static Dictionary<string, BuildSampleInfo> historyBuildInfo;
+
+        //历史记录文库路径
+        public static string historyBuildInfoPath;
+
+        //输出目录
+        public static string Output_Root_Path;
+
+        //输出目录
+        public static string Output_Path;
+
+        
+        //AssetBundleName 对应资源的映射
+        static string AssetBundleNameMap_Path;
+
+        //版本
+        static Version version;
 
         static List<BuildInfo> buildInfoList;
         
@@ -36,52 +54,33 @@ namespace BM
 
         static List<string> tempLuaPaths;
 
-        [MenuItem("Window/Bundle Manager(IOS)")]
-        public static void BuildIOS()
-        {
-            StartBuild(true, BuildTarget.iOS);
-        }
-
-        [MenuItem("Window/Bundle Manager(Android)")]
-        public static void BuildAndroid()
-        {
-            StartBuild(true, BuildTarget.Android);
-        }
-
-        [MenuItem("Window/Bundle Manager(Win64)")]
-        public static void BuildWin64()
-        {
-            StartBuild(true, BuildTarget.StandaloneWindows64);
-        }
-
-        [MenuItem("Window/Bundle Manager_Test")]
-        public static void Test()
-        {
-            StartBuild(false,BuildTarget.StandaloneWindows64);
-        }
         //=======================
         // 流程函数
         //=======================
 
-        public static List<BuildInfo> StartBuild(bool generate,BuildTarget _buildTarget)
+        public static List<BuildInfo> StartBuild(bool isForceBuild, Language language, BuildTarget _buildTarget, bool generate)
         {
             buildTarget = _buildTarget;
             buildStartTime = EditorApplication.timeSinceStartup;
             tempLuaPaths = new List<string>();
 
-            //加载打包配置
-            settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
+            //记录打包次数
+            string verStr = EditorPrefs.GetString(settings.AppName + BM_Build_Version, null);
+            if (string.IsNullOrEmpty(verStr))
+                version = new Version(0,0,0,1);
+            else
+            {
+                version = new Version(verStr);
+                version = new Version(version.Major, version.Minor, version.Build, version.Revision + 1);
+            }
 
             buildInfoJson = new JsonData();
             buildInfoJson["resDir"] = settings.resDir;
-            buildInfoJson["playform"] = buildTarget.ToString();
+            buildInfoJson["platform"] = buildTarget.ToString();
             buildInfoJson["bundles"] = new JsonData();
 
             ignoreSuffixs = settings.Ignore_Suffix.Split(',');
             ignoreFolders = settings.Ignore_Folder.Split(',');
-
-            //Output_Path = Application.dataPath.Replace("Assets", "TestBundle");
-            Output_Path = Application.streamingAssetsPath;
 
             if (Directory.Exists(Output_Path))
                 BMEditUtility.DelFolder(Output_Path);
@@ -95,16 +94,21 @@ namespace BM
             FetchAllBuildInfo();
             //计算AssetBundle信息
             CalcAssetBundleInfos();
+            //做增量过滤
+            IncrementFilter();
             //生成AssetBundle
             if(generate)
                 GenerateAssetBundle();
             //移动生成后的所有Bundle
-            MoveAssetBundle();
+            if (!isForceBuild)
+                MoveAssetBundle();
             //计算Bundle文件大小
-            CalcBundleFileSize();
+            if (generate)
+                CalcBundleFileSize();
             //写入Bundle信息
             SaveBundleInfo();
 
+            Logger.Log("Generate Assets Bundle Over. time consuming:{0}s", EditorApplication.timeSinceStartup - buildStartTime);
             return buildInfoList;
         }
 
@@ -153,7 +157,7 @@ namespace BM
                     string path = buildInfo.assetPaths[j];
                     string dirName = Path.GetDirectoryName(path);
                     string name;
-                    switch(buildInfo.buildType)
+                    switch (buildInfo.buildType)
                     {
                         case BuildType.Pack:
                             name = BMUtility.Path2Name(dirName);
@@ -186,15 +190,19 @@ namespace BM
                                 assetBundleVariant = BMConfig.BundleSuffix,
                             },
                             assetPaths = new List<string>(),
+                            assetHashs = new List<string>(),
                             dependenceMap = new Dictionary<string, string[]>(),
                         };
                         buildInfo.subBuildInfoMap.Add(md5, subInfo);
                     }
                     //添加依赖关系
                     AddDependence(path, subInfo.dependenceMap);
+                    string hash = HashHelper.ComputeMD5(path);
                     subInfo.assetPaths.Add(path.ToLower());
+                    subInfo.assetHashs.Add(hash);
                     AssetBundleBuild abb = subInfo.assetBundleBuild;
                     abb.assetNames = subInfo.assetPaths.ToArray();
+                    
                     //abb.addressableNames = subInfo.assetPaths.ToArray();
                     subInfo.assetBundleBuild = abb;
                     EditorUtility.DisplayProgressBar("Calc Asset Bundle Build Infos...", path, (float)(j + 1.0f) / (float)buildInfo.assetPaths.Count);
@@ -205,7 +213,56 @@ namespace BM
 
             Logger.Log("Calc Asset Bundle Infos Over.");
         }
-
+        //增量过滤
+        static void IncrementFilter()
+        {
+            int newCount = 0, forceCount = 0, filterCount = 0, total = 0;
+            if (historyBuildInfo!=null)
+            {
+                for (int i = 0; i < buildInfoList.Count; i++)
+                {
+                    BuildInfo buildInfo = buildInfoList[i];
+                    foreach (var subInfo in buildInfo.subBuildInfoMap.Values)
+                    {
+                        total++;
+                        historyBuildInfo.TryGetValue(subInfo.bundleName, out BuildSampleInfo historyInfo);
+                        if (historyInfo == null)
+                        {//全新的bundle
+                            newCount++;
+                            continue;
+                        }
+                        EditorUtility.DisplayProgressBar("Increment Filter Asset Bundle...", subInfo.bundleName, (float)(i + 1.0f) / (float)buildInfoList.Count);
+                        if (BuildType.Scene != subInfo.buildType && BuildType.Lua != subInfo.buildType)
+                        {//非强制打包需要做增量过滤
+                            if (historyInfo.assetPaths.Count != subInfo.assetPaths.Count)
+                            {
+                                newCount++;
+                                continue;
+                            }
+                            if (!historyInfo.assetPaths.SequenceEqual(subInfo.assetPaths))
+                            {
+                                newCount++;
+                                continue;
+                            }
+                            if (!historyInfo.assetHashs.SequenceEqual(subInfo.assetHashs))
+                            {
+                                newCount++;
+                                continue;
+                            }
+                            filterCount++;
+                            subInfo.ignore = true;
+                        }
+                        else
+                        {
+                            forceCount++;
+                        }
+                    }
+                }
+            }
+            Logger.Log(string.Format("Build new bundle {0}, Increment filter {1}, Force Build {2}, Total {3}", newCount, filterCount, forceCount, total));
+            EditorUtility.ClearProgressBar();
+        }
+        
         static void GenerateAssetBundle()
         {
             int count = 0;
@@ -217,6 +274,10 @@ namespace BM
                 {
                     for (int j = 0; j < subInfo.assetPaths.Count; j++)
                     {
+                        if (subInfo.ignore)
+                        {
+                            continue;//增量更新被忽略掉
+                        }
                         if(BuildType.Scene == buildInfo.buildType)
                         {
                             string path = subInfo.assetPaths[j];
@@ -277,7 +338,7 @@ namespace BM
                     File.Delete(path);
             }
             AssetDatabase.Refresh();
-            Logger.Log("Generate Assets Bundle Over. num:{0} time consuming:{1}s", count, EditorApplication.timeSinceStartup - buildStartTime);
+            
         }
 
         
@@ -326,6 +387,9 @@ namespace BM
             }
             string json = buildInfoJson.ToJson();
             BMEditUtility.SaveUTF8TextFile(Output_Path + "/" + BMConfig.BundlDataFile, JsonFormatter.PrettyPrint(json));
+            BMEditUtility.SaveUTF8TextFile(Output_Path + "/" + BMConfig.VersionFile, version.ToString());
+            //BMEditUtility.SaveDictionary(historyBuildInfoPath, historyBuildInfoPath);
+            EditorPrefs.SetString(settings.AppName + BM_Build_Version, version.ToString());
         }
 
         //=======================

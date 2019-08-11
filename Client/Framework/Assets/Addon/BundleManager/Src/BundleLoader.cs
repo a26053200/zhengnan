@@ -17,8 +17,9 @@ namespace BM
     {
         private JsonData bundleJsonData;
 
-        private List<BundleInfo> bundleInfos;
-        private Dictionary<string, BundleInfo> bundleInfoDict;
+        public List<BundleInfo> bundleInfos { get; private set; }
+        public Dictionary<string, BundleInfo> bundleInfoDict { get; private set; }
+
         private void Awake()
         {
             
@@ -28,7 +29,7 @@ namespace BM
         {
             string bundleData = BMUtility.LoadText(getFilePath(BMConfig.BundlDataFile));
             JsonData jsonData = JsonMapper.ToObject(bundleData);
-            Debug.Log(bundleData);
+            //Debug.Log(bundleData);
 
             bundleInfos = new List<BundleInfo>();
             bundleInfoDict = new Dictionary<string, BundleInfo>();
@@ -112,6 +113,7 @@ namespace BM
             else
             {
                 assetBundle = bundleInfo.bundleReference.assetBundle;
+                bundleInfo.bundleReference.count += 1;
             }
             Debug.LogFormat("The AssetBundle '{0}' load success!", path);
             return assetBundle;
@@ -131,9 +133,9 @@ namespace BM
                 {
                     BundleInfo chindInfo = GetBundleInfo(assetPath);
                     chindInfo.parent = bundleInfo;
-                    if (bundleInfo.children == null)
-                        bundleInfo.children = new List<BundleInfo>();
-                    bundleInfo.children.Add(chindInfo);
+                    if (bundleInfo.dependenceChildren == null)
+                        bundleInfo.dependenceChildren = new List<BundleInfo>();
+                    bundleInfo.dependenceChildren.Add(chindInfo);
                     yield return LoadAssetBundleAsync(bundleInfo.dependencePaths[i], null);
                 }
                 yield return LoadBundleAsync(bundleInfo, OnAssetBundleLoaded);
@@ -148,7 +150,10 @@ namespace BM
             {//就算 缓存池里面有 也要模拟异步加载
                 yield return new WaitForEndOfFrame();
                 if (OnAssetBundleLoaded != null)
+                {
                     OnAssetBundleLoaded(bundleInfo.bundleReference.assetBundle);
+                    bundleInfo.bundleReference.count += 1;
+                }
             }
             else
             {
@@ -213,7 +218,10 @@ namespace BM
             {
                 foreach (var item in bundleInfoDict)
                 {
-                    item.Value.bundleReference.assetBundle.Unload(true);
+                    if (item.Value.bundleReference != null)
+                    {
+                        //item.Value.bundleReference.assetBundle.Unload(true);
+                    }
                 }
             }
         }

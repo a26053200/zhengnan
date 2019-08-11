@@ -12,6 +12,11 @@ namespace BM
     /// </summary> 
     public class BMSettings : ScriptableObject
     {
+        //应用名字
+        public string AppName = "AppName";
+
+        public string BuildOutoutDirName = "AssetBundle";
+
         public string resDir = "Assets/Res/";
 
         public string lastBuildDate;

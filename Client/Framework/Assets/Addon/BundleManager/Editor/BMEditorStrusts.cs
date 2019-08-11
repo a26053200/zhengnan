@@ -18,6 +18,12 @@ namespace BM
         public Dictionary<string, SubBuildInfo> subBuildInfoMap;
 
     }
+    public class BuildSampleInfo
+    {
+        public string bundleName;
+        public List<string> assetPaths;
+        public List<string> assetHashs;
+    }
     public class SubBuildInfo
     {
         public string bundleName;
@@ -26,9 +32,12 @@ namespace BM
         public uint crc;
         public long size;
         public List<string> assetPaths;
+        public List<string> assetHashs;
         public AssetBundleBuild assetBundleBuild;
         public Dictionary<string, string[]> dependenceMap;
+        public Dictionary<string, string[]> dependenceHashMap;
 
+        public bool ignore = false;
         public JsonData ToJson()
         {
             JsonData json = new JsonData();
@@ -42,7 +51,12 @@ namespace BM
             {
                 json["assetPaths"].Add(assetPaths[i]);
             }
-            if(dependenceMap.Count > 0)
+            json["assetHashs"] = new JsonData();
+            for (int i = 0; i < assetPaths.Count; i++)
+            {
+                json["assetHashs"].Add(assetHashs[i]);
+            }
+            if (dependenceMap.Count > 0)
             {
                 //json["dependenceMap"] = new JsonData();
                 foreach (var dep in dependenceMap)
@@ -55,6 +69,21 @@ namespace BM
                         depJson.Add(dep.Value[i]);
                     }
                     //json["dependenceMap"].Add(depJson);
+                }
+            }
+            if (dependenceHashMap.Count > 0)
+            {
+                //json["dependenceHashs"] = new JsonData();
+                foreach (var dep in dependenceHashMap)
+                {
+                    JsonData depJson = new JsonData();
+                    //depJson["path"] = dep.Key;
+                    json["dependenceHashs"] = depJson;
+                    for (int i = 0; i < dep.Value.Length; i++)
+                    {
+                        depJson.Add(dep.Value[i]);
+                    }
+                    //json["dependenceHashs"].Add(depJson);
                 }
             }
             return json;

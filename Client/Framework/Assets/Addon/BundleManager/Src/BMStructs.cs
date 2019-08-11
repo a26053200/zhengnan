@@ -9,12 +9,18 @@ namespace BM
     {
         public string bundleName;
         public string buildMd5;
+        public string fileHash;
+        public int crc;
         public BuildType buildType;
         public List<string> assetPaths;
         public List<string> dependencePaths;
-        public List<BundleInfo> children;
+        public List<BundleInfo> dependenceChildren;
         public BundleInfo parent;
         public BundleReferenceInfo bundleReference;
+
+#if UNITY_EDITOR
+        public bool showChildren;
+#endif
     }
 
     public class BundleReferenceInfo

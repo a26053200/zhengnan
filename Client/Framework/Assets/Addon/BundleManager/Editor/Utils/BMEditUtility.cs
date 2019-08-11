@@ -257,6 +257,16 @@ namespace BM
             }
             return _FileMD5;
         }
+
+        //横向分割线
+        public static void DrawHorizontalSplitter(float height = 5)
+        {
+            GUILayout.Box("",
+            GUILayout.Height(height),
+            GUILayout.MaxHeight(height),
+            GUILayout.MinHeight(height),
+            GUILayout.ExpandWidth(true));
+        }
     }
 }
     
