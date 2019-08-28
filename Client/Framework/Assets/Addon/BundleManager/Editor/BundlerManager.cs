@@ -13,38 +13,41 @@ namespace BM
     /// </summary> 
     public static class BundlerManager
     {
-        [MenuItem("Build/Force Build")]
-        public static void ForceBuild()
+
+        [MenuItem("Build/Force Build Bundle(IOS)")]
+        public static void ForceBuildIOS()
         {
-            isForceBuild = !isForceBuild;
+            StartBuild(true, Language.zh_CN, BuildTarget.iOS, false);
         }
-        [MenuItem("Build/Force Build")]
-        public static void ForceBuild()
+
+        [MenuItem("Build/Force Build Bundle(Android)")]
+        public static void ForceBuildAndroid()
         {
-            isForceBuild = !isForceBuild;
+            StartBuild(true, Language.zh_CN, BuildTarget.Android, false);
         }
-        [MenuItem("Build/Force Build", true)]
-        public static bool IsForceBuild()
+
+        [MenuItem("Build/Force Build Bundle(Win64)")]
+        public static void ForceBuildWin64()
         {
-            return isForceBuild;
+            StartBuild(true, Language.zh_CN, BuildTarget.StandaloneWindows64, false);
         }
 
         [MenuItem("Build/Build Bundle(IOS)")]
         public static void BuildIOS()
         {
-            StartBuild(isForceBuild, Language.zh_CN, BuildTarget.iOS, false);
+            StartBuild(false, Language.zh_CN, BuildTarget.iOS, false);
         }
 
         [MenuItem("Build/Build Bundle(Android)")]
         public static void BuildAndroid()
         {
-            StartBuild(isForceBuild, Language.zh_CN, BuildTarget.Android, false);
+            StartBuild(false, Language.zh_CN, BuildTarget.Android, false);
         }
 
         [MenuItem("Build/Build Bundle(Win64)")]
         public static void BuildWin64()
         {
-            StartBuild(isForceBuild, Language.zh_CN, BuildTarget.StandaloneWindows64, false);
+            StartBuild(false, Language.zh_CN, BuildTarget.StandaloneWindows64, false);
         }
 
         [MenuItem("Build/Build Bundle_Test")]
@@ -127,7 +130,53 @@ namespace BM
                 return "";
             }
         }
+
+        static BuildTarget GetSelectedBuildTarget(string targetPlatform)
+        {
+            // 目标平台
+            BuildTarget buildTarget = default(BuildTarget);
+            switch (targetPlatform)
+            {
+                case "ios":
+                    buildTarget = BuildTarget.iOS;
+                    break;
+                case "android":
+                    buildTarget = BuildTarget.Android;
+                    break;
+                case "macos":
+                    buildTarget = BuildTarget.StandaloneOSX;
+                    break;
+                case "windows":
+                    buildTarget = BuildTarget.StandaloneWindows;
+                    break;
+                case "windows64":
+                    buildTarget = BuildTarget.StandaloneWindows64;
+                    break;
+            }
+            return buildTarget;
+        }
+
+        [MenuItem("Build/BuildAssetBundle")]
+        static void BuildAssetBundle()
+        {
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //BuildTarget buildTarget = GetSelectedBuildTarget(GetCommandLineArgs("-buildTarget"));
+            //Language language = (Language)Enum.Parse(typeof(Language), GetCommandLineArgs("-language"));
+            //Debug.Log(string.Format("Start build asset bundle with -buildTarget:{0}  -language{1}", 123123123, 123123123));
+            //StartBuild(true, language, buildTarget, true);
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
+            //string s = null;
+            //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA" + s.Length);
+            BMEditUtility.SaveUTF8TextFile(@"D:\work\WorkSpace_Unity\mrpg_trunk\Build\test.text", "1.1.1.1.1");
+        }
     }
 }
-
-

@@ -19,10 +19,6 @@ namespace BM
 
         public string resDir = "Assets/Res/";
 
-        public string lastBuildDate;
-
-        public int zipLevel = 9;
-
         //lua文件夹
         public List<string> luaFolderList = new List<string>();
         //打包类型

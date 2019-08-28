@@ -54,15 +54,19 @@ namespace BM
 
         static List<string> tempLuaPaths;
 
+        static bool isForceBuild;
+
         //=======================
         // 流程函数
         //=======================
 
-        public static List<BuildInfo> StartBuild(bool isForceBuild, Language language, BuildTarget _buildTarget, bool generate)
+        public static List<BuildInfo> StartBuild(bool _isForceBuild, Language language, BuildTarget _buildTarget, bool generate)
         {
             buildTarget = _buildTarget;
             buildStartTime = EditorApplication.timeSinceStartup;
             tempLuaPaths = new List<string>();
+
+            isForceBuild = _isForceBuild;
 
             //记录打包次数
             string verStr = EditorPrefs.GetString(settings.AppName + BM_Build_Version, null);
@@ -95,13 +99,14 @@ namespace BM
             //计算AssetBundle信息
             CalcAssetBundleInfos();
             //做增量过滤
-            IncrementFilter();
+            if (!isForceBuild)//是否是强制重新Bunild
+                IncrementFilter();
             //生成AssetBundle
             if(generate)
                 GenerateAssetBundle();
             //移动生成后的所有Bundle
-            if (!isForceBuild)
-                MoveAssetBundle();
+            //if (!isForceBuild)
+                //MoveAssetBundle();
             //计算Bundle文件大小
             if (generate)
                 CalcBundleFileSize();
