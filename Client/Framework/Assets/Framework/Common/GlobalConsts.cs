@@ -13,7 +13,7 @@ public class GlobalConsts
     /// <summary>
     /// 是否开启Res AssetBundle模式
     /// </summary>
-    public static bool isResBundleMode = true;
+    public static bool isResBundleMode = false;
 
     /// <summary>
     /// 是否开启Res AssetBundle模式
@@ -42,28 +42,18 @@ public class GlobalConsts
     /// <summary>
     /// 是否在编辑器模式下运行
     /// </summary>
-    public static bool isRuningInEditor
-    {
-        get
-        {
-            return Application.platform == RuntimePlatform.WindowsEditor ||
-                Application.platform == RuntimePlatform.LinuxEditor ||
-                Application.platform == RuntimePlatform.OSXEditor;
-        }
-    }
+    public static bool isRunningInEditor =>
+        Application.platform == RuntimePlatform.WindowsEditor ||
+        Application.platform == RuntimePlatform.LinuxEditor ||
+        Application.platform == RuntimePlatform.OSXEditor;
 
 
     /// <summary>
     /// 是否在移动设备下运行
     /// </summary>
-    public static bool isRuningInMobileDevice
-    {
-        get
-        {
-            return Application.platform == RuntimePlatform.IPhonePlayer ||
-                Application.platform == RuntimePlatform.LinuxEditor ||
-                Application.platform == RuntimePlatform.OSXEditor;
-        }
-    }
+    public static bool isRunningInMobileDevice =>
+        Application.platform == RuntimePlatform.IPhonePlayer ||
+        Application.platform == RuntimePlatform.LinuxEditor ||
+        Application.platform == RuntimePlatform.OSXEditor;
 }
 

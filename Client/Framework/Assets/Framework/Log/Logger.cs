@@ -285,6 +285,7 @@ public class Logger
     {
         string logContent = instance.AddLog("ErrorLog", string.Format(format, args));
         if (instance.LogInfoToConsole)
+            // ReSharper disable once Unity.PerformanceCriticalCodeInvocation
             Debug.LogError(logContent);
     }
 

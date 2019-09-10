@@ -133,7 +133,7 @@ namespace Framework
         /// <returns>T</returns>
         T LoadAsset<T>(string path) where T : UnityEngine.Object
         {
-            if (GlobalConsts.isRuningInMobileDevice || GlobalConsts.isResBundleMode)
+            if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
             {
                 //加载bundle;
                 string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
@@ -181,7 +181,7 @@ namespace Framework
                 Logger.LogError("Load Asset {0} Async must has callback function!", path);
                 yield break;
             }
-            if (GlobalConsts.isRuningInMobileDevice || GlobalConsts.isResBundleMode)
+            if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
             {
                 //加载bundle;
                 string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
@@ -212,7 +212,7 @@ namespace Framework
                     }
                 });
             }
-            else if (GlobalConsts.isRuningInEditor)
+            else if (GlobalConsts.isRunningInEditor)
             {
 #if UNITY_EDITOR
                 yield return new WaitForEndOfFrame();
@@ -240,7 +240,7 @@ namespace Framework
         //Sprite
         public Sprite LoadSprite(string path)
         {
-            if (GlobalConsts.isRuningInMobileDevice || GlobalConsts.isResBundleMode)
+            if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
             {
                 string spritePrefabPath = GetSpritePrefabPath(path);
                 Debug.LogFormat("Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
@@ -258,7 +258,7 @@ namespace Framework
 
         public void LoadSpriteAsync(string path, LuaFunction luaFunc)
         {
-            if (GlobalConsts.isRuningInMobileDevice || GlobalConsts.isResBundleMode)
+            if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
             {
                 string spritePrefabPath = GetSpritePrefabPath(path);
                 StartCoroutine(resLoader.AddLoadAssetBundleAsync(spritePrefabPath, delegate(AssetBundle assetBundle)

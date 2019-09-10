@@ -25,11 +25,14 @@ namespace Framework
         ResLoaderInfo currLoadInfo;
         public override void Initialize()
         {
-            GameObject obj = new GameObject("[BM]");
-            DontDestroyOnLoad(obj);
-            bundleLoader = obj.AddComponent<BundleLoader>();
-            bundleLoader.LoadBundleData();
-            loadQueue = new Queue<ResLoaderInfo>();
+            if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
+            {
+                GameObject obj = new GameObject("[BM]");
+                DontDestroyOnLoad(obj);
+                bundleLoader = obj.AddComponent<BundleLoader>();
+                bundleLoader.LoadBundleData();
+                loadQueue = new Queue<ResLoaderInfo>();
+            }
         }
 
 
