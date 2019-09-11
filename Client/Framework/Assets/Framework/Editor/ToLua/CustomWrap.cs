@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using ECS;
 using BindType = ToLuaMenu.BindType;
 using Framework;
+using Game;
 using UnityEngine.UI;
 /// <summary>
 /// <para>Class Introduce</para>
@@ -100,7 +101,7 @@ public static class CustomWrap
         //================
         // ECS
         //================
-        _GT(typeof(BootStrap)),
+        _GT(typeof(ECSWorld)),
     };
 }
 

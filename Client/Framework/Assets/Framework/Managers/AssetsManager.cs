@@ -82,6 +82,15 @@ namespace Framework
             LoadAssetAsync<GameObject>(path, callback);
         }
 
+        public Mesh LoadMesh(string path)
+        {
+            return LoadAsset<Mesh>(path);
+        }
+        public void LoadMeshAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<Mesh>(path, callback);
+        }
+        
         public Material LoadMaterial(string path)
         {
             return LoadAsset<Material>(path);

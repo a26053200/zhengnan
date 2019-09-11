@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace ECS
+namespace Framework
 {
     public class CameraView : MonoBehaviour
     {
