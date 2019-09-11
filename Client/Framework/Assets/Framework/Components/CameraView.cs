@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace Framework
+namespace ECS
 {
     public class CameraView : MonoBehaviour
     {
@@ -51,8 +51,6 @@ namespace Framework
         void FindLowerCorners()
         {
             var corners = GetCorners(lowerDistance);
-            
-
             // for debugging
             Debug.DrawLine(corners[0], corners[1], Color.red);
             Debug.DrawLine(corners[1], corners[3], Color.red);

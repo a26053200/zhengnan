@@ -11,29 +11,29 @@ echo Start update - %PROJ_DIR% ...
 D:
 cd %PROJ_DIR%
 svn status
-::svn update
+svn update
 echo Update Complete! -- %PROJ_DIR%
 
 cd Assets\%GAME_CODE_DIR%
 svn status
-::svn update
+svn update
 echo Update Complete! -- %GAME_CODE_DIR%
 
 cd ../
 cd %RES_DIR%
 svn status
-::svn update
+svn update
 echo Update Complete! -- %RES_DIR%
 
 cd ../
 cd %LUA_FRAMEWORK_DIR%
 svn status
-::svn update
+svn update
 echo Update Complete! -- %LUA_FRAMEWORK_DIR%
 
 cd %LUA_DIR%
 svn status
-::svn update
+svn update
 echo Update Complete! -- %LUA_DIR%
 
 pause

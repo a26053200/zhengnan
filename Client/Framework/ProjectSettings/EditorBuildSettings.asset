@@ -18,12 +18,9 @@ EditorBuildSettings:
     path: Assets/Resources/Scenes/Loading.unity
     guid: 59968a6245620d34cb4fe11a3b2b2750
   - enabled: 1
-    path: Assets/Res/BundleScenes/GuideNewbie.unity
-    guid: c5ca80d79f08f564bad5e79b154e35cc
+    path: Assets/Res/Scenes/Stage1.unity
+    guid: 83a449770d81f4407ab08a977f09cd6f
   - enabled: 1
-    path: Assets/Res/BundleScenes/Lobby.unity
-    guid: 6aa079fbf1a73ff4ea70085096a96902
-  - enabled: 1
-    path: Assets/Res/BundleScenes/Room_HJ.unity
-    guid: 58b49dabc009e3645a8861e8ed39a5bb
+    path: Assets/Res/Scenes/Battle.unity
+    guid: 7bdc046a35bec5d408c3638993a55764
   m_configObjects: {}

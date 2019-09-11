@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
-
+using ECS;
 using BindType = ToLuaMenu.BindType;
 using Framework;
 using UnityEngine.UI;
@@ -92,10 +92,15 @@ public static class CustomWrap
         _GT(typeof(FastBehavior.StateNode)),
         _GT(typeof(FastBehavior.FastLuaBehavior)),
 
-        /// Custom Components
+        // Custom Components
         _GT(typeof(ListView)),
         _GT(typeof(LuaListViewAdapter)),
         _GT(typeof(LuaListViewCell)),
+        
+        //================
+        // ECS
+        //================
+        _GT(typeof(BootStrap)),
     };
 }
 
