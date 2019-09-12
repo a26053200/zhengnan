@@ -26,7 +26,14 @@ public class Client : MonoBehaviour
         }
             
         DontDestroyOnLoad(this);
-       
+        // 初始变量赋值
+        Application.targetFrameRate = 60;
+        Application.runInBackground = true;
+        Debug.Log("Application TargetFrameRate:" + Application.targetFrameRate);
+        Debug.Log("Application RunInBackground:" + Application.runInBackground);
+        Debug.Log("Application InstallMode:" + Application.installMode);
+        Debug.Log("Application Unity Version:" + Application.unityVersion);
+        
         httpRequest = gameObject.AddComponent<HttpRequest>();
 
         JsonData json = new JsonData();

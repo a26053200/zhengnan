@@ -25,6 +25,7 @@ namespace Framework
 
             if (_theCamera)
                 tx = _theCamera.transform;
+            FindUpperCorners();
         }
 
 
