@@ -30,6 +30,8 @@ Time = UnityEngine.Time;
 Mathf = UnityEngine.Mathf;
 Camera = UnityEngine.Camera
 Rect = UnityEngine.Rect
+LayerMask = UnityEngine.LayerMask;
+
 ---@class UnityEngine.EventSystems
 ---@field EventTrigger UnityEngine.EventSystems.EventTrigger
 ---@field EventTriggerType UnityEngine.EventSystems.EventTriggerType

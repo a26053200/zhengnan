@@ -50,3 +50,9 @@ end
 function Res.LoadMaterial(path)
     return assetsMgr:LoadMaterial(path);
 end
+
+---@param path string
+---@return UnityEngine.Material
+function Res.LoadMesh(path)
+    return assetsMgr:LoadMesh(path);
+end
