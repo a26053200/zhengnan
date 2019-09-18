@@ -131,17 +131,21 @@ namespace Framework
         {
             return AddObjectEvent(go, EventTriggerType.Drop, luaFunc);
         }
-
+        public static LuaFunction AddObjectEndDrag(GameObject go, LuaFunction luaFunc)
+        {
+            return AddObjectEvent(go, EventTriggerType.EndDrag, luaFunc);
+        }
+        
         public static LuaFunction AddObjectEvent(GameObject gameObject, EventTriggerType type, LuaFunction luaFunc)
         {
-            EventTriggerListener.EventDelegate ed = delegate (GameObject go, BaseEventData eventData)
+            EventTriggerListener.EventDelegate ed = delegate (BaseEventData eventData)
             {
                 luaFunc.BeginPCall();
-                luaFunc.Call<GameObject, BaseEventData>(gameObject, eventData);
+                luaFunc.Call<BaseEventData>(eventData);
                 luaFunc.EndPCall();
             };
             EventTriggerListener listener = EventTriggerListener.Get(gameObject);
-            EventTriggerListener.Entry entry = new EventTriggerListener.Entry(luaFunc, ed);
+            //EventTriggerListener.Entry entry = new EventTriggerListener.Entry(luaFunc, ed);
             listener.GetLuaFuncHashSet(type, luaFunc).Add(ed);
             switch (type)
             {
@@ -244,15 +248,15 @@ namespace Framework
         //    return entry;
         //}
 
-        public static void RemoveObjectEvent(GameObject go, UnityEngine.EventSystems.EventTrigger.Entry entry)
-        {
-            UnityEngine.EventSystems.EventTrigger trigger = go.GetComponent<UnityEngine.EventSystems.EventTrigger>();
-            if (trigger != null)
-            {
-                if (trigger.triggers.Contains(entry))
-                    trigger.triggers.Remove(entry);
-            }
-        }
+//        public static void RemoveObjectEvent(GameObject go, UnityEngine.EventSystems.EventTrigger.Entry entry)
+//        {
+//            UnityEngine.EventSystems.EventTrigger trigger = go.GetComponent<UnityEngine.EventSystems.EventTrigger>();
+//            if (trigger != null)
+//            {
+//                if (trigger.triggers.Contains(entry))
+//                    trigger.triggers.Remove(entry);
+//            }
+//        }
         /// <summary>
         /// 判断是否按下(跨平台)
         /// </summary>

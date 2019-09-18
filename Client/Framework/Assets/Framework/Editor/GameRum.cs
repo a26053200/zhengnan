@@ -64,7 +64,7 @@ public static class GameRum
     [MenuItem("Run/Enter Edit UI")]
     static void EnterEditUI()
     {
-        EditorSceneManager.OpenScene("Assets/Edit/_Scenes/UIEditor.unity", OpenSceneMode.Single);
+        EditorSceneManager.OpenScene("Assets/Edit/Scenes/UIEditor.unity", OpenSceneMode.Single);
         //EditorApplication.ExecuteMenuItem("Edit/Play");
     }
 }

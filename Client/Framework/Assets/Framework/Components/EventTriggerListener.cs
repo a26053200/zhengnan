@@ -18,7 +18,7 @@ namespace Framework
     {
         
         #region 17个监听事件，一套带数据，一套不带数据
-        public delegate void EventDelegate(GameObject go, BaseEventData eventData);
+        public delegate void EventDelegate(BaseEventData eventData);
         public delegate void VoidDelegate(GameObject go);
 
         public class Entry
@@ -85,73 +85,73 @@ namespace Framework
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (onEventEnter != null) onEventEnter(gameObject, eventData);
+            if (onEventEnter != null) onEventEnter(eventData);
             if (onEnter != null) onEnter(gameObject);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            if (onEventExit != null) onEventExit(gameObject, eventData);
+            if (onEventExit != null) onEventExit(eventData);
             if (onExit != null) onExit(gameObject);
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
-            if (onEventDown != null) onEventDown(gameObject, eventData);
+            if (onEventDown != null) onEventDown(eventData);
             if (onDown != null) onDown(gameObject);
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (onEventUp != null) onEventUp(gameObject, eventData);
+            if (onEventUp != null) onEventUp(eventData);
             if (onUp != null) onUp(gameObject);
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
-            if (onEventClick != null) onEventClick(gameObject, eventData);
+            if (onEventClick != null) onEventClick(eventData);
             if (onClick != null) onClick(gameObject);
         }
 
         public void OnInitializePotentialDrag(PointerEventData eventData)
         {
-            if (onEventInitializeDrag != null) onEventInitializeDrag(gameObject, eventData);
+            if (onEventInitializeDrag != null) onEventInitializeDrag(eventData);
             if (onInitializeDrag != null) onInitializeDrag(gameObject);
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
-            if (onEventBeginDrag != null) onEventBeginDrag(gameObject, eventData);
+            if (onEventBeginDrag != null) onEventBeginDrag(eventData);
             if (onBeginDrag != null) onBeginDrag(gameObject);
         }
 
         public void OnDrag(PointerEventData eventData)
         {
-            if (onEventDrag != null) onEventDrag(gameObject, eventData);
+            if (onEventDrag != null) onEventDrag(eventData);
             if (onDrag != null) onDrag(gameObject);
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
-            if (onEventEndDrag != null) onEventEndDrag(gameObject, eventData);
+            if (onEventEndDrag != null) onEventEndDrag(eventData);
             if (onEndDrag != null) onEndDrag(gameObject);
         }
 
         public void OnDrop(PointerEventData eventData)
         {
-            if (onEventDrop != null) onEventDrop(gameObject, eventData);
+            if (onEventDrop != null) onEventDrop(eventData);
             if (onDrop != null) onDrop(gameObject);
         }
 
         public void OnScroll(PointerEventData eventData)
         {
-            if (onEventScroll != null) onEventScroll(gameObject, eventData);
+            if (onEventScroll != null) onEventScroll(eventData);
             if (onScroll != null) onScroll(gameObject);
         }
 
         public void OnMove(AxisEventData eventData)
         {
-            if (onEventMove != null) onEventMove(gameObject, eventData);
+            if (onEventMove != null) onEventMove(eventData);
             if (onMove != null) onMove(gameObject);
         }
 
