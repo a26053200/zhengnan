@@ -94,4 +94,10 @@ function Tools.GetRandomArray(n)
     return list
 end
 
+
+---@param camera UnityEngine.Camera
+function Tools.WorldToUILocalPosition(camera, worldPosition)
+    local pos = UnityEngine.Camera.main:WorldToViewportPoint(worldPosition);
+    return camera:ViewportToWorldPoint(pos);
+end
 return Tools

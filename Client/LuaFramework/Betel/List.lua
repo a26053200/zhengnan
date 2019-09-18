@@ -6,6 +6,7 @@
 
 local LuaObject = require("Betel.LuaObject")
 ---@class List : Betel.LuaObject
+---@field New fun(table<any, any>) : List
 local _List = class("List",LuaObject)
 
 local function Operator(list)
