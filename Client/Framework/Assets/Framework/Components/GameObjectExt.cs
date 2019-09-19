@@ -35,7 +35,7 @@ public static class GameObjectExt
     public static RectTransform GetRect(this GameObject obj)
     {
         RectTransform rect = obj.GetComponent<RectTransform>();
-        Debug.Log("RectTransform GetRectRectTransform GetRectRectTransform GetRect");
+        //Debug.Log("RectTransform GetRectRectTransform GetRectRectTransform GetRect");
         return rect;
     }
 

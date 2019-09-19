@@ -1,8 +1,9 @@
 ﻿using LuaInterface;
-using System;
 using UnityEngine;
-using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+
 /// <summary>
 /// <para>Class Introduce</para>
 /// <para>Author: zhengnan</para>
@@ -11,9 +12,13 @@ using System.Collections.Generic;
 
 namespace Framework
 {
-    public class EventTriggerListener : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler,
-    IInitializePotentialDragHandler, IPointerEnterHandler, IPointerExitHandler, IBeginDragHandler, IEndDragHandler, IDropHandler,
-    IMoveHandler, IScrollHandler
+    public class EventTriggerListener : MonoBehaviour, 
+        IPointerClickHandler, IPointerDownHandler, IPointerUpHandler,IPointerEnterHandler, IPointerExitHandler, 
+        //IInitializePotentialDragHandler, 
+        IBeginDragHandler, IDragHandler, IEndDragHandler
+        //IDropHandler,
+        //IMoveHandler, 
+        //IScrollHandler
 
     {
         
