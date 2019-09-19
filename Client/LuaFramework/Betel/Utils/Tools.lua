@@ -95,9 +95,32 @@ function Tools.GetRandomArray(n)
 end
 
 
----@param camera UnityEngine.Camera
-function Tools.WorldToUILocalPosition(camera, worldPosition)
-    local pos = UnityEngine.Camera.main:WorldToViewportPoint(worldPosition);
-    return camera:ViewportToWorldPoint(pos);
+---@param eventData UnityEngine.EventSystems.PointerEventData
+---@param rect UnityEngine.RectTransform
+---@param uiCamera UnityEngine.Camera
+---@return UnityEngine.Vector3
+function Tools.WorldToUILocalPosition(eventData, rect, uiCamera)
+    local camera = UnityEngine.Camera.main
+    local outPos = Vector2.zero;
+    local clickIn = UnityEngine.RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            rect,
+            eventData.position,
+            uiCamera,
+            outPos);
+    print(tostring(clickIn))
+    return Vector3.New(outPos.x,outPos.y,0)
 end
+
+
+---@param clickPos UnityEngine.Vector2
+---@param uiCanvas UnityEngine.Canvas
+---@param targetRect UnityEngine.RectTransform
+---@return UnityEngine.Vector3
+function Tools.ScreenToUICanvasPoint(clickPos, uiCanvas, targetRect)
+    local s2v = uiCanvas.worldCamera:ScreenToViewportPoint(clickPos)
+    local w2v = uiCanvas.worldCamera:WorldToViewportPoint(targetRect.position)
+    local v2w = uiCanvas.worldCamera:ViewportToWorldPoint(Vector3.New(s2v.x,s2v.y,w2v.z))
+    return v2w
+end
+
 return Tools
