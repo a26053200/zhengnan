@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using ECS;
 using UnityEngine;
 
 public class Client : MonoBehaviour
@@ -28,6 +29,7 @@ public class Client : MonoBehaviour
         DontDestroyOnLoad(this);
         // 初始变量赋值
         Application.targetFrameRate = 60;
+        GlobalConsts.FrameTime = 1f / Application.targetFrameRate;
         Application.runInBackground = true;
         Debug.Log("Application TargetFrameRate:" + Application.targetFrameRate);
         Debug.Log("Application RunInBackground:" + Application.runInBackground);

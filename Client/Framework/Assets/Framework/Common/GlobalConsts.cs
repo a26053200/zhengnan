@@ -8,6 +8,8 @@ using System.Collections.Generic;
 /// </summary> 
 public class GlobalConsts
 {
+    public static float FrameTime = 0.03333333f;
+    
     public static bool EnableLogNetwork = true;
 
     /// <summary>
