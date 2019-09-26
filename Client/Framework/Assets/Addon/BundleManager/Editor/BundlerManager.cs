@@ -17,43 +17,55 @@ namespace BM
         [MenuItem("Build/Force Build Bundle(IOS)")]
         public static void ForceBuildIOS()
         {
-            StartBuild(true, Language.zh_CN, BuildTarget.iOS, false);
+            StartBuild(true, Language.zh_CN, BuildTarget.iOS);
         }
 
         [MenuItem("Build/Force Build Bundle(Android)")]
         public static void ForceBuildAndroid()
         {
-            StartBuild(true, Language.zh_CN, BuildTarget.Android, false);
+            StartBuild(true, Language.zh_CN, BuildTarget.Android);
         }
 
         [MenuItem("Build/Force Build Bundle(Win64)")]
         public static void ForceBuildWin64()
         {
-            StartBuild(true, Language.zh_CN, BuildTarget.StandaloneWindows64, false);
+            StartBuild(true, Language.zh_CN, BuildTarget.StandaloneWindows64);
+        }
+        
+        [MenuItem("Build/Force Build Bundle(OSX)")]
+        public static void ForceBuildOSX()
+        {
+            StartBuild(true, Language.zh_CN, BuildTarget.StandaloneOSX);
         }
 
         [MenuItem("Build/Build Bundle(IOS)")]
         public static void BuildIOS()
         {
-            StartBuild(false, Language.zh_CN, BuildTarget.iOS, false);
+            StartBuild(false, Language.zh_CN, BuildTarget.iOS);
         }
 
         [MenuItem("Build/Build Bundle(Android)")]
         public static void BuildAndroid()
         {
-            StartBuild(false, Language.zh_CN, BuildTarget.Android, false);
+            StartBuild(false, Language.zh_CN, BuildTarget.Android);
         }
 
         [MenuItem("Build/Build Bundle(Win64)")]
         public static void BuildWin64()
         {
-            StartBuild(false, Language.zh_CN, BuildTarget.StandaloneWindows64, false);
+            StartBuild(false, Language.zh_CN, BuildTarget.StandaloneWindows64);
+        }
+        
+        [MenuItem("Build/Build Bundle(OSX)")]
+        public static void BuildOSX()
+        {
+            StartBuild(false, Language.zh_CN, BuildTarget.StandaloneOSX);
         }
 
         [MenuItem("Build/Build Bundle_Test")]
         public static void Test()
         {
-            StartBuild(isForceBuild, Language.zh_CN, BuildTarget.StandaloneWindows64, false);
+            StartBuild(isForceBuild, Language.zh_CN, BuildTarget.StandaloneWindows64);
         }
 
         //配置路径
@@ -65,7 +77,7 @@ namespace BM
 
         static Dictionary<string, BuildSampleInfo> buildInfos;
 
-        private static void StartBuild(bool isForceBuild, Language language, BuildTarget buildTarget, bool generate)
+        private static void StartBuild(bool isForceBuild, Language language, BuildTarget buildTarget)
         {
             //加载打包配置
             BundleBuilder.settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
@@ -74,7 +86,7 @@ namespace BM
             BundleBuilder.Output_Path = BundleBuilder.Output_Root_Path + "/" + language.ToString() + "/" + buildTarget.ToString();
             string historyBuildInfoPath = BundleBuilder.Output_Path + "/" + BMConfig.BundlDataFile;
             BundleBuilder.historyBuildInfo = LoadBundleData(historyBuildInfoPath);
-            BundleBuilder.StartBuild(isForceBuild, Language.zh_CN, BuildTarget.StandaloneWindows64, generate);
+            BundleBuilder.StartBuild(isForceBuild, Language.zh_CN, buildTarget, true);
         }
 
         public static Dictionary<string, BuildSampleInfo> LoadBundleData(string bundlDataFilePath)

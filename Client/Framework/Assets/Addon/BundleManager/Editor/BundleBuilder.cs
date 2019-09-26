@@ -197,6 +197,7 @@ namespace BM
                             assetPaths = new List<string>(),
                             assetHashs = new List<string>(),
                             dependenceMap = new Dictionary<string, string[]>(),
+                            dependenceHashMap = new Dictionary<string, string[]>(),
                         };
                         buildInfo.subBuildInfoMap.Add(md5, subInfo);
                     }

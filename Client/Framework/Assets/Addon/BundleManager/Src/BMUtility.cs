@@ -37,20 +37,15 @@ namespace BM
 
         public static bool FileExists(string path)
         {
-#if UNITY_ANDROID
-
-#else
             return File.Exists(path);
-#endif
         }
 
         public static string LoadText(string path)
         {
-#if UNITY_ANDROID
-            //java实现的加载
-#else
-            return File.ReadAllText(path);
-#endif
+            if (File.Exists(path))
+                return File.ReadAllText(path);
+            else
+                return null;
         }
 
         public static List<string> JsonToArray(JsonData json, string fieldName)
