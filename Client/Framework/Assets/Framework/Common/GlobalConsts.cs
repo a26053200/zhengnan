@@ -55,7 +55,6 @@ public class GlobalConsts
     /// </summary>
     public static bool isRunningInMobileDevice =>
         Application.platform == RuntimePlatform.IPhonePlayer ||
-        Application.platform == RuntimePlatform.LinuxEditor ||
-        Application.platform == RuntimePlatform.OSXEditor;
+        Application.platform == RuntimePlatform.Android;
 }
 
