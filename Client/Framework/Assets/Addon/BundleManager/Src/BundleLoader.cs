@@ -27,7 +27,9 @@ namespace BM
 
         public void LoadBundleData()
         {
-            string bundleData = BMUtility.LoadText(getFilePath(BMConfig.BundlDataFile));
+            string path = getFilePath(BMConfig.BundlDataFile);
+            Debug.LogFormat("Load bundle data:{0}", path);
+            string bundleData = BMUtility.LoadText(path);
             JsonData jsonData = JsonMapper.ToObject(bundleData);
             //Debug.Log(bundleData);
 
@@ -92,7 +94,9 @@ namespace BM
             string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
             if (bundleInfo.bundleReference == null)
             {
-                assetBundle = AssetBundle.LoadFromFile(getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern));
+                string bundePath = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
+                Debug.LogFormat("Load a new bundle:" + bundePath);
+                assetBundle = AssetBundle.LoadFromFile(bundePath);
                 if (assetBundle == null)
                 {
                     Debug.LogErrorFormat("The AssetBundle '{0}' load fail!", path);

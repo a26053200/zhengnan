@@ -15,12 +15,12 @@ public class GlobalConsts
     /// <summary>
     /// 是否开启Res AssetBundle模式
     /// </summary>
-    public static bool isResBundleMode = false;
+    public static bool isResBundleMode = true;
 
     /// <summary>
     /// 是否开启Res AssetBundle模式
     /// </summary>
-    public static bool isLuaBundleMode = false;
+    public static bool isLuaBundleMode = true;
 
     /// <summary>
     /// 资源根目录

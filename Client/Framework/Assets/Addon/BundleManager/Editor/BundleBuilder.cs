@@ -477,12 +477,15 @@ namespace BM
             if(owner)
             {
                 string[] dependencePaths = AssetDatabase.GetDependencies(filePath, true);
-                List<string> list = new List<string>(dependencePaths);
-                list.Remove(filePath);
-                for (int i = 0; i < list.Count; i++)
+                List<string> list = new List<string>();
+                for (int i = 0; i < dependencePaths.Length; i++)
                 {
-                    list[i] = list[i].ToLower();
+                    if(!dependencePaths[i].EndsWith(".cs"))
+                        list.Add(dependencePaths[i].ToLower());
                 }
+                //移除本身
+                if(list.Count > 0)
+                    list.Remove(filePath.ToLower());
                 if(list.Count > 0)
                     dependenceMap[filePath] = list.ToArray();
             }

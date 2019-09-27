@@ -166,7 +166,8 @@ public static class ToLuaExport
         "RectTransform.ReapplyDrivenProperties",
         //
         "Light.SetLightDirty",
-        "ParticleSystem.SetJob"
+        "ParticleSystem.SetJob",
+        "MeshRenderer.receiveGI"
     };
 
     class _MethodBase

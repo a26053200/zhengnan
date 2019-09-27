@@ -14,7 +14,21 @@ namespace BM
         public static readonly string BundlePattern = ".bundle";
         //只读目录(随包走)
 #if UNITY_EDITOR
-        public static readonly string ReadonlyDir = Application.dataPath + "/StreamingAssets";
+        public static string ReadonlyDir
+        {
+            get
+            {
+#if UNITY_EDITOR_OSX
+                string dir = "StandaloneOSX";
+#elif UNITY_EDITOR_WIN
+                string dir = "StandaloneWindows64";
+#endif
+                string path =  Application.dataPath;
+                path = path.Replace("Assets", "AssetBundle/zh_CN/" + dir);
+                return path;
+            }
+        }
+        
 #elif UNITY_IOS
         public static readonly string ReadonlyDir = Application.dataPath +"/Raw";
 #elif UNITY_ANDROID
