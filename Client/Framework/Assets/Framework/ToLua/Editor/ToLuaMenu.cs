@@ -917,7 +917,7 @@ public static class ToLuaMenu
         beAutoGen = false;
     }
 
-   [MenuItem("Lua/Clear wrap files", false, 6)]
+   [MenuItem("Tools/Lua/Clear wrap files", false, 6)]
     static void ClearLuaWraps()
     {
         string[] files = Directory.GetFiles(CustomSettings.saveDir, "*.cs", SearchOption.TopDirectoryOnly);

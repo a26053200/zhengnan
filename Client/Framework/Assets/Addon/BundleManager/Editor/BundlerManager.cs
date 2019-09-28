@@ -14,55 +14,55 @@ namespace BM
     public static class BundlerManager
     {
 
-        [MenuItem("Build/Force Build Bundle(IOS)")]
+        [MenuItem("Tools/Build/Force Build Bundle(IOS)",false,7)]
         public static void ForceBuildIOS()
         {
             StartBuild(true, Language.zh_CN, BuildTarget.iOS);
         }
 
-        [MenuItem("Build/Force Build Bundle(Android)")]
+        [MenuItem("Tools/Build/Force Build Bundle(Android)",false,7)]
         public static void ForceBuildAndroid()
         {
             StartBuild(true, Language.zh_CN, BuildTarget.Android);
         }
 
-        [MenuItem("Build/Force Build Bundle(Win64)")]
+        [MenuItem("Tools/Build/Force Build Bundle(Win64)",false,7)]
         public static void ForceBuildWin64()
         {
             StartBuild(true, Language.zh_CN, BuildTarget.StandaloneWindows64);
         }
         
-        [MenuItem("Build/Force Build Bundle(OSX)")]
+        [MenuItem("Tools/Build/Force Build Bundle(OSX)",false,7)]
         public static void ForceBuildOSX()
         {
             StartBuild(true, Language.zh_CN, BuildTarget.StandaloneOSX);
         }
 
-        [MenuItem("Build/Build Bundle(IOS)")]
+        [MenuItem("Tools/Build/Build Bundle(IOS)",false,7)]
         public static void BuildIOS()
         {
             StartBuild(false, Language.zh_CN, BuildTarget.iOS);
         }
 
-        [MenuItem("Build/Build Bundle(Android)")]
+        [MenuItem("Tools/Build/Build Bundle(Android)",false,7)]
         public static void BuildAndroid()
         {
             StartBuild(false, Language.zh_CN, BuildTarget.Android);
         }
 
-        [MenuItem("Build/Build Bundle(Win64)")]
+        [MenuItem("Tools/Build/Build Bundle(Win64)",false,7)]
         public static void BuildWin64()
         {
             StartBuild(false, Language.zh_CN, BuildTarget.StandaloneWindows64);
         }
         
-        [MenuItem("Build/Build Bundle(OSX)")]
+        [MenuItem("Tools/Build/Build Bundle(OSX)",false,7)]
         public static void BuildOSX()
         {
             StartBuild(false, Language.zh_CN, BuildTarget.StandaloneOSX);
         }
 
-        [MenuItem("Build/Build Bundle_Test")]
+        [MenuItem("Tools/Build/Build Bundle_Test",false,7)]
         public static void Test()
         {
             StartBuild(isForceBuild, Language.zh_CN, BuildTarget.StandaloneWindows64);
@@ -168,7 +168,7 @@ namespace BM
             return buildTarget;
         }
 
-        [MenuItem("Build/BuildAssetBundle")]
+        [MenuItem("Tools/Build/BuildAssetBundle")]
         static void BuildAssetBundle()
         {
             //Debug.Log("AAAAAAAAAAAAAAAAAAAAAAAAAAAA");
