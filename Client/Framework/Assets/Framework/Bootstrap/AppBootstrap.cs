@@ -1,6 +1,4 @@
-﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using System.IO;
 using Framework;
 /// <summary>
 /// <para>App 启动引导</para>
@@ -13,7 +11,7 @@ public static class AppBootstrap
     public static void Start(Client client)
     {
         s_client = client;
-
+        
         // Init and add managers
         GameManager.AddManager(client.gameObject.AddComponent<GameManager>());
         GameManager.AddManager(client.gameObject.AddComponent<ResLoader>());
