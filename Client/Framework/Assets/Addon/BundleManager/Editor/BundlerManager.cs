@@ -35,7 +35,7 @@ namespace BM
         [MenuItem("Tools/Build/Force Build Bundle(OSX)",false,7)]
         public static void ForceBuildOSX()
         {
-            StartBuild(true, Language.zh_CN, BuildTarget.StandaloneOSX);
+            StartBuild(true, Language.zh_CN, BuildTarget.StandaloneOSX, true);
         }
 
         [MenuItem("Tools/Build/Build Bundle(IOS)",false,7)]
@@ -59,13 +59,13 @@ namespace BM
         [MenuItem("Tools/Build/Build Bundle(OSX)",false,7)]
         public static void BuildOSX()
         {
-            StartBuild(false, Language.zh_CN, BuildTarget.StandaloneOSX);
+            StartBuild(false, Language.zh_CN, BuildTarget.StandaloneOSX, true);
         }
 
         [MenuItem("Tools/Build/Build Bundle_Test",false,7)]
         public static void Test()
         {
-            StartBuild(isForceBuild, Language.zh_CN, BuildTarget.StandaloneWindows64);
+            StartBuild(isForceBuild, Language.zh_CN, BuildTarget.StandaloneWindows64, true);
         }
 
         //配置路径
@@ -77,7 +77,7 @@ namespace BM
 
         static Dictionary<string, BuildSampleInfo> buildInfos;
 
-        private static void StartBuild(bool isForceBuild, Language language, BuildTarget buildTarget)
+        private static void StartBuild(bool isForceBuild, Language language, BuildTarget buildTarget, bool moveBundle = false)
         {
             //加载打包配置
             BundleBuilder.settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
@@ -85,11 +85,11 @@ namespace BM
             BundleBuilder.Output_Root_Path = Application.dataPath.Replace("Assets", BundleBuilder.settings.BuildOutoutDirName);
             BundleBuilder.Output_Path = BundleBuilder.Output_Root_Path + "/" + language.ToString() + "/" + buildTarget.ToString();
             string historyBuildInfoPath = BundleBuilder.Output_Path + "/" + BMConfig.BundlDataFile;
-            BundleBuilder.historyBuildInfo = LoadBundleData(historyBuildInfoPath);
-            BundleBuilder.StartBuild(isForceBuild, Language.zh_CN, buildTarget, true);
+            BundleBuilder.historyBuildInfo = isForceBuild ? null : LoadHistoryBundleData(historyBuildInfoPath);
+            BundleBuilder.StartBuild(isForceBuild, Language.zh_CN, buildTarget, true, moveBundle);
         }
 
-        public static Dictionary<string, BuildSampleInfo> LoadBundleData(string bundlDataFilePath)
+        public static Dictionary<string, BuildSampleInfo> LoadHistoryBundleData(string bundlDataFilePath)
         {
             string bundleData = BMUtility.LoadText(bundlDataFilePath);
             if (bundleData == null)

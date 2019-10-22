@@ -171,15 +171,18 @@ namespace BM
                 // string[] fileList = Directory.GetFiles(srcPath);
                 string[] fileList = Directory.GetFileSystemEntries(srcPath);
                 // 遍历所有的文件和目录
-                foreach (string file in fileList)
+                for (int i = 0; i < fileList.Length; i++)
                 {
+                    var file = fileList[i];
                     // 先当作目录处理如果存在这个目录就递归Copy该目录下面的文件
                     if (Directory.Exists(file))
                         CopyDir(file, dstPath + Path.GetFileName(file));
                     // 否则直接Copy文件
                     else
                         File.Copy(file, dstPath + Path.GetFileName(file), true);
+                    EditorUtility.DisplayProgressBar("Move Bundle File...", file, (float)(i + 1.0f) / (float)fileList.Length);
                 }
+                EditorUtility.ClearProgressBar();
             }
             catch
             {

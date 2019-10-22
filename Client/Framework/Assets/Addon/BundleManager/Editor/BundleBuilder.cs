@@ -24,9 +24,6 @@ namespace BM
         //历史记录
         public static Dictionary<string, BuildSampleInfo> historyBuildInfo;
 
-        //历史记录文库路径
-        public static string historyBuildInfoPath;
-
         //输出目录
         public static string Output_Root_Path;
 
@@ -60,7 +57,7 @@ namespace BM
         // 流程函数
         //=======================
 
-        public static List<BuildInfo> StartBuild(bool _isForceBuild, Language language, BuildTarget _buildTarget, bool generate)
+        public static List<BuildInfo> StartBuild(bool _isForceBuild, Language language, BuildTarget _buildTarget, bool generate, bool moveBundle)
         {
             buildTarget = _buildTarget;
             buildStartTime = EditorApplication.timeSinceStartup;
@@ -99,19 +96,21 @@ namespace BM
             //计算AssetBundle信息
             CalcAssetBundleInfos();
             //做增量过滤
-            if (!isForceBuild)//是否是强制重新Bunild
+            if (!isForceBuild)//是否是强制重新Build
                 IncrementFilter();
             //生成AssetBundle
             if(generate)
                 GenerateAssetBundle();
-            //移动生成后的所有Bundle
-            //if (!isForceBuild)
-                //MoveAssetBundle();
+            
             //计算Bundle文件大小
             if (generate)
                 CalcBundleFileSize();
             //写入Bundle信息
             SaveBundleInfo();
+            
+            //移动生成后的所有Bundle
+            if (moveBundle)
+                MoveAssetBundle();
 
             Logger.Log("Generate Assets Bundle Over. time consuming:{0}s", EditorApplication.timeSinceStartup - buildStartTime);
             return buildInfoList;
@@ -346,19 +345,15 @@ namespace BM
             AssetDatabase.Refresh();
             
         }
-
         
         static void MoveAssetBundle()
         {
-            if(buildTarget == BuildTarget.StandaloneWindows64)
-            {
-                //Logger.Log("MoveTo:{0}", Application.persistentDataPath);
-                //BMEditUtility.CopyDir(Output_Path, Application.persistentDataPath);
-            }
-            else
-            {
-
-            }
+            string streamingAssetsPath = Application.streamingAssetsPath;
+            BMEditUtility.DelFolder(streamingAssetsPath);
+            if (!Directory.Exists(streamingAssetsPath))
+                Directory.CreateDirectory(streamingAssetsPath);
+            BMEditUtility.CopyDir(Output_Path, Application.streamingAssetsPath);
+            Logger.Log("Move all bundle files over.");
         }
 
         static void CalcBundleFileSize()
@@ -366,16 +361,29 @@ namespace BM
             for (int i = 0; i < buildInfoList.Count; i++)
             {
                 BuildInfo buildInfo = buildInfoList[i];
-                
-                foreach (var subInfo in buildInfo.subBuildInfoMap.Values)
+                //增量更新时已经被删除的bundle
+                List<string> hasDeletedBundleList = new List<string>();
+                foreach (var key in buildInfo.subBuildInfoMap.Keys)
                 {
+                    var subInfo = buildInfo.subBuildInfoMap[key];
                     string path = Path.Combine(Output_Path, subInfo.bundleName + BMConfig.BundlePattern);
+                    if (!File.Exists(path))
+                    {
+                        hasDeletedBundleList.Add(key);
+                        continue;
+                    }
                     subInfo.size = new FileInfo(path).Length;
                     uint crc;
                     BuildPipeline.GetCRCForAssetBundle(path, out crc);
                     subInfo.crc = crc;
                     AssetBundle ab = AssetBundle.LoadFromFile(path);
                     EditorUtility.DisplayProgressBar("Calc Bundle Size...", path, (float)(i + 1.0f) / (float)buildInfoList.Count);
+                }
+
+                foreach (var delKey in hasDeletedBundleList)
+                {
+                    buildInfo.subBuildInfoMap.Remove(delKey);
+                    Debug.LogFormat("Delete bundle {0}", delKey);
                 }
             }
             EditorUtility.ClearProgressBar();
