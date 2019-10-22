@@ -9,9 +9,7 @@ namespace BM
 
         public static readonly string VersionFile = "Version.txt";
 
-        public static readonly string BundleSuffix = "bundle";
-
-        public static readonly string BundlePattern = ".bundle";
+        public static string BundlePattern = ".bundle";
         //只读目录(随包走)
 #if UNITY_EDITOR
         public static string ReadonlyDir

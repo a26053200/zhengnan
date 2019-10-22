@@ -191,7 +191,7 @@ namespace BM
                             assetBundleBuild = new AssetBundleBuild()
                             {
                                 assetBundleName = name,
-                                assetBundleVariant = BMConfig.BundleSuffix,
+                                assetBundleVariant = settings.Suffix_Bundle,
                             },
                             assetPaths = new List<string>(),
                             assetHashs = new List<string>(),
@@ -288,7 +288,7 @@ namespace BM
                             string path = subInfo.assetPaths[j];
                             string dirName = Path.GetDirectoryName(path);
                             string name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
-                            string outputPath = string.Format("{0}/{1}.{2}", Output_Path, name, BMConfig.BundleSuffix);
+                            string outputPath = string.Format("{0}/{1}.{2}", Output_Path, name, settings.Suffix_Bundle);
                             BuildPipeline.BuildPlayer(new string[] { path },
                                 outputPath, buildTarget,
                                 BuildOptions.BuildAdditionalStreamedScenes);
@@ -366,7 +366,7 @@ namespace BM
                 foreach (var key in buildInfo.subBuildInfoMap.Keys)
                 {
                     var subInfo = buildInfo.subBuildInfoMap[key];
-                    string path = Path.Combine(Output_Path, subInfo.bundleName + BMConfig.BundlePattern);
+                    string path = Path.Combine(Output_Path, subInfo.bundleName + settings.Suffix_Bundle);
                     if (!File.Exists(path))
                     {
                         hasDeletedBundleList.Add(key);
@@ -382,8 +382,10 @@ namespace BM
 
                 foreach (var delKey in hasDeletedBundleList)
                 {
+                    var subInfo = buildInfo.subBuildInfoMap[delKey];
+                    string path = Path.Combine(Output_Path, subInfo.bundleName + settings.Suffix_Bundle);
                     buildInfo.subBuildInfoMap.Remove(delKey);
-                    Debug.LogFormat("Delete bundle {0}", delKey);
+                    Debug.LogFormat("Delete bundle {0}", path);
                 }
             }
             EditorUtility.ClearProgressBar();
