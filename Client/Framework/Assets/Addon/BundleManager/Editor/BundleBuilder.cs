@@ -112,9 +112,9 @@ namespace BM
             //写入Bundle信息
             SaveBundleInfo();
             
-            //移动生成后的所有Bundle
-            if (moveBundle)
-                MoveAssetBundle();
+            //清除manifest文件
+            if (settings.clearManifestFile)
+                ClearManifestFiles();
 
             Logger.Log("Generate Assets Bundle Over. time consuming:{0}s", EditorApplication.timeSinceStartup - buildStartTime);
         }
@@ -369,32 +369,22 @@ namespace BM
                     File.Delete(path);
             }
             
-            //清楚manifest文件
-            if (settings.clearManifestFile)
-            {
-                FileInfo[] manifestFiles = BMEditUtility.GetAllFiles(Output_Path, ".manifest");
-                for (int i = 0; i < manifestFiles.Length; i++)
-                {
-                    FileInfo fileInfo = manifestFiles[i];
-                    string path = BMEditUtility.Absolute2Relativity(fileInfo.DirectoryName) + "/" + fileInfo.Name; //相对路径
-                    if(File.Exists(path))
-                        File.Delete(path);
-                    EditorUtility.DisplayProgressBar("Clear Manifest Files...", path, (float)(i + 1.0f) / (float)manifestFiles.Length);
-                }
-                EditorUtility.ClearProgressBar();
-            }
-            
             AssetDatabase.Refresh();
         }
         
-        static void MoveAssetBundle()
+        static void ClearManifestFiles()
         {
-            string streamingAssetsPath = Application.streamingAssetsPath;
-            BMEditUtility.DelFolder(streamingAssetsPath);
-            if (!Directory.Exists(streamingAssetsPath))
-                Directory.CreateDirectory(streamingAssetsPath);
-            BMEditUtility.CopyDir(Output_Path, Application.streamingAssetsPath);
-            Logger.Log("Move all bundle files over.");
+            FileInfo[] manifestFiles = BMEditUtility.GetAllFiles(Output_Path, "*.manifest");
+            for (int i = 0; i < manifestFiles.Length; i++)
+            {
+                FileInfo fileInfo = manifestFiles[i];
+                string path = fileInfo.DirectoryName + "/" + fileInfo.Name; //相对路径
+                Debug.Log(path);
+                if(File.Exists(path))
+                    File.Delete(path);
+                EditorUtility.DisplayProgressBar("Clear Manifest Files...", path, (float)(i + 1.0f) / (float)manifestFiles.Length);
+            }
+            EditorUtility.ClearProgressBar();
         }
 
         static void CalcBundleFileSize()

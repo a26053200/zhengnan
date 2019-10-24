@@ -78,13 +78,13 @@ namespace BM
             BundleBuilder.StartBuild(forceBuild, Language.zh_CN, buildTarget, true, false);
         }
 
-        private static Dictionary<string, BuildSampleInfo> LoadHistoryBundleData(string bundlDataFilePath)
+        private static Dictionary<string, BuildSampleInfo> LoadHistoryBundleData(string bundleDataFilePath)
         {
-            string bundleData = BMUtility.LoadText(bundlDataFilePath);
+            string bundleData = BMUtility.LoadText(bundleDataFilePath);
             if (bundleData == null)
                 return null;
             JsonData jsonData = JsonMapper.ToObject(bundleData);
-            Logger.Log("Load History Bundle Data:" + bundleData);
+            Debug.Log("Load History Bundle Data:" + bundleData);
 
             Dictionary<string, BuildSampleInfo> buildInfos = new Dictionary<string, BuildSampleInfo>();
 
