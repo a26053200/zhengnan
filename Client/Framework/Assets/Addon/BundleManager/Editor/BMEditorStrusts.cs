@@ -1,6 +1,7 @@
 ﻿using LitJson;
 using System.Collections.Generic;
 using UnityEditor;
+using UnityEngine.TestTools.Constraints;
 
 namespace BM
 {
@@ -14,6 +15,7 @@ namespace BM
         public string buildName;
         public BuildType buildType;             //打包类型
         public CompressType compressType;       //压缩类型
+        public int version;                    //版本号
         public List<string> assetPaths;
         public Dictionary<string, SubBuildInfo> subBuildInfoMap;
 
@@ -21,6 +23,7 @@ namespace BM
     public class BuildSampleInfo
     {
         public string bundleName;
+        public int version;
         public List<string> assetPaths;
         public List<string> assetHashs;
     }
@@ -29,6 +32,7 @@ namespace BM
         public string bundleName;
         public string buildMd5;
         public BuildType buildType;
+        public int version;
         public uint crc;
         public long size;
         public List<string> assetPaths;
@@ -44,6 +48,7 @@ namespace BM
             json["bundleName"] = bundleName;
             json["buildMd5"] = buildMd5;
             json["buildType"] = buildType.ToString();
+            json["version"] = version;
             json["crc"] = crc;
             json["size"] = size;
             json["assetPaths"] = new JsonData();

@@ -19,6 +19,9 @@ namespace BM
 
         public string resDir = "Assets/Res/";
 
+        public bool useHashName = false;
+
+        public bool clearManifestFile = true;
         //lua文件夹
         public List<string> luaFolderList = new List<string>();
         //打包类型
@@ -80,6 +83,13 @@ namespace BM
         public List<string> atlasSpriteFolderList = new List<string>();
 
         public string atlasSpritePrefabDir;
+
+        //场景版本号
+        [HideInInspector] 
+        public List<string> scenePaths = new List<string>();
+        
+        [HideInInspector]
+        public List<int> sceneVersions = new List<int>();
     }
 }
     

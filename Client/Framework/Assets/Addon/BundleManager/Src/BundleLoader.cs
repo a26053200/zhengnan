@@ -17,6 +17,10 @@ namespace BM
     {
         private JsonData bundleJsonData;
 
+        private string suffix;
+
+        private bool useHashName;
+
         public List<BundleInfo> bundleInfos { get; private set; }
         public Dictionary<string, BundleInfo> bundleInfoDict { get; private set; }
 
@@ -27,7 +31,7 @@ namespace BM
 
         public void LoadBundleData()
         {
-            string path = getFilePath(BMConfig.BundlDataFile);
+            string path = getFilePath(BMConfig.BundleDataFile);
             Debug.LogFormat("Load bundle data:{0}", path);
             string bundleData = BMUtility.LoadText(path);
             JsonData jsonData = JsonMapper.ToObject(bundleData);
@@ -36,6 +40,8 @@ namespace BM
             bundleInfos = new List<BundleInfo>();
             bundleInfoDict = new Dictionary<string, BundleInfo>();
 
+            suffix = "." + jsonData["suffix"];//Bundle 文件后缀
+            useHashName = (bool) jsonData["useHashName"];//是否使用Hash name
             JsonData bundleInfoJson = jsonData["bundles"];
             for (int i = 0; i < bundleInfoJson.Count; i++)
             {
@@ -91,12 +97,11 @@ namespace BM
         private AssetBundle LoadBundle(BundleInfo bundleInfo)
         {
             AssetBundle assetBundle = null;
-            string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
+            string path = getFilePath((useHashName ? bundleInfo.buildMd5 : bundleInfo.bundleName) + suffix);
             if (bundleInfo.bundleReference == null)
             {
-                string bundePath = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
-                Debug.LogFormat("Load a new bundle:" + bundePath);
-                assetBundle = AssetBundle.LoadFromFile(bundePath);
+                Debug.LogFormat("Load a new bundle:" + path);
+                assetBundle = AssetBundle.LoadFromFile(path);
                 if (assetBundle == null)
                 {
                     Debug.LogErrorFormat("The AssetBundle '{0}' load fail!", path);
@@ -149,7 +154,7 @@ namespace BM
 
         public IEnumerator LoadBundleAsync(BundleInfo bundleInfo, UnityAction<AssetBundle> OnAssetBundleLoaded)
         {
-            string path = getFilePath(bundleInfo.bundleName + BMConfig.BundlePattern);
+            string path = getFilePath((useHashName ? bundleInfo.buildMd5 : bundleInfo.bundleName) + suffix);
             if (bundleInfo.bundleReference != null)
             {//就算 缓存池里面有 也要模拟异步加载
                 yield return new WaitForEndOfFrame();

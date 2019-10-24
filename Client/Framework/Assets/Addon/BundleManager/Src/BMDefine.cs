@@ -5,24 +5,25 @@ namespace BM
 {
     public class BMConfig
     {
-        public static readonly string BundlDataFile = "BundleData.txt";
+        public static readonly string BundleDataFile = "BundleData.txt";
 
         public static readonly string VersionFile = "Version.txt";
 
-        public static string BundlePattern = ".bundle";
+        public static Language Language = Language.zh_CN;
+
         //只读目录(随包走)
 #if UNITY_EDITOR
         public static string ReadonlyDir
         {
             get
             {
-#if UNITY_EDITOR_OSX
+    #if UNITY_EDITOR_OSX
                 string dir = "StandaloneOSX";
-#elif UNITY_EDITOR_WIN
+    #elif UNITY_EDITOR_WIN
                 string dir = "StandaloneWindows64";
-#endif
+    #endif
                 string path =  Application.dataPath;
-                path = path.Replace("Assets", "AssetBundle/zh_CN/" + dir);
+                path = path.Replace("Assets", "AssetBundle/" + Language + "/" + dir);
                 return path;
             }
         }

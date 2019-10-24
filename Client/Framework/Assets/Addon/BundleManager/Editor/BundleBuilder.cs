@@ -57,13 +57,13 @@ namespace BM
         // 流程函数
         //=======================
 
-        public static List<BuildInfo> StartBuild(bool _isForceBuild, Language language, BuildTarget _buildTarget, bool generate, bool moveBundle)
+        public static void StartBuild(bool forceBuild, Language language, BuildTarget buildTag, bool generate, bool moveBundle)
         {
-            buildTarget = _buildTarget;
+            buildTarget = buildTag;
             buildStartTime = EditorApplication.timeSinceStartup;
             tempLuaPaths = new List<string>();
 
-            isForceBuild = _isForceBuild;
+            isForceBuild = forceBuild;
 
             //记录打包次数
             string verStr = EditorPrefs.GetString(settings.AppName + BM_Build_Version, null);
@@ -78,19 +78,23 @@ namespace BM
             buildInfoJson = new JsonData();
             buildInfoJson["resDir"] = settings.resDir;
             buildInfoJson["platform"] = buildTarget.ToString();
+            buildInfoJson["suffix"] = settings.Suffix_Bundle;
+            buildInfoJson["useHashName"] = settings.useHashName;
+            buildInfoJson["language"] = language.ToString();
             buildInfoJson["bundles"] = new JsonData();
 
             ignoreSuffixs = settings.Ignore_Suffix.Split(',');
             ignoreFolders = settings.Ignore_Folder.Split(',');
 
-            if (Directory.Exists(Output_Path))
+            //强制打包时情况原来的目录
+            if (isForceBuild && Directory.Exists(Output_Path))
                 BMEditUtility.DelFolder(Output_Path);
             Directory.CreateDirectory(Output_Path);
             //清空控制台日志
             Debug.ClearDeveloperConsole();
             
             //清除AssetBundleName (这步可以不做)
-            RemoveAllAssetBundleName();
+            //RemoveAllAssetBundleName();
             //获取所有Build信息
             FetchAllBuildInfo();
             //计算AssetBundle信息
@@ -113,7 +117,6 @@ namespace BM
                 MoveAssetBundle();
 
             Logger.Log("Generate Assets Bundle Over. time consuming:{0}s", EditorApplication.timeSinceStartup - buildStartTime);
-            return buildInfoList;
         }
 
         static void RemoveAllAssetBundleName()
@@ -168,6 +171,15 @@ namespace BM
                             break;
                         case BuildType.Scene:
                             name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                            int index = settings.scenePaths.IndexOf(path);
+                            if (index == -1)
+                            {//新场景
+                                buildInfo.version = 1;
+                                settings.scenePaths.Add(path);
+                                settings.sceneVersions.Add(1);
+                            }
+                            else
+                                buildInfo.version = settings.sceneVersions[index];
                             break;
                         case BuildType.Shader:
                             name = BMUtility.Path2Name(buildInfo.buildName);
@@ -183,14 +195,18 @@ namespace BM
                     SubBuildInfo subInfo = null;
                     if (!buildInfo.subBuildInfoMap.TryGetValue(md5, out subInfo))
                     {
+                        string abName = name;
+                        if (settings.useHashName)
+                            abName = md5;
                         subInfo = new SubBuildInfo()
                         {
                             bundleName = name,
                             buildMd5 = md5,
                             buildType = buildInfo.buildType,
+                            version = buildInfo.version,
                             assetBundleBuild = new AssetBundleBuild()
                             {
-                                assetBundleName = name,
+                                assetBundleName = abName,
                                 assetBundleVariant = settings.Suffix_Bundle,
                             },
                             assetPaths = new List<string>(),
@@ -237,7 +253,7 @@ namespace BM
                             continue;
                         }
                         EditorUtility.DisplayProgressBar("Increment Filter Asset Bundle...", subInfo.bundleName, (float)(i + 1.0f) / (float)buildInfoList.Count);
-                        if (BuildType.Scene != subInfo.buildType && BuildType.Lua != subInfo.buildType)
+                        if (BuildType.Lua != subInfo.buildType)
                         {//非强制打包需要做增量过滤
                             if (historyInfo.assetPaths.Count != subInfo.assetPaths.Count)
                             {
@@ -253,6 +269,14 @@ namespace BM
                             {
                                 newCount++;
                                 continue;
+                            }
+                            if (BuildType.Scene == subInfo.buildType)
+                            {
+                                if (buildInfo.version > historyInfo.version)
+                                {
+                                    newCount++;
+                                    continue;
+                                }
                             }
                             filterCount++;
                             subInfo.ignore = true;
@@ -288,6 +312,8 @@ namespace BM
                             string path = subInfo.assetPaths[j];
                             string dirName = Path.GetDirectoryName(path);
                             string name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                            if (settings.useHashName)
+                                name = subInfo.buildMd5;
                             string outputPath = string.Format("{0}/{1}.{2}", Output_Path, name, settings.Suffix_Bundle);
                             BuildPipeline.BuildPlayer(new string[] { path },
                                 outputPath, buildTarget,
@@ -342,8 +368,23 @@ namespace BM
                 if (File.Exists(path))
                     File.Delete(path);
             }
-            AssetDatabase.Refresh();
             
+            //清楚manifest文件
+            if (settings.clearManifestFile)
+            {
+                FileInfo[] manifestFiles = BMEditUtility.GetAllFiles(Output_Path, ".manifest");
+                for (int i = 0; i < manifestFiles.Length; i++)
+                {
+                    FileInfo fileInfo = manifestFiles[i];
+                    string path = BMEditUtility.Absolute2Relativity(fileInfo.DirectoryName) + "/" + fileInfo.Name; //相对路径
+                    if(File.Exists(path))
+                        File.Delete(path);
+                    EditorUtility.DisplayProgressBar("Clear Manifest Files...", path, (float)(i + 1.0f) / (float)manifestFiles.Length);
+                }
+                EditorUtility.ClearProgressBar();
+            }
+            
+            AssetDatabase.Refresh();
         }
         
         static void MoveAssetBundle()
@@ -366,7 +407,7 @@ namespace BM
                 foreach (var key in buildInfo.subBuildInfoMap.Keys)
                 {
                     var subInfo = buildInfo.subBuildInfoMap[key];
-                    string path = Path.Combine(Output_Path, subInfo.bundleName + settings.Suffix_Bundle);
+                    string path = Path.Combine(Output_Path, (settings.useHashName ? subInfo.buildMd5: subInfo.bundleName) + "." + settings.Suffix_Bundle);
                     if (!File.Exists(path))
                     {
                         hasDeletedBundleList.Add(key);
@@ -376,14 +417,14 @@ namespace BM
                     uint crc;
                     BuildPipeline.GetCRCForAssetBundle(path, out crc);
                     subInfo.crc = crc;
-                    AssetBundle ab = AssetBundle.LoadFromFile(path);
+                    //AssetBundle ab = AssetBundle.LoadFromFile(path);
                     EditorUtility.DisplayProgressBar("Calc Bundle Size...", path, (float)(i + 1.0f) / (float)buildInfoList.Count);
                 }
 
                 foreach (var delKey in hasDeletedBundleList)
                 {
                     var subInfo = buildInfo.subBuildInfoMap[delKey];
-                    string path = Path.Combine(Output_Path, subInfo.bundleName + settings.Suffix_Bundle);
+                    string path = Path.Combine(Output_Path, (settings.useHashName ? subInfo.buildMd5: subInfo.bundleName) + "." + settings.Suffix_Bundle);
                     buildInfo.subBuildInfoMap.Remove(delKey);
                     Debug.LogFormat("Delete bundle {0}", path);
                 }
@@ -393,19 +434,22 @@ namespace BM
 
         static void SaveBundleInfo()
         {
+            int total = 0;
             for (int i = 0; i < buildInfoList.Count; i++)
             {
                 BuildInfo buildInfo = buildInfoList[i];
                 foreach (var sub in buildInfo.subBuildInfoMap.Values)
                 {
+                    total++;
                     buildInfoJson["bundles"].Add(sub.ToJson());
                 }
             }
             string json = buildInfoJson.ToJson();
-            BMEditUtility.SaveUTF8TextFile(Output_Path + "/" + BMConfig.BundlDataFile, JsonFormatter.PrettyPrint(json));
+            BMEditUtility.SaveUTF8TextFile(Output_Path + "/" + BMConfig.BundleDataFile, JsonFormatter.PrettyPrint(json));
             BMEditUtility.SaveUTF8TextFile(Output_Path + "/" + BMConfig.VersionFile, version.ToString());
             //BMEditUtility.SaveDictionary(historyBuildInfoPath, historyBuildInfoPath);
             EditorPrefs.SetString(settings.AppName + BM_Build_Version, version.ToString());
+            Logger.Log(string.Format("Bundle total num:{0}", total));
         }
 
         //=======================
