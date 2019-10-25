@@ -37,6 +37,27 @@ namespace ToLuaSupport
 
             EditorUtility.ClearProgressBar();
         }
+        
+        /// <summary>
+        /// 创建asset配置文件
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="path"></param>
+        public static void CreateAsset<T>(string path) where T : ScriptableObject
+        {
+            T asset = ScriptableObject.CreateInstance<T>();
+            if (string.IsNullOrEmpty(path))
+            {
+                Debug.LogError("Not select files, select files first! ");
+                return;
+            }
+            string assetPathAndName = AssetDatabase.GenerateUniqueAssetPath(path);
+            AssetDatabase.CreateAsset(asset, assetPathAndName);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+            EditorUtility.FocusProjectWindow();
+            Selection.activeObject = asset;
+        }
 
         //横向分割线
         public static void DrawHorizontalSplitter(float height = 5)

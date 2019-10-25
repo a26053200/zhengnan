@@ -71,7 +71,7 @@ namespace BM
             //加载打包配置
             BundleBuilder.settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
             //Output_Path = Application.dataPath.Replace("Assets", "TestBundle");
-            BundleBuilder.Output_Root_Path = Application.dataPath.Replace("Assets", BundleBuilder.settings.BuildOutoutDirName);
+            BundleBuilder.Output_Root_Path = Application.dataPath.Replace("Assets", BundleBuilder.settings.BuildOutputDirName);
             BundleBuilder.Output_Path = BundleBuilder.Output_Root_Path + "/" + language.ToString() + "/" + buildTarget.ToString();
             string historyBuildInfoPath = BundleBuilder.Output_Path + "/" + BMConfig.BundleDataFile;
             BundleBuilder.historyBuildInfo = forceBuild ? null : LoadHistoryBundleData(historyBuildInfoPath);

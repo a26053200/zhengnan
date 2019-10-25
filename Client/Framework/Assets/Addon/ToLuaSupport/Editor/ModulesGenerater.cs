@@ -17,13 +17,12 @@ namespace ToLuaSupport
 {
     public class ModulesGenerater : EditorWindow
     {
-        private const string ViewConfigPath = "Assets/Lua/Game/Config/ViewConfig.lua";
-        private const string LuaModulesDir = "Lua/Game/Modules/";
-        private const string PrefabsDir = "Assets/Res/Prefabs/UI/";
-        private const string PrefabsRootDir = "Res/Prefabs/UI/";
-        private const string MediatorContextPath = "Assets/Lua/Game/Core/Ioc/MediatorContext.lua";
-        private const string ModelContextPath = "Assets/Lua/Game/Core/Ioc/ModelContext.lua";
-        private const string ServiceContextPath = "Assets/Lua/Game/Core/Ioc/ServiceContext.lua";
+        private string ViewConfigPath = "Assets/Lua/Game/Config/ViewConfig.lua";
+        private string ModulesDir = "Lua/Game/Modules/";
+        private string PrefabsRootDir = "Res/Prefabs/UI/";
+        private string MediatorContextPath = "Assets/Lua/Game/Core/Ioc/MediatorContext.lua";
+        private string ModelContextPath = "Assets/Lua/Game/Core/Ioc/ModelContext.lua";
+        private string ServiceContextPath = "Assets/Lua/Game/Core/Ioc/ServiceContext.lua";
 
         [MenuItem("Tools/OpenModuelsWnd")]
         static void OpenModuelsWnd()
@@ -32,6 +31,10 @@ namespace ToLuaSupport
             wnd.Show();
             wnd.Init();
         }
+
+        private const string SettingPath = "Assets/Edit/ToLuaSetting.asset";
+
+        private ToLuaSetting settings;
 
         GUILayoutOption endButtonWidth = null;
         GUIStyle disable = null;
@@ -47,9 +50,21 @@ namespace ToLuaSupport
 
         void Init()
         {
+            if(!File.Exists(SettingPath))
+            {
+                EditorUtils.CreateAsset<ToLuaSetting>(SettingPath);
+            }
+            settings = AssetDatabase.LoadAssetAtPath<ToLuaSetting>(SettingPath);
+            ViewConfigPath      = settings.ViewConfigPath;
+            ModulesDir          = settings.ModulesDir;
+            PrefabsRootDir      = settings.PrefabsRootDir;
+            MediatorContextPath = settings.MediatorContextPath;
+            ModelContextPath    = settings.ModelContextPath;
+            ServiceContextPath  = settings.ServiceContextPath;
+        
             luaTable = GetLuaTable(ViewConfigPath);
             minSize = new Vector2(500, 500);
-            endButtonWidth = GUILayout.Width(position.width * 0.1f);
+            endButtonWidth = GUILayout.Width(position.width * 0.2f);
             disable = new GUIStyle();
             disable.active = new GUIStyleState();
             LoadAllModules();
@@ -106,7 +121,7 @@ namespace ToLuaSupport
         //加载所有模块
         void LoadAllModules()
         {
-            string modulesRootDir = Path.Combine(Application.dataPath, LuaModulesDir);
+            string modulesRootDir = Path.Combine(Application.dataPath, ModulesDir);
             if (!Directory.Exists(modulesRootDir))
                 return;
             string[] moduleDirs = Directory.GetDirectories(modulesRootDir);
@@ -123,6 +138,8 @@ namespace ToLuaSupport
                 moduleInfo.serviceDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Service);
                 moduleInfo.voDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Vo);
                 //Views
+                if(!Directory.Exists(moduleInfo.viewDirPath))
+                    continue;
                 string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
                 for (int j = 0; j < mdrFiles.Length; j++)
                 {
@@ -337,7 +354,6 @@ namespace ToLuaSupport
         void FetchPrefabUrl(LuaViewInfo viewInfo)
         {
             EditorGUILayout.BeginHorizontal();
-            viewInfo.prefab = EditorGUILayout.ObjectField("", viewInfo.prefab,typeof(Object),false);
             EditorGUILayout.LabelField("Prefab url:", viewInfo.prefabUrl);
             if (GUILayout.Button("...", endButtonWidth))
             {
@@ -364,7 +380,7 @@ namespace ToLuaSupport
         //生成模块相关文件夹
         void GeneratedModuleFolders(string moduleName)
         {
-            string moduleDir = Path.Combine(Application.dataPath, LuaModulesDir + moduleName + "/");
+            string moduleDir = Path.Combine(Application.dataPath, ModulesDir + moduleName + "/");
             if (!Directory.Exists(moduleDir))
                 Directory.CreateDirectory(moduleDir);
             if (!Directory.Exists(moduleDir + "View/"))
@@ -394,7 +410,7 @@ namespace ToLuaSupport
                         modelSb.AppendLine(ToLuaGenerater.GetSingletonLuaLine(modelFiles[j], LuaFolder.Model));
                 }
 
-                if (Directory.Exists(moduleInfo.modelDirPath))
+                if (Directory.Exists(moduleInfo.serviceDirPath))
                 {
                     string[] serviceFiles = Directory.GetFiles(moduleInfo.serviceDirPath, "*Service.lua");
                     for (int j = 0; j < serviceFiles.Length; j++)
