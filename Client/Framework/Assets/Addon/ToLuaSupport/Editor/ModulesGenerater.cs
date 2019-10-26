@@ -89,7 +89,7 @@ namespace ToLuaSupport
                     if (GUILayout.Button("重新生成 Mvc Context 文件"))
                     {
                         string fileText = luaTable.ToString();
-                        FileUtils.SaveTextFile(ViewConfigPath, fileText);
+                        EditorUtils.SaveTextFile(ViewConfigPath, fileText);
                         Debug.Log("保存成功 \n" + fileText);
                         GeneratedMvcFiles();
                     }
@@ -439,7 +439,7 @@ namespace ToLuaSupport
 
         LuaTable LoadLuaTable(string path)
         {
-            string[] textLine = FileUtils.GetFileTextLine(path);
+            string[] textLine = EditorUtils.GetFileTextLine(path);
             if (textLine != null && textLine.Length > 0)
             {
                 LuaTable lt = new LuaTable();
