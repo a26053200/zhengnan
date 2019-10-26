@@ -45,6 +45,7 @@ namespace ToLuaSupport
         public string viewName;
         public string viewDirPath;
         public string prefabUrl = "";
+        public string moduleName;
 
         public Object prefab;
         public LuaViewInfo(string viewName)

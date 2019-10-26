@@ -13,38 +13,40 @@ namespace ToLuaSupport
 {
     public class LuaTable
     {
-        public string rootName { get; private set; }
+        private string rootName { get; set; }
         
-        private Dictionary<string, Dictionary<string, object>> hashTable;
+        private readonly Dictionary<string, Dictionary<string, object>> _hashTable;
+
+        public Dictionary<string, Dictionary<string, object>> HashTable => _hashTable;
 
         public LuaTable()
         {
-            hashTable = new Dictionary<string, Dictionary<string, object>>();
+            _hashTable = new Dictionary<string, Dictionary<string, object>>();
         }
         public LuaTable(string rootName)
         {
             this.rootName = rootName;
-            hashTable = new Dictionary<string, Dictionary<string, object>>();
+            _hashTable = new Dictionary<string, Dictionary<string, object>>();
         }
 
         public Dictionary<string, object> SetTable(string key)
         {
             Dictionary<string, object> tableLine = null;
-            if(!hashTable.TryGetValue(key,out tableLine))
+            if(!_hashTable.TryGetValue(key,out tableLine))
             {
                 tableLine = new Dictionary<string, object>();
-                hashTable.Add(key, tableLine);
+                _hashTable.Add(key, tableLine);
             }
             return tableLine;
         }
         public bool HasTable(string key)
         {
-            return hashTable.ContainsKey(key);
+            return _hashTable.ContainsKey(key);
         }
         public Dictionary<string, object> GetTable(string key)
         {
             Dictionary<string, object> tableLine = null;
-            hashTable.TryGetValue(key, out tableLine);
+            _hashTable.TryGetValue(key, out tableLine);
             return tableLine;
         }
 
@@ -102,7 +104,7 @@ namespace ToLuaSupport
                 }
                 else
                 {
-                    hashTable.Add(key, tableLine);
+                    _hashTable.Add(key, tableLine);
                     string[] data = GetFileAndValue(line, ',');
                     for (int j = 0; j < data.Length; j++)
                     {
@@ -152,10 +154,10 @@ namespace ToLuaSupport
             StringBuilder sb = new StringBuilder();
             //Header
             sb.AppendLine(string.Format("{0} = {{}}", rootName));
-            foreach (var key in hashTable.Keys)
+            foreach (var key in _hashTable.Keys)
             {
                 StringBuilder lineSb = new StringBuilder();
-                Dictionary<string, object> tableLine = hashTable[key];
+                Dictionary<string, object> tableLine = _hashTable[key];
                 foreach (var field in tableLine.Keys)
                     AddFiled(lineSb, field, tableLine[field]);
                 sb.AppendLine(string.Format("{0}.{1} = {{{2}}}", rootName, key, lineSb.ToString()));

@@ -55,6 +55,8 @@ namespace ToLuaSupport
                 EditorUtils.CreateAsset<ToLuaSetting>(SettingPath);
             }
             settings = AssetDatabase.LoadAssetAtPath<ToLuaSetting>(SettingPath);
+            ToLuaGenerater._setting = settings;
+
             ViewConfigPath      = settings.ViewConfigPath;
             ModulesDir          = settings.ModulesDir;
             PrefabsRootDir      = settings.PrefabsRootDir;
@@ -62,7 +64,7 @@ namespace ToLuaSupport
             ModelContextPath    = settings.ModelContextPath;
             ServiceContextPath  = settings.ServiceContextPath;
         
-            luaTable = GetLuaTable(ViewConfigPath);
+            luaTable = LoadLuaTable(ViewConfigPath);
             minSize = new Vector2(500, 500);
             endButtonWidth = GUILayout.Width(position.width * 0.2f);
             disable = new GUIStyle();
@@ -138,7 +140,7 @@ namespace ToLuaSupport
                 moduleInfo.serviceDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Service);
                 moduleInfo.voDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Vo);
                 //Views
-                if(!Directory.Exists(moduleInfo.viewDirPath))
+                if (!Directory.Exists(moduleDirPath))
                     continue;
                 string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
                 for (int j = 0; j < mdrFiles.Length; j++)
@@ -151,13 +153,12 @@ namespace ToLuaSupport
                     LuaViewInfo viewInfo = new LuaViewInfo(mdrName);
                     viewInfo.viewName = mdrName;
                     viewInfo.viewDirPath = moduleInfo.viewDirPath;
-                    if (luaTable.HasTable(mdrName))
+                    viewInfo.moduleName = moduleInfo.moduleName;
+                    if (luaTable.HasTable(mdrName))//已经存在配置
                     {
-                        //已经存在配置
-                        Dictionary<string, object> table = luaTable.SetTable(mdrName);
+                        luaTable.SetHashTable(viewInfo.viewName, "module", moduleInfo.moduleName);
                         viewInfo.prefabUrl = luaTable.GetString(mdrName, "prefab");
                     }
-
                     moduleInfo.viewList.Add(viewInfo);
                 }
 
@@ -214,6 +215,7 @@ namespace ToLuaSupport
                             if (GUILayout.Button("新建", endButtonWidth))
                             {
                                 luaTable.SetTable(viewInfo.viewName);
+                                luaTable.SetHashTable(viewInfo.viewName, "module", moduleInfo.moduleName);
                                 luaTable.SetHashTable(viewInfo.viewName, "name", viewInfo.viewName);
                             }
 
@@ -276,6 +278,7 @@ namespace ToLuaSupport
                         viewInfo.viewDirPath = moduleInfo.viewDirPath;
                         luaTable.SetTable(viewInfo.viewName);
                         luaTable.SetHashTable(viewInfo.viewName, "name", viewInfo.viewName);
+                        luaTable.SetHashTable(viewInfo.viewName, "module", moduleInfo.moduleName);
                         moduleInfo.viewList.Add(viewInfo);
                         moduleInfo.newViewMdrName = "";
                     }
@@ -434,14 +437,28 @@ namespace ToLuaSupport
                 return string.Format(format, packName, viewName);
         }
 
-        LuaTable GetLuaTable(string path)
+        LuaTable LoadLuaTable(string path)
         {
             string[] textLine = FileUtils.GetFileTextLine(path);
             if (textLine != null && textLine.Length > 0)
             {
                 LuaTable lt = new LuaTable();
                 lt.fromTextLine(textLine);
-                Debug.Log("获取LuaTable -- " + lt.ToString());
+                Debug.Log("Load Lua Table -- " + lt.ToString());
+                List<string> delList = new List<string>();
+                foreach (var viewName in lt.HashTable.Keys)
+                {
+                    string modulePath = Application.dataPath + "/" + ModulesDir + lt.GetString(viewName, "module");
+                    string viewPath = modulePath + ToLuaGenerater.Folder2Directory(LuaFolder.View) + lt.GetString(viewName, "name") + "Mdr.lua";
+                    if (!Directory.Exists(modulePath) || !File.Exists(viewPath))
+                    {
+                        Debug.Log(viewPath);
+                        if(!delList.Contains(viewName))delList.Add(viewName);
+                    }
+                }
+                foreach (var viewName in delList)
+                    lt.HashTable.Remove(viewName);
+
                 return lt;
             }
             else
