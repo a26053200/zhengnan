@@ -118,7 +118,7 @@ namespace ToLuaSupport
         {
             string fileName = Path.GetFileNameWithoutExtension(filePath);
             string viewName = fileName.Replace(folder.ToString(), "");
-            string packName = string.Format("Game.Modules.{0}.View.{1}", moduleName, fileName);
+            string packName = string.Format("{0}.{1}.View.{2}",_setting.PackageRoot, moduleName, fileName);
             return string.Format(Format_Mdr_Line, packName, viewName);
         }
 
@@ -127,7 +127,7 @@ namespace ToLuaSupport
         {
             string fileName = Path.GetFileNameWithoutExtension(filePath);
             string viewName = fileName.Replace(folder.ToString(), "");
-            string packName = string.Format("Game.Modules.{0}.{1}.{2}", viewName, folder.ToString(), fileName);
+            string packName = string.Format("{0}.{1}.{2}.{3}",_setting.PackageRoot, viewName, folder.ToString(), fileName);
             return string.Format(Format_Shingleton_Line, packName);
         }
 

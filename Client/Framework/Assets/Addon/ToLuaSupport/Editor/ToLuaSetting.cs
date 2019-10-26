@@ -11,7 +11,7 @@ namespace ToLuaSupport
         public string MediatorContextPath = "Assets/Lua/Game/Core/Ioc/MediatorContext.lua";
         public string ModelContextPath = "Assets/Lua/Game/Core/Ioc/ModelContext.lua";
         public string ServiceContextPath = "Assets/Lua/Game/Core/Ioc/ServiceContext.lua";
-        
+        public string PackageRoot = "Game.Modules";
         
         public string MODULE_NAME = "$MODULE_NAME$";
 
