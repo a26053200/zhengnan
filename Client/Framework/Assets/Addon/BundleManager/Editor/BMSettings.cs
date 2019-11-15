@@ -19,7 +19,9 @@ namespace BM
         public string BuildOutputDirName = "AssetBundle";
 
         public string resDir = "Assets/Res/";
-
+        //是否加密lua文件
+        public bool encodeLuaFile = false;
+        
         public bool useHashName = false;
 
         public bool clearManifestFile = true;

@@ -13,6 +13,11 @@ namespace BM
     /// </summary> 
     public static class BundleManager
     {
+        [MenuItem("Tools/Build/Clear Build",false,1)]
+        public static void ClearBuild()
+        {
+            EditorUtility.ClearProgressBar();
+        }
         [MenuItem("Tools/Build/Force Build Bundle(IOS)",false,1)]
         public static void ForceBuildIOS()
         {
@@ -75,7 +80,7 @@ namespace BM
             BundleBuilder.Output_Path = BundleBuilder.Output_Root_Path + "/" + language.ToString() + "/" + buildTarget.ToString();
             string historyBuildInfoPath = BundleBuilder.Output_Path + "/" + BMConfig.BundleDataFile;
             BundleBuilder.historyBuildInfo = forceBuild ? null : LoadHistoryBundleData(historyBuildInfoPath);
-            BundleBuilder.StartBuild(forceBuild, Language.zh_CN, buildTarget, true, false);
+            BundleBuilder.StartBuild(forceBuild, Language.zh_CN, buildTarget, true, BundleBuilder.settings.encodeLuaFile,false);
         }
 
         private static Dictionary<string, BuildSampleInfo> LoadHistoryBundleData(string bundleDataFilePath)

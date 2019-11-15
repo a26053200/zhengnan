@@ -53,17 +53,20 @@ namespace BM
 
         static bool isForceBuild;
 
+        static bool isLuaEncoded;
+
         //=======================
         // 流程函数
         //=======================
 
-        public static void StartBuild(bool forceBuild, Language language, BuildTarget buildTag, bool generate, bool moveBundle)
+        public static void StartBuild(bool forceBuild, Language language, BuildTarget buildTag, bool generate, bool luaEncoded, bool moveBundle)
         {
             buildTarget = buildTag;
             buildStartTime = EditorApplication.timeSinceStartup;
             tempLuaPaths = new List<string>();
 
             isForceBuild = forceBuild;
+            isLuaEncoded = luaEncoded;
 
             //记录打包次数
             string verStr = EditorPrefs.GetString(settings.AppName + BM_Build_Version, null);
@@ -472,7 +475,18 @@ namespace BM
                     string temp = path + "." + BMUtility.EncryptWithMD5(path) + ".txt";
                     if (File.Exists(temp))
                         File.Delete(temp);
-                    File.Copy(path, temp);
+                    if (isLuaEncoded)
+                    {
+                        if (!EncodeLuaFile(path, temp))
+                        {
+                            Debug.Log("Encode lua file fail!");
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        File.Copy(path, temp);
+                    }
                     buildInfo.assetPaths.Add(temp);
                     tempLuaPaths.Add(temp);
                 }
@@ -481,7 +495,7 @@ namespace BM
                     buildInfo.assetPaths.Add(path);
                 }
                 //Logger.Log("path:{0}", path);
-                EditorUtility.DisplayProgressBar("Fetch Build Info...", path, (float)(i + 1.0f) / (float)resFiles.Length);
+                EditorUtility.DisplayCancelableProgressBar("Fetch Build Info...", path, (float)(i + 1.0f) / (float)resFiles.Length);
             }
             //EditorUtility.ClearProgressBar();
             if (buildType == BuildType.Lua)
@@ -533,6 +547,28 @@ namespace BM
                 if(list.Count > 0)
                     dependenceMap[filePath] = list.ToArray();
             }
+        }
+        
+        //加密lua
+        static bool EncodeLuaFile(string srcFile, string outFile)
+        {
+            string AppDataPath = Application.dataPath.Replace("Assets", "");
+            string luaexe   = string.Empty;
+            string exedir   = string.Empty;
+            bool   isWin    = true;
+            if (Application.platform == RuntimePlatform.WindowsEditor)
+            {
+                isWin   = true;
+                luaexe  = LuaUtils.isX64 ? "luajit64.exe" : "luajit32.exe";
+                exedir  = Path.Combine(AppDataPath, LuaUtils.isX64 ? "Tools/Luajit64/" : "Tools/Luajit/");
+            }
+            else if (Application.platform == RuntimePlatform.OSXEditor)
+            {
+                isWin   = false;
+                luaexe = "luajit";
+                exedir  = Path.Combine(AppDataPath, "Tools/luajit_mac/");
+            }
+            return LuaUtils.EncodeLuaFile(AppDataPath + srcFile, AppDataPath + outFile, isWin, exedir, luaexe);
         }
     }
 }
