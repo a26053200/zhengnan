@@ -38,6 +38,9 @@ public class Client : MonoBehaviour
         logger.Start();
         Logger.Info("Game Start");
         
+        GlobalConsts.isLuaBundleMode = GetRunMode(1) == 1;
+        GlobalConsts.isResBundleMode = GetRunMode(2) == 1;
+        
         if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
         {
             if (!Directory.Exists("Assets/Res") || !Directory.Exists("Assets/Lua"))
@@ -46,9 +49,17 @@ public class Client : MonoBehaviour
                 return;
             }
         }
+        
+        
+        
         AppBootstrap.Start(this);
     }
    
+    static int GetRunMode(int mode)
+    {
+        return PlayerPrefs.GetInt(StringUtils.EncryptWithMD5(Application.dataPath) + "_Mode" + mode, 0);
+    }
+    
     private void OnApplicationQuit()
     {
         if(logger != null)

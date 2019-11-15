@@ -141,7 +141,8 @@ namespace Framework
             EventTriggerListener.EventDelegate ed = delegate (BaseEventData eventData)
             {
                 luaFunc.BeginPCall();
-                luaFunc.Call<BaseEventData>(eventData);
+                luaFunc.Push(eventData);
+                luaFunc.PCall();
                 luaFunc.EndPCall();
             };
             EventTriggerListener listener = EventTriggerListener.Get(gameObject);

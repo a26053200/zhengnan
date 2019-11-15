@@ -84,6 +84,38 @@ namespace Framework
                 func.Call(sceneName);
             }
         }
+        /// <summary>
+        /// 查找指定场景的所有顶级对象
+        /// </summary>
+        public GameObject FindRootObjInScene(Scene scene, string name)
+        {
+            List<GameObject> rootObjects = new List<GameObject>();
+            scene.GetRootGameObjects(rootObjects);
+            for (int i = 0; i < rootObjects.Count; i++)
+            {
+                if (rootObjects[i].name == name)
+                {
+                    return rootObjects[i];
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 遍历所有顶级对象，调用Lua函数
+        /// </summary>
+        public void ForEachRootObj(Scene scene, LuaFunction luaFunc)
+        {
+            List<GameObject> rootObjects = new List<GameObject>();
+            scene.GetRootGameObjects(rootObjects);
+            for (int i = 0; i < rootObjects.Count; i++)
+            {
+                luaFunc.BeginPCall();
+                luaFunc.Push(rootObjects[i]);
+                luaFunc.PCall();
+                luaFunc.EndPCall();
+            }
+        }
     }
 }
 

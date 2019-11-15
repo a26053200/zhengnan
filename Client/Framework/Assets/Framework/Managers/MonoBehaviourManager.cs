@@ -16,12 +16,14 @@ namespace Framework
         private List<LuaFunction> updateList;
         private List<LuaFunction> lateUpdateList;
         private List<LuaFunction> fixedUpdateList;
-
+        private List<LuaFunction> destroyList;
+        
         private void Awake()
         {
             updateList = new List<LuaFunction>();
             lateUpdateList = new List<LuaFunction>();
             fixedUpdateList = new List<LuaFunction>();
+            destroyList = new List<LuaFunction>();
         }
         private void Update()
         {
@@ -39,6 +41,12 @@ namespace Framework
         {
             for (int i = 0; i < fixedUpdateList.Count; i++)
                 Call(fixedUpdateList[i]);
+        }
+
+        private void OnDestroy()
+        {
+            for (int i = 0; i < destroyList.Count; i++)
+                Call(destroyList[i]);
         }
 
         public void AddUpdateFun(LuaFunction func)
@@ -59,6 +67,12 @@ namespace Framework
                 fixedUpdateList.Add(func);
         }
 
+        public void AddDestroyFun(LuaFunction func)
+        {
+            //if (!destroyList.Contains(func))
+                destroyList.Add(func);
+        }
+        
         public void RemoveUpdateFun(LuaFunction func)
         {
             if (updateList.Contains(func))
@@ -84,6 +98,15 @@ namespace Framework
             {
                 fixedUpdateList.Remove(func);
                 RemoveFixedUpdateFun(func);
+            }
+        }
+        
+        public void RemoveDestroyFun(LuaFunction func)
+        {
+            if (destroyList.Contains(func))
+            {
+                destroyList.Remove(func);
+                RemoveDestroyFun(func);
             }
         }
 

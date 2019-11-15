@@ -211,6 +211,7 @@ namespace Framework
                         {
                             Logger.Info("Asset:'{0}' has loaded", path);
                             luaFunc.BeginPCall();
+                            luaFunc.Push(t);
                             luaFunc.PCall();
                             luaFunc.EndPCall();
                         }
