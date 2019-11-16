@@ -149,7 +149,7 @@ namespace BM
                     continue;
                 string resDir = BMEditUtility.Relativity2Absolute(folders[i]);
                 BuildInfo buildInfo = FetchBuildInfo(resDir, searchPattern, buildType);
-                buildInfo.buildName = folders[i];
+                buildInfo.buildName = folders[i].EndsWith("/")?folders[i].Substring(0,folders[i].Length - 1):folders[i];
                 buildInfo.buildType = buildType;
                 buildInfo.compressType = compressType;
                 buildInfoList.Add(buildInfo);
