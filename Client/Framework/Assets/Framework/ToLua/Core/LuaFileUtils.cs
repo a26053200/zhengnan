@@ -259,11 +259,11 @@ namespace LuaInterface
 
             foreach(var zipFile in zipMap.Values)
             {
-                string key = zipName + fileName.ToLower();
-                Debug.Log("key:" + key);
-                string luaName = luaNameMap[key];
-                Debug.Log("luaName:" + luaName);
-                TextAsset luaCode = zipFile.LoadAsset<TextAsset>(luaName);
+                //string key = zipName + fileName.ToLower();
+                //Debug.Log("key:" + key);
+                //string luaName = luaNameMap[key];
+                //Debug.Log("luaName:" + luaName);
+                TextAsset luaCode = zipFile.LoadAsset<TextAsset>(luaNameMap[zipName + fileName.ToLower()]);
                 if (luaCode != null)
                 {
                     //Debug.Log(luaCode.text);

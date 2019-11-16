@@ -21,7 +21,7 @@ namespace Framework
             public UnityAction<AssetBundle> OnAssetBundleLoaded;
         }
 
-        BundleLoader bundleLoader;
+        public BundleLoader bundleLoader { get; private set; }
         Queue<ResLoaderInfo> loadQueue;
         ResLoaderInfo currLoadInfo;
         public override void Initialize()

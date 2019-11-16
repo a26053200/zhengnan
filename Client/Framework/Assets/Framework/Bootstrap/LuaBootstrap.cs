@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using Framework;
 using LuaInterface;
 using System.Text;
 using BM;
+
 /// <summary>
 /// <para>lua 引导启动</para>
 /// <para>Author: zhengnan</para>
@@ -21,8 +23,7 @@ public class LuaBootstrap : LuaClient
             // 例如 Assets/Lua/Main.lua.a19cffbd6db217c8a9f41869010f8a9e.txt
             tailLength = StringUtils.EncryptWithMD5("md5").Length + ".bytes".Length + 1;
 
-            LoadLuaScriptBundle(GlobalConsts.LuaRootDir);
-            LoadLuaScriptBundle(GlobalConsts.ToLuaRootDir);
+            LoadLuaScriptBundle();
         }
         else
         {
@@ -39,28 +40,36 @@ public class LuaBootstrap : LuaClient
         OpenCJson();//打开cjson
     }
 
-    protected void LoadLuaScriptBundle(string luaRootDir)
+    protected void LoadLuaScriptBundle()
     {
         ResLoader resLoader = GameManager.GetResLoader();
-        string bundleName = BMUtility.Path2Name(luaRootDir.ToLower());
-        AssetBundle luaBundle = resLoader.GetBundleByBundleName(bundleName);
-        if (luaBundle)
+        List<BundleInfo> bundleInfos = resLoader.bundleLoader.bundleInfos;
+        for (int i = 0; i < bundleInfos.Count; i++)
         {
-            LuaFileUtils.Instance.AddSearchBundle(luaRootDir.ToLower(), luaBundle);
-            string[] allNames = luaBundle.GetAllAssetNames();
-            for (int i = 0; i < allNames.Length; i++)
+            if (bundleInfos[i].buildType == BuildType.Lua)
             {
-                string name = allNames[i];
-                name = name.Substring(0, name.Length - tailLength); //去掉md5后缀,转化为正确的Lua文件名
-                name = name.Replace(luaRootDir.ToLower() + "/", "");
-                name = "lua_" + BMUtility.Path2Name(name);
-                Debug.LogFormat("{0} - {1}", name, allNames[i]);
-                LuaFileUtils.Instance.AddLuaNameMap(name, allNames[i]);
+                string bundleName = bundleInfos[i].bundleName;
+                string luaRootDir = BMUtility.Name2Path(bundleName);
+                AssetBundle luaBundle = resLoader.GetBundleByBundleName(bundleName);
+                if (luaBundle)
+                {
+                    LuaFileUtils.Instance.AddSearchBundle(bundleName, luaBundle);
+                    string[] allNames = luaBundle.GetAllAssetNames();
+                    for (int j = 0; j < allNames.Length; j++)
+                    {
+                        string name = allNames[j];
+                        name = name.Substring(0, name.Length - tailLength); //去掉md5后缀,转化为正确的Lua文件名
+                        name = name.Replace(luaRootDir.ToLower() + "/", "");
+                        name = "lua_" + BMUtility.Path2Name(name);
+                        Debug.LogFormat("{0} - {1}", name, allNames[j]);
+                        LuaFileUtils.Instance.AddLuaNameMap(name, allNames[j]);
+                    }
+                }
+                else
+                {
+                    Logger.Error("There is not lua bundle:{0}",bundleName);
+                }
             }
-        }
-        else
-        {
-            Logger.Error("There is not lua bundle:{0}",bundleName);
         }
     }
 }
