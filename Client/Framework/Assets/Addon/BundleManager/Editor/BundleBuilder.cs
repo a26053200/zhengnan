@@ -366,6 +366,7 @@ namespace BM
                 count += buildAbb.Value.Count;
                 BuildPipeline.BuildAssetBundles(Output_Path, buildAbb.Value.ToArray(), buildAbb.Key, buildTarget);
             }
+            //清除临时的lua bundle 文件
             foreach (var path in tempLuaPaths)
             {
                 if (File.Exists(path))
@@ -472,7 +473,7 @@ namespace BM
                 string path = dirPath + fileInfo.Name; //相对路径
                 if (buildType == BuildType.Lua)
                 {
-                    string temp = path + "." + BMUtility.EncryptWithMD5(path) + ".txt";
+                    string temp = path + "." + BMUtility.EncryptWithMD5(path) + ".bytes";
                     if (File.Exists(temp))
                         File.Delete(temp);
                     if (isLuaEncoded)
@@ -556,6 +557,7 @@ namespace BM
             string luaexe   = string.Empty;
             string exedir   = string.Empty;
             bool   isWin    = true;
+            string args     = string.Format("-b -g {0} {1}",AppDataPath + srcFile, AppDataPath + outFile);
             if (Application.platform == RuntimePlatform.WindowsEditor)
             {
                 isWin   = true;
@@ -565,10 +567,25 @@ namespace BM
             else if (Application.platform == RuntimePlatform.OSXEditor)
             {
                 isWin   = false;
-                luaexe = "luajit";
-                exedir  = Path.Combine(AppDataPath, "Tools/luajit_mac/");
+                if (buildTarget == BuildTarget.StandaloneOSX)
+                {
+                    args = string.Format("-o {0} {1}",AppDataPath + outFile, AppDataPath + srcFile);
+                    luaexe = "./luac";
+                    exedir  = AppDataPath + "Tools/luavm/";
+                }
+                else
+                {
+                    luaexe = "./luajit";
+                    exedir  = AppDataPath + "Tools/luajit_mac/";
+                }
             }
-            return LuaUtils.EncodeLuaFile(AppDataPath + srcFile, AppDataPath + outFile, isWin, exedir, luaexe);
+            if (!Directory.Exists(exedir))
+                throw new Exception(string.Format("Can not found Lua dir {0}",exedir));
+            if (!File.Exists(srcFile))
+                throw new Exception(string.Format("Can not found Source Lua file {0}",srcFile));
+            if (!File.Exists(exedir + luaexe))
+                throw new Exception(string.Format("Can not found Luajit.exe {0}{1}",exedir,luaexe));
+            return LuaUtils.EncodeLuaFile(args, isWin,exedir, luaexe);
         }
     }
 }

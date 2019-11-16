@@ -259,9 +259,14 @@ namespace LuaInterface
 
             foreach(var zipFile in zipMap.Values)
             {
-                TextAsset luaCode = zipFile.LoadAsset<TextAsset>(luaNameMap[zipName + fileName.ToLower()]);
+                string key = zipName + fileName.ToLower();
+                Debug.Log("key:" + key);
+                string luaName = luaNameMap[key];
+                Debug.Log("luaName:" + luaName);
+                TextAsset luaCode = zipFile.LoadAsset<TextAsset>(luaName);
                 if (luaCode != null)
                 {
+                    //Debug.Log(luaCode.text);
                     buffer = luaCode.bytes;
                     Resources.UnloadAsset(luaCode);
                     break;

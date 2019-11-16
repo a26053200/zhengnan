@@ -36,7 +36,6 @@ namespace Framework
             }
         }
 
-
         public AssetBundle GetBundleByAssetPath(string assetPath)
         {
             if (BundleLoadState.Loading == bundleLoader.GetBundleStateByAssetPath(assetPath))

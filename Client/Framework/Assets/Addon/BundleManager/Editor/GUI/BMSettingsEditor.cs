@@ -166,7 +166,7 @@ namespace BM
                 GameObject spritePrefab = new GameObject(spriteName);
                 Image img = spritePrefab.AddComponent<Image>();
                 string rPath = BMEditUtility.Absolute2Relativity(info.FullName);
-                img.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(rPath);
+                //img.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(rPath);
                 //spritePrefab.hideFlags = HideFlags.HideInHierarchy;
                 PrefabUtility.SaveAsPrefabAsset(spritePrefab, outPath + spriteName + ".prefab");
                 DestroyImmediate(spritePrefab);

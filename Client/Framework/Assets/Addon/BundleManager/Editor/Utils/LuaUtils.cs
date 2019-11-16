@@ -8,17 +8,9 @@ namespace BM
     public class LuaUtils
     {
         
-        public static bool EncodeLuaFile(string srcFile, string outFile, bool isWin, string luajitDir, string luajitExecuteFile)
+        public static bool EncodeLuaFile(string args, bool isWin, string luajitDir, string luajitExecuteFile)
         {
-            string args     = string.Format("-b -g {0} {1}",srcFile, outFile);
-            Debug.LogFormat("[LuaEncode] {0}{1} {2}",luajitDir,luajitExecuteFile,args);
             string currDir  = Directory.GetCurrentDirectory();
-            if (!Directory.Exists(luajitDir))
-                throw new Exception(string.Format("Can not found Lua dir {0}",luajitDir));
-            if (!File.Exists(srcFile))
-                throw new Exception(string.Format("Can not found Source Lua file {0}",srcFile));
-            if (!File.Exists(luajitDir + luajitExecuteFile))
-                throw new Exception(string.Format("Can not found Luajit.exe {0}{1}",luajitDir,luajitExecuteFile));
             try
             {
                 Directory.SetCurrentDirectory(luajitDir);

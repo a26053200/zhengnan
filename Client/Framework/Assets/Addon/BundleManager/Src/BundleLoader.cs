@@ -34,6 +34,7 @@ namespace BM
             string path = getFilePath(BMConfig.BundleDataFile);
             Debug.LogFormat("Load bundle data:{0}", path);
             string bundleData = BMUtility.LoadText(path);
+            Debug.Log(bundleData);
             JsonData jsonData = JsonMapper.ToObject(bundleData);
             //Debug.Log(bundleData);
 
