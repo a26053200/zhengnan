@@ -71,7 +71,7 @@ namespace BM
 
         static Dictionary<string, string> argDict;
 
-        private static void StartBuild(bool forceBuild, Language language, BuildTarget buildTarget)
+        private static void StartBuild(bool forceBuild, Language language, BuildTarget buildTarget, bool moveBundle = false)
         {
             //加载打包配置
             BundleBuilder.settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
@@ -80,7 +80,12 @@ namespace BM
             BundleBuilder.Output_Path = BundleBuilder.Output_Root_Path + "/" + language.ToString() + "/" + buildTarget.ToString();
             string historyBuildInfoPath = BundleBuilder.Output_Path + "/" + BMConfig.BundleDataFile;
             BundleBuilder.historyBuildInfo = forceBuild ? null : LoadHistoryBundleData(historyBuildInfoPath);
-            BundleBuilder.StartBuild(forceBuild, Language.zh_CN, buildTarget, true, BundleBuilder.settings.encodeLuaFile,false);
+            if (BundleBuilder.settings.tempForceBuild)
+            {
+                forceBuild = true;
+                BundleBuilder.settings.tempForceBuild = false;
+            }
+            BundleBuilder.StartBuild(forceBuild, Language.zh_CN, buildTarget, true, BundleBuilder.settings.encodeLuaFile,moveBundle);
         }
 
         private static Dictionary<string, BuildSampleInfo> LoadHistoryBundleData(string bundleDataFilePath)
@@ -164,13 +169,13 @@ namespace BM
         }
 
         //[MenuItem("Tools/Build/BuildAssetBundle")]
-        static void BuildAssetBundle()
+        public static void BuildAssetBundle(BuildTarget buildTarget, Language language)
         {
-            Logger.Log("Start build asset bundle with command ");
-            BuildTarget buildTarget = GetSelectedBuildTarget(GetCommandLineArgs("-buildTarget"));
-            Language language = (Language)Enum.Parse(typeof(Language), GetCommandLineArgs("-language"));
+            //BuildTarget buildTarget = GetSelectedBuildTarget(GetCommandLineArgs("-buildTarget"));
+            //Language language = (Language)Enum.Parse(typeof(Language), GetCommandLineArgs("-language"));
+            //Logger.Log("Start build asset bundle with command. target:" + buildTarget + " language:" + language);
             Debug.Log(string.Format("Start build asset bundle with -buildTarget:{0}  -language{1}", buildTarget, language));
-            StartBuild(false, language, buildTarget);
+            StartBuild(false, language, buildTarget, true);
         }
     }
 }

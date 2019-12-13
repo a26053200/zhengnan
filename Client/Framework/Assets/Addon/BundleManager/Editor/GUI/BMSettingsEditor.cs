@@ -73,6 +73,17 @@ namespace BM
             EditorGUILayout.EndHorizontal();
             
             EditorGUILayout.Space();
+            //uiSpriteDir
+            settings.uiSpriteDir = EditorGUILayout.TextField("UI Sprite", settings.uiSpriteDir);
+            if (!string.IsNullOrEmpty(settings.uiSpriteDir))
+            {
+                if (GUILayout.Button("Update All Packing Tag"))
+                {
+                    UpdatePackingTag(settings.uiSpriteDir);
+                }
+            }
+            
+            EditorGUILayout.Space();
             foreach (var folder in settings.scenesFolderList)
             {
                 FileInfo[] sceneFiles = BMEditUtility.GetAllFiles(folder, settings.scenesPattern);
@@ -166,7 +177,13 @@ namespace BM
                 GameObject spritePrefab = new GameObject(spriteName);
                 Image img = spritePrefab.AddComponent<Image>();
                 string rPath = BMEditUtility.Absolute2Relativity(info.FullName);
-                //img.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(rPath);
+                TextureImporter ti = AssetImporter.GetAtPath(rPath) as TextureImporter;
+                if (ti)
+                {
+                    ti.spritePackingTag = "Atlas_" + dirName;
+                    ti.SaveAndReimport();
+                }
+                img.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(rPath);
                 //spritePrefab.hideFlags = HideFlags.HideInHierarchy;
                 PrefabUtility.SaveAsPrefabAsset(spritePrefab, outPath + spriteName + ".prefab");
                 DestroyImmediate(spritePrefab);
@@ -174,6 +191,25 @@ namespace BM
 
             //Save md5
             BMEditUtility.SaveDictionary(Path.Combine(atlasDir, "manifest.txt"), md5Map);
+        }
+        
+        private void UpdatePackingTag(string dir)
+        {
+            FileInfo[] resFiles = BMEditUtility.GetAllFiles(dir, "*.*");
+            for (int i = 0; i < resFiles.Length; i++)
+            {
+                FileInfo info = resFiles[i];
+                string rPath = BMEditUtility.Absolute2Relativity(info.FullName);
+                if(Path.GetExtension(rPath) == ".meta")
+                    continue;
+                string dirName = Path.GetFileName(Path.GetDirectoryName(rPath));
+                TextureImporter ti = AssetImporter.GetAtPath(rPath) as TextureImporter;
+                if (ti)
+                {
+                    ti.spritePackingTag = "UISprite_" + dirName;
+                    ti.SaveAndReimport();
+                }
+            }
         }
     }
 }

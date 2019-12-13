@@ -118,6 +118,10 @@ namespace BM
             //清除manifest文件
             if (settings.clearManifestFile)
                 ClearManifestFiles();
+            
+            //移动生成后的所有bundle文件
+            if(moveBundle)
+                MoveAssetBundle();
 
             Logger.Log("Generate Assets Bundle Over. time consuming:{0}s", EditorApplication.timeSinceStartup - buildStartTime);
         }
@@ -148,6 +152,8 @@ namespace BM
                 if (!Directory.Exists(folders[i]))
                     continue;
                 string resDir = BMEditUtility.Relativity2Absolute(folders[i]);
+                if(resDir == null)
+                    continue;
                 BuildInfo buildInfo = FetchBuildInfo(resDir, searchPattern, buildType);
                 buildInfo.buildName = folders[i].EndsWith("/")?folders[i].Substring(0,folders[i].Length - 1):folders[i];
                 buildInfo.buildType = buildType;
@@ -194,7 +200,7 @@ namespace BM
                             name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
                             break;
                     }
-                    string md5 = BMUtility.EncryptWithMD5(name);
+                    string md5 = BMUtility.EncryptWithMD5(name + "." + settings.Suffix_Bundle);
                     SubBuildInfo subInfo = null;
                     if (!buildInfo.subBuildInfoMap.TryGetValue(md5, out subInfo))
                     {
@@ -391,6 +397,15 @@ namespace BM
             EditorUtility.ClearProgressBar();
         }
 
+        static void MoveAssetBundle()
+        {
+            string streamingAssetsPath = Application.streamingAssetsPath;
+            BMEditUtility.DelFolder(streamingAssetsPath);
+            if (!Directory.Exists(streamingAssetsPath))
+                Directory.CreateDirectory(streamingAssetsPath);
+            BMEditUtility.CopyDir(Output_Path,streamingAssetsPath);
+            Logger.Log("Move all bundle files over. to " + streamingAssetsPath);
+        }
         static void CalcBundleFileSize()
         {
             for (int i = 0; i < buildInfoList.Count; i++)

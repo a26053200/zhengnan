@@ -13,12 +13,15 @@ namespace BM
     /// </summary> 
     public class BMSettings : ScriptableObject
     {
+        public int buildNo = 0;
         //应用名字
         public string AppName = "AppName";
 
         public string BuildOutputDirName = "AssetBundle";
 
         public string resDir = "Assets/Res/";
+        //临时强制打包
+        public bool tempForceBuild = false;
         //是否加密lua文件
         public bool encodeLuaFile = false;
         
@@ -86,6 +89,8 @@ namespace BM
         public List<string> atlasSpriteFolderList = new List<string>();
 
         public string atlasSpritePrefabDir;
+        [HideInInspector]
+        public string uiSpriteDir;
 
         //场景版本号
         [HideInInspector] 
