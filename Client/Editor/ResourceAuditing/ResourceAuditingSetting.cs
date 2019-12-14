@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using UnityEditor;
 
 namespace ResourceAuditing
 {
@@ -17,25 +18,25 @@ namespace ResourceAuditing
         {
             return s_Instance;
         }
-        /// <summary>
+
         /// IOS平台推荐使用贴图格式
         /// </summary>
-        public TextuteFormatKey[] Tex_Format_Recommend_IOS;
+        public TextureFormatKey[] Tex_Format_Recommend_IOS;
 
         /// <summary>
         /// IOS平台禁止使用贴图格式
         /// </summary>
-        public TextuteFormatKey[] Tex_Format_Forbid_IOS;
+        public TextureFormatKey[] Tex_Format_Forbid_IOS;
 
         /// <summary>
         /// Android平台推荐使用贴图格式
         /// </summary>
-        public TextuteFormatKey[] Tex_Format_Recommend_Android;
+        public TextureFormatKey[] Tex_Format_Recommend_Android;
 
         /// <summary>
         /// Android平台禁止使用贴图格式
         /// </summary>
-        public TextuteFormatKey[] Tex_Format_Forbid_Android;
+        public TextureFormatKey[] Tex_Format_Forbid_Android;
 
         /// <summary>
         /// 贴图最大尺寸
@@ -90,6 +91,24 @@ namespace ResourceAuditing
 
         public string[] Sound_FileTypes = new string[] { ".aif", ".wav", ".mp3", ".ogg" };
 
+    }
+    //平台设置
+    public class PlatformSetting : ScriptableObject
+    {
+        /// <summary>
+        /// 平台推荐使用贴图格式
+        /// </summary>
+        public TextureImporterFormat[] Tex_Format_Recommend;
+
+        /// <summary>
+        /// 平台禁止使用贴图格式
+        /// </summary>
+        public TextureImporterFormat[] Tex_Format_Forbid;
+        
+        public AudioClipLoadType audioClipLoadType_Short;
+        public AudioCompressionFormat compressionFormat_Shor;
+        public AudioClipLoadType audioClipLoadType_Long;
+        public AudioCompressionFormat compressionFormat_Long;
     }
 }
 

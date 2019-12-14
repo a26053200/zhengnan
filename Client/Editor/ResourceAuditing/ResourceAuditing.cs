@@ -57,7 +57,7 @@ namespace ResourceAuditing
 
             Res_Root_Path = Application.dataPath + "/Res";
             Resource_Auditing_Setting_Path = "Assets/Res/ResourceAuditingSetting.asset";
-
+            
             if (!File.Exists(Resource_Auditing_Setting_Path))
                 ResUtils.CreateAsset<ResourceAuditingSetting>(Resource_Auditing_Setting_Path);
             setting = AssetDatabase.LoadAssetAtPath<ResourceAuditingSetting>(Resource_Auditing_Setting_Path);
@@ -117,6 +117,7 @@ namespace ResourceAuditing
             switch (currSelectDetailsType)
             {
                 case DetailsType.Textures:
+                    OptimizeTextures();
                     textureTree.OnGUI();
                     break;
                 case DetailsType.Materials:
@@ -131,6 +132,44 @@ namespace ResourceAuditing
             }
         }
 
+        private TextureImporterFormat _iosTif = TextureImporterFormat.ASTC_RGB_6x6;
+        private TextureImporterFormat _iosTif_a = TextureImporterFormat.ASTC_RGBA_6x6;
+        private TextureImporterFormat _androidTif = TextureImporterFormat.ETC2_RGB4;
+        private TextureImporterFormat _androidTif_a = TextureImporterFormat.ETC2_RGBA8;
+        void OptimizeTextures()
+        {
+            if (allTexDict != null)
+            {
+                EditorGUILayout.BeginHorizontal();
+                _iosTif = (TextureImporterFormat)EditorGUILayout.EnumFlagsField("IOS:", _iosTif);
+                _iosTif_a = (TextureImporterFormat)EditorGUILayout.EnumFlagsField("Alpha:", _iosTif_a);
+                if(GUILayout.Button("Optimize"))
+                    DoOptimizeTextures(EditPlatform.iPhone, _iosTif, _iosTif_a);
+                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.BeginHorizontal();
+                _androidTif = (TextureImporterFormat)EditorGUILayout.EnumFlagsField("Android:", _androidTif);
+                _androidTif_a = (TextureImporterFormat)EditorGUILayout.EnumFlagsField("Alpha:", _androidTif_a);
+                if(GUILayout.Button("Optimize"))
+                {
+                    DoOptimizeTextures(EditPlatform.Android, _androidTif,_androidTif_a);
+                }
+                EditorGUILayout.EndHorizontal();
+            }
+        }
+
+        void DoOptimizeTextures(string platform, TextureImporterFormat tif, TextureImporterFormat tif_a)
+        {
+            foreach (var detail in allTexDict.Values)
+            {
+                for (int i = 0; i < detail.resources.Count; i++)
+                {
+                    EditorUtility.DisplayProgressBar("Optimize...", detail.resources[i].path, (float)i + 1.0f / (float)detail.resources.Count);
+                    detail.resources[i].Optimization(platform + "," + tif+ "," + tif_a);
+                }
+            }
+            EditorUtility.ClearProgressBar();
+        }
+        
         /// <summary>
         /// 获取所有贴图
         /// </summary>

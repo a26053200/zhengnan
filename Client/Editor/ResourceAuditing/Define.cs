@@ -18,7 +18,7 @@ namespace ResourceAuditing
         public const string tvOS = "tvOS";
     }
 
-    public enum TextuteFormatKey
+    public enum TextureFormatKey
     {
         None,
         ETC,

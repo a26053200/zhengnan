@@ -30,6 +30,12 @@ namespace ResourceAuditing
         }
 
         public abstract void OnResourceGUI();
+
+        //优化
+        public virtual void Optimization(string param)
+        {
+            
+        }
     }
 }
 

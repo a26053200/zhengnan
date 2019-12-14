@@ -50,7 +50,34 @@ namespace ResourceAuditing
         {
             get { return texture; }
         }
+        public override void Optimization(string param)
+        {
+            string[] patams = param.Split(',');
+            if (textureImporter)
+            {
+                var format = textureImporter.DoesSourceTextureHaveAlpha()
+                    ? (TextureImporterFormat) Enum.Parse(typeof(TextureImporterFormat), patams[1])
+                    : (TextureImporterFormat) Enum.Parse(typeof(TextureImporterFormat), patams[2]);
+                TextureImporterPlatformSettings platformSettings = textureImporter.GetPlatformTextureSettings(patams[0]);
+                TextureImporterPlatformSettings settings = new TextureImporterPlatformSettings
+                {
+                    allowsAlphaSplitting = platformSettings.allowsAlphaSplitting,
+                    crunchedCompression = platformSettings.crunchedCompression,
+                    maxTextureSize = platformSettings.maxTextureSize,
+                    name = platformSettings.name,
+                    resizeAlgorithm = platformSettings.resizeAlgorithm,
 
+                    textureCompression = TextureImporterCompression.Compressed,
+                    compressionQuality = (int)UnityEditor.TextureCompressionQuality.Normal,
+                    overridden = true
+                };
+                settings.format = format;
+                settings.overridden = true;
+                textureImporter.isReadable = false;
+                textureImporter.SetPlatformTextureSettings(settings);
+                textureImporter.SaveAndReimport();
+            }
+        }
         public override void SetResObj(Object obj)
         {
             resObj = obj;
@@ -58,7 +85,7 @@ namespace ResourceAuditing
             textureImporter = AssetImporter.GetAtPath(path) as TextureImporter;
 
             //format
-            standalone_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.Standalone),new TextuteFormatKey[] { }, new TextuteFormatKey[] { });
+            standalone_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.Standalone),new TextureFormatKey[] { }, new TextureFormatKey[] { });
             ios_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.iPhone), ResourceAuditingSetting.GetIntance().Tex_Format_Recommend_IOS, ResourceAuditingSetting.GetIntance().Tex_Format_Forbid_IOS); 
             android_setting = GetPlatformNorm(textureImporter.GetPlatformTextureSettings(EditPlatform.Android), ResourceAuditingSetting.GetIntance().Tex_Format_Recommend_Android, ResourceAuditingSetting.GetIntance().Tex_Format_Forbid_Android); 
             //maxSize
@@ -100,7 +127,7 @@ namespace ResourceAuditing
             EditorGUILayout.EndVertical();
         }
 
-        public TexturePlatformNorm GetPlatformNorm(TextureImporterPlatformSettings setting, TextuteFormatKey[] normRecommend, TextuteFormatKey[] normForbid)
+        public TexturePlatformNorm GetPlatformNorm(TextureImporterPlatformSettings setting, TextureFormatKey[] normRecommend, TextureFormatKey[] normForbid)
         {
             TexturePlatformNorm tpn = new TexturePlatformNorm()
             {
@@ -160,9 +187,9 @@ namespace ResourceAuditing
             EditorGUILayout.EndHorizontal();
         }
 
-        private bool isInclude(TextuteFormatKey[] formats, string format)
+        private bool isInclude(TextureFormatKey[] formats, string format)
         {
-            for (int i = 0; i < formats.Length; i++)
+            for (int i = 0; i < formats.Length; i++) 
             {
                 if (format.StartsWith(formats[i].ToString()))
                     return true;
@@ -176,7 +203,7 @@ namespace ResourceAuditing
     {
         public TextureImporterPlatformSettings setting;
 
-        public TextuteFormatKey[] normRecommend;
+        public TextureFormatKey[] normRecommend;
 
         public int formatLevel = 1;
         public int maxSizeLevel = 1;
