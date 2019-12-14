@@ -16,7 +16,6 @@ namespace BM
     public class BMSettingsEditor : Editor
     {
         BMSettings settings;
-        bool forceGenerate;
         private GUIStyle newSceneStyle;
 
         private void OnEnable()
@@ -25,50 +24,19 @@ namespace BM
             newSceneStyle = new GUIStyle();
             newSceneStyle.normal.textColor = Color.green;
         }
-
-        private void updateSceneInfo()
-        {
-            if (settings != null)
-            {
-                foreach (var folder in settings.scenesFolderList)
-                {
-                    FileInfo[] sceneFiles = BMEditUtility.GetAllFiles(folder, settings.scenesPattern);
-                    
-                    for (int i = 0; i < sceneFiles.Length; i++)
-                    {
-                        string path = BMEditUtility.Absolute2Relativity(sceneFiles[i].DirectoryName) + "/" + sceneFiles[i].Name; //相对路径
-                        if (settings.scenePaths.IndexOf(path) == -1)
-                        {
-                            settings.scenePaths.Add(path);
-                        }
-                    }
-                }
-                for (int i = 0; i < settings.scenePaths.Count; i++)
-                {
-                    if (i >= settings.sceneVersions.Count)
-                        settings.sceneVersions.Add(0);;
-                }
-            }
-        }
         
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
             EditorGUILayout.Space();
             EditorGUILayout.BeginHorizontal();
-            forceGenerate = EditorGUILayout.ToggleLeft("Force Generate Atlas", forceGenerate);
             if (GUILayout.Button("Generate Atlas Sprite"))
             {
-                for (int i = 0; i < settings.atlasSpriteFolderList.Count; i++)
-                {
-                    string atlasDir = settings.atlasSpriteFolderList[i];
-                    if(forceGenerate || CheckModify(atlasDir))
-                        GenerateAtlasSpritePrefab(atlasDir);
-                    else
-                    {
-                        Debug.Log(string.Format("There is not modify in atlas directory -- {0}", atlasDir));
-                    }
-                }
+                GenerateAtlasSprite(false);
+            }
+            if (GUILayout.Button("Force Generate Atlas Sprite"))
+            {
+                GenerateAtlasSprite(true);
             }
             EditorGUILayout.EndHorizontal();
             
@@ -121,6 +89,22 @@ namespace BM
             }
         }
 
+        private void GenerateAtlasSprite(bool forceGenerate)
+        {
+            if (GUILayout.Button("Generate Atlas Sprite"))
+            {
+                for (int i = 0; i < settings.atlasSpriteFolderList.Count; i++)
+                {
+                    string atlasDir = settings.atlasSpriteFolderList[i];
+                    if(forceGenerate || CheckModify(atlasDir))
+                        GenerateAtlasSpritePrefab(atlasDir);
+                    else
+                    {
+                        Debug.Log(string.Format("There is not modify in atlas directory -- {0}", atlasDir));
+                    }
+                }
+            }
+        }
         private bool CheckModify(string atlasDir)
         {
             Dictionary<string, string> md5Map = BMEditUtility.GetDictionaryFromFile(Path.Combine(atlasDir, "manifest.txt"));
@@ -138,7 +122,7 @@ namespace BM
                         continue;
                     string spriteFileName = Path.GetFileName(info.FullName);
                     string oldmd5;
-                    string md5 = BMEditUtility.GetFileMD5(Path.Combine(atlasDir, spriteFileName));
+                    string md5 = HashHelper.ComputeMD5(Path.Combine(atlasDir, spriteFileName));
                     if (md5Map.TryGetValue(spriteFileName, out oldmd5))
                     {
                         if (md5 != oldmd5)
@@ -171,7 +155,7 @@ namespace BM
                 if (info.FullName.EndsWith(".meta", StringComparison.Ordinal) || info.FullName.EndsWith(".txt", StringComparison.Ordinal))
                     continue;
                 string spriteFileName = Path.GetFileName(info.FullName);
-                string md5 = BMEditUtility.GetFileMD5(Path.Combine(atlasDir, spriteFileName));
+                string md5 = HashHelper.ComputeMD5(Path.Combine(atlasDir, spriteFileName));
                 md5Map.Add(spriteFileName, md5);
                 string spriteName = Path.GetFileNameWithoutExtension(info.FullName);
                 GameObject spritePrefab = new GameObject(spriteName);
