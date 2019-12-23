@@ -35,6 +35,14 @@ namespace BM
             EditorUtility.FocusProjectWindow();
             Selection.activeObject = asset;
         }
+        
+        public static void SaveSetting(BMSettings settings)
+        {
+            EditorUtility.SetDirty(settings);
+            AssetDatabase.SaveAssets();
+            AssetDatabase.Refresh();
+        }
+        
         /// <summary>
         /// 获取该目录下面所有的文件,包含子目录
         /// </summary>
@@ -65,8 +73,15 @@ namespace BM
         {
             DirectoryInfo direction = new DirectoryInfo(path);
             FileInfo[] files = direction.GetFiles("*", SearchOption.TopDirectoryOnly);
-            path = files[0].DirectoryName;
-            return path;
+            if (files.Length > 0)
+            {
+                path = files[0].DirectoryName;
+                return path;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public static void SaveUTF8TextFile(string fn, string txt)

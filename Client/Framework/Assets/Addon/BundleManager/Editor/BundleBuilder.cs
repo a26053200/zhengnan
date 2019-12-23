@@ -186,6 +186,7 @@ namespace BM
                                 buildInfo.version = 1;
                                 settings.scenePaths.Add(path);
                                 settings.sceneVersions.Add(1);
+                                BMEditUtility.SaveSetting(settings);
                             }
                             else
                                 buildInfo.version = settings.sceneVersions[index];
@@ -197,7 +198,7 @@ namespace BM
                             name = BMUtility.Path2Name(buildInfo.buildName);
                             break;
                         default:// BuildType.Single:
-                            name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
+                            name = BMUtility.Path2Name(dirName + "/" + Path.GetFileName(path));
                             break;
                     }
                     string md5 = BMUtility.EncryptWithMD5(name + "." + settings.Suffix_Bundle);
@@ -267,16 +268,19 @@ namespace BM
                             if (historyInfo.assetPaths.Count != subInfo.assetPaths.Count)
                             {
                                 newCount++;
+                                Logger.Log("New bundle: {0}",subInfo.bundleName);
                                 continue;
                             }
                             if (!historyInfo.assetPaths.SequenceEqual(subInfo.assetPaths))
                             {
                                 newCount++;
+                                Logger.Log("New bundle: {0}",subInfo.bundleName);
                                 continue;
                             }
                             if (!historyInfo.assetHashs.SequenceEqual(subInfo.assetHashs))
                             {
                                 newCount++;
+                                Logger.Log("New bundle: {0}",subInfo.bundleName);
                                 continue;
                             }
                             if (BuildType.Scene == subInfo.buildType)
@@ -284,6 +288,7 @@ namespace BM
                                 if (buildInfo.version > historyInfo.version)
                                 {
                                     newCount++;
+                                    Logger.Log("New bundle: {0}",subInfo.bundleName);
                                     continue;
                                 }
                             }
@@ -293,6 +298,7 @@ namespace BM
                         else
                         {
                             forceCount++;
+                            Logger.Log("Force build: {0}",subInfo.bundleName);
                         }
                     }
                 }

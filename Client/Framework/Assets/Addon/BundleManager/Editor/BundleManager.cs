@@ -67,7 +67,7 @@ namespace BM
         }
 
         //配置路径
-        const string BMSettings_Path = "Assets/Res/BMSettings.asset";
+        public const string BMSettings_Path = "Assets/Res/BMSettings.asset";
 
         static Dictionary<string, string> argDict;
 
@@ -84,6 +84,7 @@ namespace BM
             {
                 forceBuild = true;
                 BundleBuilder.settings.tempForceBuild = false;
+                BMEditUtility.SaveSetting(BundleBuilder.settings);
             }
             BundleBuilder.StartBuild(forceBuild, Language.zh_CN, buildTarget, true, BundleBuilder.settings.encodeLuaFile,moveBundle);
         }

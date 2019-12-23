@@ -15,6 +15,14 @@ namespace Framework
 {
     public class SceneManager : BaseManager
     {
+        private Dictionary<string, AsyncOperation> _asyncOperationDict;
+        
+        public override void Initialize()
+        {
+            base.Initialize();
+            _asyncOperationDict = new Dictionary<string, AsyncOperation>();
+        }
+        
         /// <summary>
 		///  异步方式加载场景
 		/// </summary>
@@ -22,7 +30,13 @@ namespace Framework
 		/// <param name="func">加载完成Lua回调函数</param>
 		public void LoadSceneAsync(string sceneName, LuaFunction func)
         {
-            StartCoroutine(OnLoadSceneAnsyn(sceneName, func, LoadSceneMode.Single));
+            StartCoroutine(OnLoadSceneAsync(sceneName, func, LoadSceneMode.Single));
+        }
+
+        public AsyncOperation GetAsyncOperation(string sceneName)
+        {
+            _asyncOperationDict.TryGetValue(sceneName, out AsyncOperation asyncOperation);
+            return asyncOperation;
         }
 
         /// <summary>
@@ -30,14 +44,16 @@ namespace Framework
         /// </summary>
         /// <param name="sceneName">加载的场景名称</param>
         /// <param name="func">加载完成Lua回调函数</param>
-        IEnumerator OnLoadSceneAnsyn(string sceneName, LuaFunction func, LoadSceneMode mode)
+        IEnumerator OnLoadSceneAsync(string sceneName, LuaFunction func, LoadSceneMode mode)
         {
             AsyncOperation operation = UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(sceneName, mode);
+            _asyncOperationDict.Add(sceneName, operation);
             yield return operation;
             if (func != null)
             {
                 func.Call(UnityEngine.SceneManagement.SceneManager.GetSceneByName(sceneName));
             }
+            _asyncOperationDict.Remove(sceneName);
         }
         /// <summary>
         /// 获取当前活动的场景对象
@@ -55,7 +71,7 @@ namespace Framework
 		/// <param name="func">加载完成Lua回调函数</param>
 		public void LoadSubSceneAsync(string sceneName, LuaFunction func)
         {
-            StartCoroutine(OnLoadSceneAnsyn(sceneName, func, LoadSceneMode.Additive));
+            StartCoroutine(OnLoadSceneAsync(sceneName, func, LoadSceneMode.Additive));
         }
 
 
@@ -84,6 +100,7 @@ namespace Framework
                 func.Call(sceneName);
             }
         }
+
         /// <summary>
         /// 查找指定场景的所有顶级对象
         /// </summary>

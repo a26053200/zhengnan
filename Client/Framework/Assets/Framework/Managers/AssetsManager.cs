@@ -201,6 +201,7 @@ namespace Framework
                     {//场景Bundle
                         Logger.Info("Scene bundle:'{0}' has loaded", path);
                         luaFunc.BeginPCall();
+                        luaFunc.Push(Path.GetFileNameWithoutExtension(assetPath));
                         luaFunc.PCall();
                         luaFunc.EndPCall();
                     }
@@ -235,6 +236,12 @@ namespace Framework
                 luaFunc.EndPCall();
 #endif
             }
+        }
+
+        public AsyncOperation GetBundleRequest(string path)
+        {
+            string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
+            return resLoader.bundleLoader.GetAssetBundleCreateRequest(assetPath);
         }
 
         #region 加载 Sprite 特殊处理

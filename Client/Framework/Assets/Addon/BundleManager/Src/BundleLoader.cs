@@ -15,23 +15,21 @@ namespace BM
     /// </summary> 
     public class BundleLoader : MonoBehaviour
     {
-        private JsonData bundleJsonData;
+        private JsonData _bundleJsonData;
 
-        private string suffix;
+        private string _suffix;
 
-        private bool useHashName;
+        private bool _useHashName;
+
+        private Dictionary<string, AssetBundleCreateRequest> _bundleRequestDict;
 
         public List<BundleInfo> bundleInfos { get; private set; }
         public Dictionary<string, BundleInfo> bundleInfoDict { get; private set; }
 
-        private void Awake()
+        public void LoadBundleData(string bundleDataFile, bool useHashName)
         {
-            
-        }
-
-        public void LoadBundleData()
-        {
-            string path = getFilePath(BMConfig.BundleDataFile);
+            _useHashName = useHashName;
+            string path = getFilePath(bundleDataFile);
             Debug.LogFormat("Load bundle data:{0}", path);
             string bundleData = BMUtility.LoadText(path);
             Debug.Log(bundleData);
@@ -40,9 +38,10 @@ namespace BM
 
             bundleInfos = new List<BundleInfo>();
             bundleInfoDict = new Dictionary<string, BundleInfo>();
-
-            suffix = "." + jsonData["suffix"];//Bundle 文件后缀
-            useHashName = (bool) jsonData["useHashName"];//是否使用Hash name
+            _bundleRequestDict = new Dictionary<string, AssetBundleCreateRequest>();
+            
+            _suffix = "." + jsonData["suffix"];//Bundle 文件后缀
+            //_useHashName = (bool) jsonData["useHashName"];//是否使用Hash name
             JsonData bundleInfoJson = jsonData["bundles"];
             for (int i = 0; i < bundleInfoJson.Count; i++)
             {
@@ -98,7 +97,7 @@ namespace BM
         private AssetBundle LoadBundle(BundleInfo bundleInfo)
         {
             AssetBundle assetBundle = null;
-            string path = getFilePath((useHashName ? bundleInfo.buildMd5 : bundleInfo.bundleName) + suffix);
+            string path = getFilePath((_useHashName ? bundleInfo.buildMd5 : bundleInfo.bundleName) + _suffix);
             if (bundleInfo.bundleReference == null)
             {
                 Debug.LogFormat("Load a new bundle:" + path);
@@ -155,7 +154,7 @@ namespace BM
 
         public IEnumerator LoadBundleAsync(BundleInfo bundleInfo, UnityAction<AssetBundle> OnAssetBundleLoaded)
         {
-            string path = getFilePath((useHashName ? bundleInfo.buildMd5 : bundleInfo.bundleName) + suffix);
+            string path = getFilePath((_useHashName ? bundleInfo.buildMd5 : bundleInfo.bundleName) + _suffix);
             if (bundleInfo.bundleReference != null)
             {//就算 缓存池里面有 也要模拟异步加载
                 yield return new WaitForEndOfFrame();
@@ -174,6 +173,7 @@ namespace BM
                     buildType = bundleInfo.buildType,
                 };
                 AssetBundleCreateRequest assetBundleCreateRequest = AssetBundle.LoadFromFileAsync(path);
+                _bundleRequestDict.Add(path, assetBundleCreateRequest);
                 yield return assetBundleCreateRequest;
                 if (assetBundleCreateRequest.assetBundle == null)
                 {
@@ -184,9 +184,32 @@ namespace BM
                 bundleInfo.bundleReference = bundleReferenceInfo;
                 if (OnAssetBundleLoaded != null)
                     OnAssetBundleLoaded(assetBundleCreateRequest.assetBundle);
+                RemoveAssetBundleCreateRequest(path);
             }
         }
 
+        //异步加载信息
+        public AsyncOperation GetAssetBundleCreateRequest(string assetPath)
+        {
+            AssetBundleCreateRequest rqst = null;
+            BundleInfo bundleInfo = GetBundleInfo(assetPath);
+            if (bundleInfo != null)
+            {
+                string path = getFilePath((_useHashName ? bundleInfo.buildMd5 : bundleInfo.bundleName) + _suffix);
+                _bundleRequestDict.TryGetValue(path, out rqst);
+            }
+            return rqst;
+        }
+        // 移除异步加载信息
+        public bool RemoveAssetBundleCreateRequest(string path)
+        {
+            if (_bundleRequestDict.ContainsKey(path))
+            {
+                _bundleRequestDict.Remove(path);
+                return true;
+            }
+            return false;
+        }
         //获取BundleInfo
         private BundleInfo GetBundleInfo(string assetPath)
         {

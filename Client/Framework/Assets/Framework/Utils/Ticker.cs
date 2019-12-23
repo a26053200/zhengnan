@@ -19,6 +19,7 @@ namespace Framework
             public LuaFunction luaFunc;
             public float startTime;
             public float delay;
+            public bool delete;
         }
         private static Ticker s_instance;
 
@@ -37,60 +38,91 @@ namespace Framework
             return s_instance;
         }
 
+        public Iterator<TickHandler> luaHandlerList = new Iterator<TickHandler>();
 
-        private Dictionary<string, TickHandler> luaHandlerList = new Dictionary<string, TickHandler>();
-
-        private List<string> keyList = new List<string>();
-        private List<string> delList = new List<string>();
+        public Stack<TickHandler> tickPool = new Stack<TickHandler>();
+        
+        private void Awake()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                tickPool.Push(new TickHandler()
+                {
+                    key = null,
+                    luaFunc = null,
+                    startTime = 0,
+                    delay = 0,
+                    delete = false
+                });
+            }
+        }
 
         private void Update()
         {
-            //非要采用for的方法也可
-
-            keyList.Clear();
-            delList.Clear();
-            keyList.AddRange(luaHandlerList.Keys);
-
-            for (int i = 0; i < keyList.Count; i++)
+            luaHandlerList.Reset();
+            while (luaHandlerList.MoveNext())
             {
-                var handler = luaHandlerList[keyList[i]];
-                if (Time.time - handler.startTime > handler.delay)
+                var handler = luaHandlerList.Current as TickHandler;
+                if (handler != null && !handler.delete && Time.time - handler.startTime > handler.delay)
                 {
                     handler.luaFunc.BeginPCall();
                     handler.luaFunc.PCall();
                     handler.luaFunc.EndPCall();
-                    delList.Add(keyList[i]);
+                    handler.delete = true;
+                    luaHandlerList.Remove(handler);
+                    tickPool.Push(handler);
                 }
-            }
-            for (int i = 0; i < delList.Count; i++)
-            {
-                luaHandlerList.Remove(delList[i]);
             }
         }
         public bool Contain(string key)
         {
-            return luaHandlerList.ContainsKey(key);
+            for (int i = 0; i < luaHandlerList.list.Count; i++)
+            {
+                if (luaHandlerList.list[i].key == key)
+                    return true;
+            }
+            return false;
         }
         public void DelayCallback(string key, float delay, LuaFunction luaFunc, GameObject caller = null)
         {
-            TickHandler handler = new TickHandler
+            TickHandler handler = Pop();
+            handler.key = key;
+            handler.luaFunc = luaFunc;
+            handler.startTime = Time.time;
+            handler.delay = delay;
+            handler.delete = false;
+            luaHandlerList.Add(handler);
+        }
+
+        private TickHandler Pop()
+        {
+            if (tickPool.Count > 0)
             {
-                key = key,
-                luaFunc = luaFunc,
-                startTime = Time.time,
-                delay = delay,
-            };
-            luaHandlerList.Add(key, handler);
+                return tickPool.Pop();
+            }
+            else
+            {
+                return new TickHandler()
+                {
+                    key = null,
+                    luaFunc = null,
+                    startTime = 0,
+                    delay = 0,
+                    delete = false
+                };
+            }
         }
 
         public void CancelDelayCallback(string key)
         {
-            if (luaHandlerList.ContainsKey(key))
+            for (int i = 0; i < luaHandlerList.list.Count; i++)
             {
-                luaHandlerList.Remove(key);
+                if (luaHandlerList.list[i].key == key)
+                {
+                    luaHandlerList.Remove(luaHandlerList.list[i]);
+                }
             }
         }
-    
     }
 }
 

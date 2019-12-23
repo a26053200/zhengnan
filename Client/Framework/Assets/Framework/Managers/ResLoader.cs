@@ -15,6 +15,9 @@ namespace Framework
     /// </summary> 
     public class ResLoader : BaseManager
     {
+        public static readonly string BundleDataFile = "BundleData.txt";
+        
+        public static readonly string BundleDataFile_Md5 = "85805d2c13e3090247509fb57043de76.ast";
         class ResLoaderInfo
         {
             public string assetPath;
@@ -26,12 +29,14 @@ namespace Framework
         ResLoaderInfo currLoadInfo;
         public override void Initialize()
         {
+            string path = GlobalConsts.isRunningInMobileDevice ? BundleDataFile_Md5 : BundleDataFile;
+            bool useHashName = GlobalConsts.isRunningInMobileDevice ? true : false;
             if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
             {
                 GameObject obj = new GameObject("[BM]");
                 DontDestroyOnLoad(obj);
                 bundleLoader = obj.AddComponent<BundleLoader>();
-                bundleLoader.LoadBundleData();
+                bundleLoader.LoadBundleData(path, useHashName);
                 loadQueue = new Queue<ResLoaderInfo>();
             }
         }

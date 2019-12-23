@@ -6,7 +6,7 @@ namespace BM
     public class BMConfig
     {
         public static readonly string BundleDataFile = "BundleData.txt";
-
+        
         public static readonly string VersionFile = "Version.txt";
 
         public static Language Language = Language.zh_CN;

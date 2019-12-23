@@ -68,11 +68,12 @@ namespace BM
                     }
                     else
                     {
-                        int ver = EditorGUILayout.IntField(path, oldVer);
+                        int ver = EditorGUILayout.IntField(path.Replace(settings.resDir,""), oldVer);
                         if (oldVer != ver)
                         {
                             settings.sceneVersions[i] = ver;
                             serializedObject.ApplyModifiedProperties();
+                            BMEditUtility.SaveSetting(settings);
                             Debug.Log("ApplyModifiedProperties scene version");
                         }
                     }
@@ -86,6 +87,8 @@ namespace BM
             {
                 settings.sceneVersions = new List<int>();
                 settings.scenePaths = new List<string>();
+                serializedObject.ApplyModifiedProperties();
+                BMEditUtility.SaveSetting(settings);
             }
         }
 
