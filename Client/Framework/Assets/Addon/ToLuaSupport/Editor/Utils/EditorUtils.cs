@@ -32,46 +32,13 @@ namespace ToLuaSupport
             }
             return sList.ToArray();
         }
-
-
+        
         public static void SaveTextFile(string fn, string txt)
         {
             byte[] data = System.Text.UTF8Encoding.UTF8.GetBytes(txt);
             SaveFileData(fn, data);
         }
-        public static void SaveUTF8TextFile(string fn, string txt)
-        {
-            byte[] data = System.Text.UTF8Encoding.UTF8.GetBytes(txt);
-            byte[] bom = new byte[] { 0xef, 0xbb, 0xbf };
-            byte[] saveData = new byte[data.Length + bom.Length];
-            Array.Copy(bom, 0, saveData, 0, bom.Length);
-            Array.Copy(data, 0, saveData, bom.Length, data.Length);
-            SaveFileData(fn, saveData);
-        }
-        public static byte[] GetFileData(string fn)
-        {
-            if (!File.Exists(fn))
-                return null;
-            FileStream fs = new FileStream(fn, FileMode.Open);
-            try
-            {
-                if (fs.Length > 0)
-                {
-                    byte[] data = new byte[(int)fs.Length];
-                    fs.Read(data, 0, (int)fs.Length);
-                    return data;
-                }
-                else
-                {
-                    return null;
-                }
-            }
-            finally
-            {
-                fs.Close();
-            }
-        }
-
+        
         public static void SaveFileData(string fn, byte[] data)
         {
             string dir = Path.GetDirectoryName(fn);
@@ -88,6 +55,7 @@ namespace ToLuaSupport
                 fs.Close();
             }
         }
+        
         public static void DisplayProgressBar<T>(string title, T[] dataList, UnityAction<T> progressFun)
         {
             for (int i = 0; i < dataList.Length; i++)

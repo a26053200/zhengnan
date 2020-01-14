@@ -173,6 +173,7 @@ namespace BM
                     string path = buildInfo.assetPaths[j];
                     string dirName = Path.GetDirectoryName(path);
                     string name;
+                    int version = 0;
                     switch (buildInfo.buildType)
                     {
                         case BuildType.Pack:
@@ -183,13 +184,13 @@ namespace BM
                             int index = settings.scenePaths.IndexOf(path);
                             if (index == -1)
                             {//新场景
-                                buildInfo.version = 1;
+                                version = 1;
                                 settings.scenePaths.Add(path);
                                 settings.sceneVersions.Add(1);
                                 BMEditUtility.SaveSetting(settings);
                             }
                             else
-                                buildInfo.version = settings.sceneVersions[index];
+                                version = settings.sceneVersions[index];
                             break;
                         case BuildType.Shader:
                             name = BMUtility.Path2Name(buildInfo.buildName);
@@ -213,7 +214,7 @@ namespace BM
                             bundleName = name,
                             buildMd5 = md5,
                             buildType = buildInfo.buildType,
-                            version = buildInfo.version,
+                            version = version,
                             assetBundleBuild = new AssetBundleBuild()
                             {
                                 assetBundleName = abName,
@@ -285,7 +286,7 @@ namespace BM
                             }
                             if (BuildType.Scene == subInfo.buildType)
                             {
-                                if (buildInfo.version > historyInfo.version)
+                                if (subInfo.version > historyInfo.version)
                                 {
                                     newCount++;
                                     Logger.Log("New bundle: {0}",subInfo.bundleName);

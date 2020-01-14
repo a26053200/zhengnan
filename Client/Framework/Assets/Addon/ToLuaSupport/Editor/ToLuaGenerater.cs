@@ -52,7 +52,7 @@ namespace ToLuaSupport
             string packerName = GetLuaPackerNameByPath(path + Folder2Directory(moduleFolder)); //包名
             luaFileText = StringUtils.ReplaceAll(luaFileText, _setting.MODULE_NAME, moduleName);
             luaFileText = StringUtils.ReplaceAll(luaFileText, _setting.Module_name, StringUtils.FirstToLower(moduleName));
-            luaFileText = StringUtils.ReplaceAll(luaFileText, _setting.MODULE_PAKER, modulePakerName);
+            luaFileText = StringUtils.ReplaceAll(luaFileText, _setting.MODULE_PACKER, modulePakerName);
             luaFileText = StringUtils.ReplaceAll(luaFileText, _setting.CLASS_PACKER, packerName);
             luaFileText = StringUtils.ReplaceAll(luaFileText, _setting.CLASS_NAME, className);
             luaFileText = StringUtils.ReplaceAll(luaFileText, _setting.INSTANCE_NAME, instanceName);

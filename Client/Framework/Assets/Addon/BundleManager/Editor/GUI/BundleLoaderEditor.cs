@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEditor;
+using Object = UnityEngine.Object;
 
 namespace BM
 {
@@ -11,46 +14,67 @@ namespace BM
     [CustomEditor(typeof(BundleLoader))]
     public class BundleLoaderEditor : Editor
     {
-        const string Title_DependenceChildren = "Dependence Children";
+        private const string Title_DependenceChildren = "Dependence Children";
 
-        BundleLoader bundleLoader;
-        bool showNotLoaded;
+        private BundleLoader _bundleLoader;
+        private bool _showNotLoaded;
+        private readonly Dictionary<string, bool> showFolderDict = new Dictionary<string, bool>();
+        private readonly Dictionary<string, List<BundleInfo>> bundleInfoListDict = new Dictionary<string, List<BundleInfo>>();
+        
         private void OnEnable()
         {
-            bundleLoader = target as BundleLoader;
+            _bundleLoader = target as BundleLoader;
+            if (_bundleLoader != null)
+                foreach (var bundleInfo in _bundleLoader.bundleInfos)
+                {
+                    string path = BMUtility.Name2Path(bundleInfo.bundleName);
+                    int index = path.IndexOf("/", StringComparison.Ordinal);
+                    string folderName;
+                    if (index > 0)
+                        folderName = path.Substring(0, index);
+                    else
+                        folderName = "other";
+                    if (!showFolderDict.ContainsKey(folderName))
+                    {
+                        showFolderDict.Add(folderName, false);
+                        bundleInfoListDict.Add(folderName, new List<BundleInfo>());
+                    }
+                    bundleInfoListDict.TryGetValue(folderName, out List<BundleInfo> list);
+                    list.Add(bundleInfo);
+                }
         }
         public override void OnInspectorGUI()
         {
             //base.OnInspectorGUI();
-            showNotLoaded = EditorGUILayout.ToggleLeft("Show Not Loaded", showNotLoaded);
-            foreach (var bundleInfo in bundleLoader.bundleInfos)
+            _showNotLoaded = EditorGUILayout.ToggleLeft("Show Not Loaded", _showNotLoaded);
+            foreach (var folderName in bundleInfoListDict.Keys)
             {
-                if(showNotLoaded || bundleInfo.bundleReference != null)
+                showFolderDict[folderName] = EditorGUILayout.Foldout(showFolderDict[folderName], folderName);
+                if (showFolderDict[folderName])
                 {
-                    displayBundleInfo(bundleInfo, false);
+                    foreach (var bundleInfo in bundleInfoListDict[folderName])
+                    {
+                        if(_showNotLoaded || bundleInfo.bundleReference != null)
+                            displayBundleInfo(bundleInfo, false);
+                    }
                 }
             }
         }
 
         void displayBundleInfo(BundleInfo bundleInfo, bool isChild)
         {
-            //BMEditUtility.DrawHorizontalSplitter();
-            //EditorGUI.BeginDisabledGroup(true);
-            //EditorGUILayout.BeginHorizontal();
-            //EditorGUILayout.EndHorizontal();
             EditorGUILayout.BeginHorizontal();
-            GUILayout.Label(BMUtility.Name2Path(bundleInfo.bundleName));
-            GUILayout.Label("[" + bundleInfo.buildType.ToString() + "]");
-            if (bundleInfo.bundleReference != null)
-            {
-                GUILayout.Label("count:" + bundleInfo.bundleReference.count);
-            }
+            bundleInfo.showContent = EditorGUILayout.ToggleLeft(new GUIContent("", "show content"), bundleInfo.showContent, GUILayout.Width(16));
+            EditorGUILayout.TextField("count:" + bundleInfo.bundleReference?.count, BMUtility.Name2Path(bundleInfo.bundleName));
             EditorGUILayout.EndHorizontal();
-            if (bundleInfo.bundleReference != null)
+            if (bundleInfo.showContent && bundleInfo.bundleReference != null && bundleInfo.bundleReference.assetBundle)
             {
-                //EditorGUILayout.ObjectField("", bundleInfo.bundleReference.assetBundle, typeof(AssetBundle), false);
+                Object[] abList = bundleInfo.bundleReference.assetBundle.LoadAllAssets();
+                for (int i = 0; i < abList.Length; i++)
+                {
+                    EditorGUILayout.ObjectField("", abList[i], typeof(Object),false);
+                }
             }
-            //EditorGUI.EndDisabledGroup();
             if (!isChild && bundleInfo.dependenceChildren != null)
             {
                 EditorGUI.indentLevel++;
@@ -59,7 +83,11 @@ namespace BM
                 {
                     foreach (var item in bundleInfo.dependenceChildren)
                     {
-                        displayBundleInfo(item, true);
+                        EditorGUILayout.LabelField(BMUtility.Name2Path(item.bundleName));
+                        EditorGUI.indentLevel++;
+                        for (int i = 0; i < item.assetPaths.Count; i++)
+                            EditorGUILayout.TextField(item.assetPaths[i]);
+                        EditorGUI.indentLevel--;
                     }
                 }
                 EditorGUI.indentLevel--;

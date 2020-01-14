@@ -21,7 +21,7 @@ namespace ToLuaSupport
 
         public string INSTANCE_NAME = "$INSTANCE_NAME$";
 
-        public string MODULE_PAKER = "$MODULE_PAKER$";
+        public string MODULE_PACKER = "$MODULE_PACKER$";
 
         public string CLASS_PACKER = "$CLASS_PACKER$";
 
@@ -37,9 +37,9 @@ namespace ToLuaSupport
 --- DateTime: {1}
 ---
 
----@class $CLASS_PACKER$.$CLASS_NAME$ : Betel.LuaObject
+---@class $CLASS_PACKER$.$CLASS_NAME$ : Core.LuaObject
 local LuaObject = require('Betel.LuaObject')
-local $CLASS_NAME$ = class('$CLASS_NAME$',LuaObject)
+local $CLASS_NAME$ = class('$CLASS_PACKER$.$CLASS_NAME$',LuaObject)
 
 function $CLASS_NAME$:Ctor()
     
@@ -57,7 +57,7 @@ return $CLASS_NAME$
 ---
 
 local $SUPER_CLASS_NAME$ = require('$SUPER_CLASS_PACKER$')
-local $CLASS_NAME$ = class('$CLASS_NAME$',$SUPER_CLASS_NAME$)
+local $CLASS_NAME$ = class('$CLASS_PACKER$.$CLASS_NAME$',$SUPER_CLASS_NAME$)
 
 function $CLASS_NAME$:Ctor()
     
@@ -76,9 +76,9 @@ return $CLASS_NAME$
 
 local BaseMediator = require('Game.Core.Ioc.BaseMediator')
 ---@class $CLASS_PACKER$.$CLASS_NAME$Mdr : Game.Core.Ioc.BaseMediator
----@field $Module_name$Model $MODULE_PAKER$.Model.$MODULE_NAME$Model
----@field $Module_name$Service $MODULE_PAKER$.Service.$MODULE_NAME$Service
-local $CLASS_NAME$Mdr = class('$CLASS_NAME$Mdr',BaseMediator)
+---@field $Module_name$Model $MODULE_PACKER$.Model.$MODULE_NAME$Model
+---@field $Module_name$Service $MODULE_PACKER$.Service.$MODULE_NAME$Service
+local $CLASS_NAME$Mdr = class('$CLASS_PACKER$.$CLASS_NAME$Mdr',BaseMediator)
 
 function $CLASS_NAME$Mdr:OnInit()
     
@@ -97,8 +97,8 @@ return $CLASS_NAME$Mdr
 
 local BaseModel = require('Game.Core.Ioc.BaseModel')
 ---@class $CLASS_PACKER$.$CLASS_NAME$Model : Game.Core.Ioc.BaseModel
----@field $INSTANCE_NAME$Service $MODULE_PAKER$.Service.$CLASS_NAME$Service
-local $CLASS_NAME$Model = class('$CLASS_NAME$Model',BaseModel)
+---@field $INSTANCE_NAME$Service $MODULE_PACKER$.Service.$CLASS_NAME$Service
+local $CLASS_NAME$Model = class('$CLASS_PACKER$.$CLASS_NAME$Model',BaseModel)
 
 function $CLASS_NAME$Model:Ctor()
     
@@ -117,8 +117,8 @@ return $CLASS_NAME$Model
 
 local BaseService = require('Game.Core.Ioc.BaseService')
 ---@class $CLASS_PACKER$.$CLASS_NAME$Service : Game.Core.Ioc.BaseService
----@field $INSTANCE_NAME$Model $MODULE_PAKER$.Model.$CLASS_NAME$Model
-local $CLASS_NAME$Service = class('$CLASS_NAME$Service',BaseService)
+---@field $INSTANCE_NAME$Model $MODULE_PACKER$.Model.$CLASS_NAME$Model
+local $CLASS_NAME$Service = class('$CLASS_PACKER$.$CLASS_NAME$Service',BaseService)
 
 function $CLASS_NAME$Service:Ctor()
     
@@ -137,7 +137,7 @@ return $CLASS_NAME$Service
 
 local BaseVo = require('Game.Core.BaseVo')
 ---@class $CLASS_PACKER$.$CLASS_NAME$Vo : Game.Core.BaseVo
-local $CLASS_NAME$Vo = class('$CLASS_NAME$Vo',BaseVo)
+local $CLASS_NAME$Vo = class('$CLASS_PACKER$.$CLASS_NAME$Vo',BaseVo)
 
 function $CLASS_NAME$Vo:Ctor()
     

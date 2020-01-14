@@ -20,6 +20,7 @@ namespace BM
 
 #if UNITY_EDITOR
         public bool showChildren;
+        public bool showContent;
 #endif
     }
 

@@ -15,11 +15,12 @@ namespace Framework
         public class TickHandler
         {
             public GameObject caller;
-            public string key;
+            public int id;
             public LuaFunction luaFunc;
             public float startTime;
             public float delay;
             public bool delete;
+            public bool ignoreTimeScale;
         }
         private static Ticker s_instance;
 
@@ -38,17 +39,18 @@ namespace Framework
             return s_instance;
         }
 
+        [NoToLua]
         public Iterator<TickHandler> luaHandlerList = new Iterator<TickHandler>();
-
-        public Stack<TickHandler> tickPool = new Stack<TickHandler>();
+        [NoToLua]
+        public Queue<TickHandler> tickPool = new Queue<TickHandler>();
         
         private void Awake()
         {
             for (int i = 0; i < 10; i++)
             {
-                tickPool.Push(new TickHandler()
+                tickPool.Enqueue(new TickHandler()
                 {
-                    key = null,
+                    id = 0,
                     luaFunc = null,
                     startTime = 0,
                     delay = 0,
@@ -63,34 +65,47 @@ namespace Framework
             while (luaHandlerList.MoveNext())
             {
                 var handler = luaHandlerList.Current as TickHandler;
-                if (handler != null && !handler.delete && Time.time - handler.startTime > handler.delay)
+                if (handler != null && !handler.delete && getCurrentTime(handler.ignoreTimeScale) - handler.startTime > handler.delay)
                 {
                     handler.luaFunc.BeginPCall();
                     handler.luaFunc.PCall();
                     handler.luaFunc.EndPCall();
                     handler.delete = true;
                     luaHandlerList.Remove(handler);
-                    tickPool.Push(handler);
+                    if(!tickPool.Contains(handler))
+                        tickPool.Enqueue(handler);
                 }
             }
         }
-        public bool Contain(string key)
+
+        private float getCurrentTime(bool ignoreTimeScale)
+        {
+            float time;
+            if (ignoreTimeScale)
+                return Time.realtimeSinceStartup;
+            else
+                return Time.time;
+            return time;
+        }
+
+        public bool Contain(int id)
         {
             for (int i = 0; i < luaHandlerList.list.Count; i++)
             {
-                if (luaHandlerList.list[i].key == key)
+                if (luaHandlerList.list[i].id == id)
                     return true;
             }
             return false;
         }
-        public void DelayCallback(string key, float delay, LuaFunction luaFunc, GameObject caller = null)
+        public void DelayCallback(int id, float delay, LuaFunction luaFunc, bool ignoreTimeScale = false)
         {
             TickHandler handler = Pop();
-            handler.key = key;
+            handler.id = id;
             handler.luaFunc = luaFunc;
-            handler.startTime = Time.time;
+            handler.startTime = getCurrentTime(ignoreTimeScale);
             handler.delay = delay;
             handler.delete = false;
+            handler.ignoreTimeScale = ignoreTimeScale;
             luaHandlerList.Add(handler);
         }
 
@@ -98,13 +113,13 @@ namespace Framework
         {
             if (tickPool.Count > 0)
             {
-                return tickPool.Pop();
+                return tickPool.Dequeue();
             }
             else
             {
                 return new TickHandler()
                 {
-                    key = null,
+                    id = 0,
                     luaFunc = null,
                     startTime = 0,
                     delay = 0,
@@ -113,13 +128,18 @@ namespace Framework
             }
         }
 
-        public void CancelDelayCallback(string key)
+        public void CancelDelayCallback(int id)
         {
             for (int i = 0; i < luaHandlerList.list.Count; i++)
             {
-                if (luaHandlerList.list[i].key == key)
+                if (luaHandlerList.list[i].id == id)
                 {
-                    luaHandlerList.Remove(luaHandlerList.list[i]);
+                    var temp = luaHandlerList.list[i];
+                    luaHandlerList.Remove(temp);
+                    temp.delete = true;
+                    if(!tickPool.Contains(temp))
+                        tickPool.Enqueue(temp);
+                    break;
                 }
             }
         }

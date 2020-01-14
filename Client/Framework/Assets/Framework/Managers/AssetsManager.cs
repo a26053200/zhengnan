@@ -64,15 +64,39 @@ namespace Framework
 
 
         //Texture
+        public Sprite LoadSingleSprite(string path)
+        {
+            return LoadAsset<Sprite>(path);
+        }
+        public void LoadSingleSpriteAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<Sprite>(path, callback);
+        }
         public Texture LoadTexture(string path)
         {
             return LoadAsset<Texture>(path);
         }
         public void LoadTextureAsync(string path, LuaFunction callback)
         {
-            LoadAssetAsync<Sprite>(path, callback);
+            LoadAssetAsync<Texture>(path, callback);
         }
-
+        public Texture LoadTexture2D(string path)
+        {
+            return LoadAsset<Texture2D>(path);
+        }
+        public void LoadTexture2DAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<Texture2D>(path, callback);
+        }
+        public Texture LoadTexture3D(string path)
+        {
+            return LoadAsset<Texture3D>(path);
+        }
+        public void LoadTexture3DAsync(string path, LuaFunction callback)
+        {
+            LoadAssetAsync<Texture3D>(path, callback);
+        }
+        
         public GameObject LoadPrefab(string path)
         {
             return LoadAsset<GameObject>(path);
@@ -146,12 +170,12 @@ namespace Framework
             {
                 //加载bundle;
                 string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
-                Logger.Info("Load Asset:'{0}' ", assetPath);
+                //Logger.Info("Load Asset:'{0}' ", assetPath);
                 AssetBundle assetBundle = resLoader.GetBundleByAssetPath(assetPath);
                 T t = assetBundle.LoadAsset<T>(assetPath);
                 if (t)
                 {
-                    Logger.Info("Asset:'{0}' has loaded", path);
+                    //Logger.Info("Asset:'{0}' has loaded", path);
                     return t;
                 }
                 else
@@ -194,12 +218,12 @@ namespace Framework
             {
                 //加载bundle;
                 string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
-                Logger.Info("Load Asset:'{0}' ", assetPath);
+                //Logger.Info("Load Asset:'{0}' ", assetPath);
                 yield return resLoader.AddLoadAssetBundleAsync(assetPath, delegate (AssetBundle assetBundle)
                 {
                     if (assetBundle.isStreamedSceneAssetBundle)
                     {//场景Bundle
-                        Logger.Info("Scene bundle:'{0}' has loaded", path);
+                        //Logger.Info("Scene bundle:'{0}' has loaded", path);
                         luaFunc.BeginPCall();
                         luaFunc.Push(Path.GetFileNameWithoutExtension(assetPath));
                         luaFunc.PCall();
@@ -210,7 +234,7 @@ namespace Framework
                         T t = assetBundle.LoadAsset<T>(assetPath);
                         if (t)
                         {
-                            Logger.Info("Asset:'{0}' has loaded", path);
+                            //Logger.Info("Asset:'{0}' has loaded", path);
                             luaFunc.BeginPCall();
                             luaFunc.Push(t);
                             luaFunc.PCall();
@@ -241,7 +265,10 @@ namespace Framework
         public AsyncOperation GetBundleRequest(string path)
         {
             string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
-            return resLoader.bundleLoader.GetAssetBundleCreateRequest(assetPath);
+            if (resLoader && resLoader.bundleLoader)
+                return resLoader.bundleLoader.GetAssetBundleCreateRequest(assetPath);
+            else 
+                return null;
         }
 
         #region 加载 Sprite 特殊处理
@@ -260,7 +287,7 @@ namespace Framework
             if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
             {
                 string spritePrefabPath = GetSpritePrefabPath(path);
-                Debug.LogFormat("Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
+                //Debug.LogFormat("Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
                 GameObject prefab = LoadPrefab(spritePrefabPath);
                 return prefab.GetComponent<Image>().sprite;
             }else
@@ -288,7 +315,7 @@ namespace Framework
                     luaFunc.PCall();
                     luaFunc.EndPCall();
                 }));
-                Debug.LogFormat("Async Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
+                //Debug.LogFormat("Async Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
             }
             else
             {
@@ -298,6 +325,13 @@ namespace Framework
             }
         }
         #endregion
+
+        public void UnloadAssetBundle(string path, bool unloadAllDependence, bool unloadAllLoadedObjects)
+        {
+            string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
+            if(resLoader && resLoader.bundleLoader)
+                resLoader.bundleLoader.UnloadAssetBundle(assetPath, unloadAllDependence,unloadAllLoadedObjects);
+        }
     }
 }
 

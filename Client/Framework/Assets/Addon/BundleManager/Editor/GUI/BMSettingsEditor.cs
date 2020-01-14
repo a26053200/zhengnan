@@ -94,17 +94,14 @@ namespace BM
 
         private void GenerateAtlasSprite(bool forceGenerate)
         {
-            if (GUILayout.Button("Generate Atlas Sprite"))
+            for (int i = 0; i < settings.atlasSpriteFolderList.Count; i++)
             {
-                for (int i = 0; i < settings.atlasSpriteFolderList.Count; i++)
+                string atlasDir = settings.atlasSpriteFolderList[i];
+                if(forceGenerate || CheckModify(atlasDir))
+                    GenerateAtlasSpritePrefab(atlasDir);
+                else
                 {
-                    string atlasDir = settings.atlasSpriteFolderList[i];
-                    if(forceGenerate || CheckModify(atlasDir))
-                        GenerateAtlasSpritePrefab(atlasDir);
-                    else
-                    {
-                        Debug.Log(string.Format("There is not modify in atlas directory -- {0}", atlasDir));
-                    }
+                    Debug.Log(string.Format("There is not modify in atlas directory -- {0}", atlasDir));
                 }
             }
         }

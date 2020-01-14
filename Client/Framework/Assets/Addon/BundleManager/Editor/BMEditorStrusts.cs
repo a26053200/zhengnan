@@ -15,7 +15,7 @@ namespace BM
         public string buildName;
         public BuildType buildType;             //打包类型
         public CompressType compressType;       //压缩类型
-        public int version;                    //版本号
+        //public int version;                    //版本号
         public List<string> assetPaths;
         public Dictionary<string, SubBuildInfo> subBuildInfoMap;
 

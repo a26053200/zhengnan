@@ -103,7 +103,7 @@ namespace ToLuaSupport
             {
                 if (!ToLuaGenerater.FileNameValid(moduleName, this))
                     return;
-                if (luaTable.HasTable(moduleName))
+                if (luaTable != null && luaTable.HasTable(moduleName))
                 {
                     ShowNotification(new GUIContent("该模块已经存在"));
                     return;
@@ -141,6 +141,8 @@ namespace ToLuaSupport
                 moduleInfo.voDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Vo);
                 //Views
                 if (!Directory.Exists(moduleDirPath))
+                    continue;
+                if (!Directory.Exists(moduleInfo.viewDirPath))
                     continue;
                 string[] mdrFiles = Directory.GetFiles(moduleInfo.viewDirPath, "*.lua");
                 for (int j = 0; j < mdrFiles.Length; j++)
@@ -440,9 +442,10 @@ namespace ToLuaSupport
         LuaTable LoadLuaTable(string path)
         {
             string[] textLine = EditorUtils.GetFileTextLine(path);
+            LuaTable lt = new LuaTable();
             if (textLine != null && textLine.Length > 0)
             {
-                LuaTable lt = new LuaTable();
+                
                 lt.fromTextLine(textLine);
                 Debug.Log("Load Lua Table -- " + lt.ToString());
                 List<string> delList = new List<string>();
@@ -458,13 +461,8 @@ namespace ToLuaSupport
                 }
                 foreach (var viewName in delList)
                     lt.HashTable.Remove(viewName);
-
-                return lt;
             }
-            else
-            {
-                return null;
-            }
+            return lt;
         }
     }
 

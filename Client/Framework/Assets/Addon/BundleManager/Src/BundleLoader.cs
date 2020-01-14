@@ -73,6 +73,12 @@ namespace BM
             //如果该资源有依赖,则优先加载依赖
             for (int i = 0; i < bundleInfo.dependencePaths.Count; i++)
             {
+                BundleInfo childInfo = GetBundleInfo(bundleInfo.dependencePaths[i]);
+                childInfo.parent = bundleInfo;
+                if (bundleInfo.dependenceChildren == null)
+                    bundleInfo.dependenceChildren = new List<BundleInfo>();
+                if(!bundleInfo.dependenceChildren.Contains(childInfo))
+                    bundleInfo.dependenceChildren.Add(childInfo);
                 LoadAssetBundle(bundleInfo.dependencePaths[i]);
             }
             return LoadBundle(bundleInfo);
@@ -100,7 +106,7 @@ namespace BM
             string path = getFilePath((_useHashName ? bundleInfo.buildMd5 : bundleInfo.bundleName) + _suffix);
             if (bundleInfo.bundleReference == null)
             {
-                Debug.LogFormat("Load a new bundle:" + path);
+                //Debug.LogFormat("Load a new bundle:" + path);
                 assetBundle = AssetBundle.LoadFromFile(path);
                 if (assetBundle == null)
                 {
@@ -124,7 +130,7 @@ namespace BM
                 assetBundle = bundleInfo.bundleReference.assetBundle;
                 bundleInfo.bundleReference.count += 1;
             }
-            Debug.LogFormat("The AssetBundle '{0}' load success!", path);
+            //Debug.LogFormat("The AssetBundle '{0}' load success!", path);
             return assetBundle;
         }
 
@@ -140,11 +146,12 @@ namespace BM
                 //如果该资源有依赖,则优先加载依赖
                 for (int i = 0; i < bundleInfo.dependencePaths.Count; i++)
                 {
-                    BundleInfo chindInfo = GetBundleInfo(assetPath);
-                    chindInfo.parent = bundleInfo;
+                    BundleInfo childInfo = GetBundleInfo(bundleInfo.dependencePaths[i]);
+                    childInfo.parent = bundleInfo;
                     if (bundleInfo.dependenceChildren == null)
                         bundleInfo.dependenceChildren = new List<BundleInfo>();
-                    bundleInfo.dependenceChildren.Add(chindInfo);
+                    if(!bundleInfo.dependenceChildren.Contains(childInfo))
+                        bundleInfo.dependenceChildren.Add(childInfo);
                     yield return LoadAssetBundleAsync(bundleInfo.dependencePaths[i], null);
                 }
                 yield return LoadBundleAsync(bundleInfo, OnAssetBundleLoaded);
@@ -210,6 +217,35 @@ namespace BM
             }
             return false;
         }
+        
+        //卸载AssetBundle
+        public void UnloadAssetBundle(string assetPath, bool unloadAllDependence, bool unloadAllLoadedObjects)
+        {
+            BundleInfo bundleInfo = GetBundleInfo(assetPath);
+            if (bundleInfo?.bundleReference != null)
+            {
+                UnloadBundleReference(bundleInfo, unloadAllLoadedObjects);
+                if (unloadAllDependence && bundleInfo.dependenceChildren != null)
+                {
+                    foreach (var dependenceBundleInfo in bundleInfo.dependenceChildren)
+                    {
+                        UnloadBundleReference(dependenceBundleInfo, false);
+                    }
+                }
+            }
+        }
+        
+        private void UnloadBundleReference(BundleInfo bundleInfo, bool unloadAllLoadedObjects)
+        {
+            bundleInfo.bundleReference.count = Mathf.Max(0, bundleInfo.bundleReference.count - 1);
+            if (bundleInfo.bundleReference.count <= 0)
+            {
+                bundleInfo.bundleReference.assetBundle.Unload(unloadAllLoadedObjects);
+                bundleInfo.bundleReference.assetBundle = null;
+                bundleInfo.bundleReference = null;
+            }
+        }
+        
         //获取BundleInfo
         private BundleInfo GetBundleInfo(string assetPath)
         {
