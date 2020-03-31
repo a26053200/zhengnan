@@ -27,7 +27,11 @@ namespace Framework
         private void DoCall(string funName)
         {
             if (behaviourFun.ContainsKey(funName))
-                behaviourFun[funName].Call();
+            {
+                behaviourFun[funName].BeginPCall();
+                behaviourFun[funName].PCall();
+                behaviourFun[funName].EndPCall();
+            }
         }
 
         private void Awake()
@@ -59,7 +63,11 @@ namespace Framework
             {
                 LuaFunction func = behaviourFun[BehaviourFunction.ON_DESTROY];
                 if (func.GetLuaState() != null)
-                    func.Call();
+                {
+                    func.BeginPCall();
+                    func.PCall();
+                    func.EndPCall();
+                }
             }
             RemoveUpdate();
             if (behaviourFun != null)

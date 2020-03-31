@@ -53,7 +53,6 @@ namespace Framework
             EventTriggerListener listener = go.GetComponent<EventTriggerListener>();
             if (listener == null)
             {
-                
                 listener = go.AddComponent<EventTriggerListener>();
                 listener.luaFuncHash = new Dictionary<EventTriggerType, Dictionary<LuaFunction, List<EventDelegate>>>();
             }
@@ -61,6 +60,7 @@ namespace Framework
             return listener;
         }
 
+        public bool passEvent;
         public List<EventDelegate> GetLuaFuncHashSet(EventTriggerType type, LuaFunction lunc)
         {
             Dictionary<LuaFunction, List<EventDelegate>> dict = null;
@@ -90,66 +90,77 @@ namespace Framework
 
         public void OnPointerEnter(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.pointerEnterHandler);
             if (onEventEnter != null) onEventEnter(eventData);
             if (onEnter != null) onEnter(gameObject);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
+            //if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.pointerExitHandler);
             if (onEventExit != null) onEventExit(eventData);
             if (onExit != null) onExit(gameObject);
         }
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.pointerDownHandler);
             if (onEventDown != null) onEventDown(eventData);
             if (onDown != null) onDown(gameObject);
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.pointerUpHandler);
             if (onEventUp != null) onEventUp(eventData);
             if (onUp != null) onUp(gameObject);
         }
 
         public void OnPointerClick(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.pointerClickHandler);
             if (onEventClick != null) onEventClick(eventData);
             if (onClick != null) onClick(gameObject);
         }
 
         public void OnInitializePotentialDrag(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.initializePotentialDrag);
             if (onEventInitializeDrag != null) onEventInitializeDrag(eventData);
             if (onInitializeDrag != null) onInitializeDrag(gameObject);
         }
 
         public void OnBeginDrag(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.beginDragHandler);
             if (onEventBeginDrag != null) onEventBeginDrag(eventData);
             if (onBeginDrag != null) onBeginDrag(gameObject);
         }
 
         public void OnDrag(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.dragHandler);
             if (onEventDrag != null) onEventDrag(eventData);
             if (onDrag != null) onDrag(gameObject);
         }
 
         public void OnEndDrag(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.endDragHandler);
             if (onEventEndDrag != null) onEventEndDrag(eventData);
             if (onEndDrag != null) onEndDrag(gameObject);
         }
 
         public void OnDrop(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.dragHandler);
             if (onEventDrop != null) onEventDrop(eventData);
             if (onDrop != null) onDrop(gameObject);
         }
 
         public void OnScroll(PointerEventData eventData)
         {
+            if (passEvent) EventHelper.PassEvent(eventData, ExecuteEvents.scrollHandler);
             if (onEventScroll != null) onEventScroll(eventData);
             if (onScroll != null) onScroll(gameObject);
         }
@@ -159,6 +170,8 @@ namespace Framework
             if (onEventMove != null) onEventMove(eventData);
             if (onMove != null) onMove(gameObject);
         }
+        
+        
 
     }
 

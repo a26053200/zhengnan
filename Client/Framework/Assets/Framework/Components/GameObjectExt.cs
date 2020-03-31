@@ -132,7 +132,7 @@ public static class GameObjectExt
     }
 
     //设置按钮文本
-    public static void SetButtonText(this GameObject gameObject, string path, string label)
+    public static void SetButtonText(this GameObject gameObject, string path = null, string label = "")
     {
         GameObject child = gameObject.FindChild(path);
         if (child)
@@ -141,8 +141,30 @@ public static class GameObjectExt
         }
     }
 
+    public static Toggle GetToggle(this GameObject gameObject, string path = null)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+        {
+            Toggle toggle = child.GetComponent<Toggle>();
+            return toggle;
+        }
+        return null;
+    }
+    
+    public static ToggleGroup GetToggleGroup(this GameObject gameObject, string path = null)
+    {
+        GameObject child = gameObject.FindChild(path);
+        if (child)
+        {
+            ToggleGroup toggle = child.GetComponent<ToggleGroup>();
+            return toggle;
+        }
+        return null;
+    }
+    
     //按节点路径查找子节点
-    public static GameObject FindChild(this GameObject gameObject, string path)
+    public static GameObject FindChild(this GameObject gameObject, string path = null)
     {
         if (string.IsNullOrEmpty(path))
             return gameObject;
