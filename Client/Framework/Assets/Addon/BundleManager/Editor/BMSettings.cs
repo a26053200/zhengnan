@@ -92,12 +92,7 @@ namespace BM
         [HideInInspector]
         public string uiSpriteDir;
 
-        //场景版本号
-        [HideInInspector] 
-        public List<string> scenePaths = new List<string>();
-        
-        [HideInInspector]
-        public List<int> sceneVersions = new List<int>();
+        public string scenesVersionFile;
     }
 }
     

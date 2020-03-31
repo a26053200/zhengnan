@@ -15,19 +15,65 @@ namespace BM
     [CustomEditor(typeof(BMSettings))]
     public class BMSettingsEditor : Editor
     {
-        BMSettings settings;
-        private GUIStyle newSceneStyle;
+        private BMSettings _settings;
+        private GUIStyle _newSceneStyle;
+        private Dictionary<string, string> _scenesVersionDict;
 
         private void OnEnable()
         {
-            settings = target as BMSettings;
-            newSceneStyle = new GUIStyle();
-            newSceneStyle.normal.textColor = Color.green;
+            _settings = target as BMSettings;
+            _newSceneStyle = new GUIStyle();
+            _newSceneStyle.normal.textColor = Color.green;
+            _scenesVersionDict = BMEditUtility.GetDictionaryFromFile(_settings.scenesVersionFile);
+            if (_scenesVersionDict == null)
+                _scenesVersionDict = new Dictionary<string, string>();
         }
         
         public override void OnInspectorGUI()
         {
             base.OnInspectorGUI();
+            
+
+            if (!string.IsNullOrEmpty(_settings.scenesVersionFile))
+            {
+                EditorGUILayout.Space();
+                foreach (var folder in _settings.scenesFolderList)
+                {
+                    FileInfo[] sceneFiles = BMEditUtility.GetAllFiles(folder, _settings.scenesPattern);
+                    for (int i = 0; i < sceneFiles.Length; i++)
+                    {
+                        string path = BMEditUtility.Absolute2Relativity(sceneFiles[i].DirectoryName) + "/" + sceneFiles[i].Name; //相对路径
+                        if (_scenesVersionDict.TryGetValue(path, out string version))
+                        {
+                            var oldVer = version;
+                            version = EditorGUILayout.TextField(path.Replace(_settings.resDir,""), version);
+                            if (version != oldVer)
+                            {
+                                _scenesVersionDict[path] = version;
+                                BMEditUtility.SaveDictionary(_settings.scenesVersionFile, _scenesVersionDict);
+                            }
+                        }
+                        else
+                            EditorGUILayout.TextField(path.Replace(_settings.resDir,""), "0");
+                    }
+                }
+            
+                if (GUILayout.Button("Save Scene Version"))
+                {
+                    BMEditUtility.SaveDictionary(_settings.scenesVersionFile,_scenesVersionDict);
+                }
+                //重制所有场景版本号
+                if (GUILayout.Button("Reset All Scenes Version"))
+                {
+                    _scenesVersionDict = new Dictionary<string, string>();
+                    BMEditUtility.SaveDictionary(_settings.scenesVersionFile, _scenesVersionDict);
+//                _settings.sceneVersions = new List<int>();
+//                _settings.scenePaths = new List<string>();
+//                serializedObject.ApplyModifiedProperties();
+//                BMEditUtility.SaveSetting(_settings);
+                }
+            }
+            
             EditorGUILayout.Space();
             EditorGUILayout.BeginHorizontal();
             if (GUILayout.Button("Generate Atlas Sprite"))
@@ -39,69 +85,62 @@ namespace BM
                 GenerateAtlasSprite(true);
             }
             EditorGUILayout.EndHorizontal();
-            
             EditorGUILayout.Space();
             //uiSpriteDir
-            settings.uiSpriteDir = EditorGUILayout.TextField("UI Sprite", settings.uiSpriteDir);
-            if (!string.IsNullOrEmpty(settings.uiSpriteDir))
+            _settings.uiSpriteDir = EditorGUILayout.TextField("UI Sprite", _settings.uiSpriteDir);
+            if (!string.IsNullOrEmpty(_settings.uiSpriteDir))
             {
                 if (GUILayout.Button("Update All Packing Tag"))
                 {
-                    UpdatePackingTag(settings.uiSpriteDir);
+                    UpdatePackingTag(_settings.uiSpriteDir);
                 }
             }
             
-            EditorGUILayout.Space();
-            foreach (var folder in settings.scenesFolderList)
-            {
-                FileInfo[] sceneFiles = BMEditUtility.GetAllFiles(folder, settings.scenesPattern);
-                    
-                for (int i = 0; i < sceneFiles.Length; i++)
-                {
-                    string path = BMEditUtility.Absolute2Relativity(sceneFiles[i].DirectoryName) + "/" + sceneFiles[i].Name; //相对路径
-                    int index = settings.scenePaths.IndexOf(path);
-                    EditorGUILayout.BeginHorizontal();
-                    int oldVer = index == -1 ? 0 : settings.sceneVersions[index];
-                    if (index == -1)
-                    {
-                        EditorGUILayout.LabelField(path.Replace(settings.resDir,""), "new", newSceneStyle);
-                    }
-                    else
-                    {
-                        int ver = EditorGUILayout.IntField(path.Replace(settings.resDir,""), oldVer);
-                        if (oldVer != ver)
-                        {
-                            settings.sceneVersions[i] = ver;
-                            serializedObject.ApplyModifiedProperties();
-                            BMEditUtility.SaveSetting(settings);
-                            Debug.Log("ApplyModifiedProperties scene version");
-                        }
-                    }
-                    
-                    EditorGUILayout.EndHorizontal();
-                    
-                }
-            }
-            //重制所有场景版本号
-            if (GUILayout.Button("Reset All Scenes Version"))
-            {
-                settings.sceneVersions = new List<int>();
-                settings.scenePaths = new List<string>();
-                serializedObject.ApplyModifiedProperties();
-                BMEditUtility.SaveSetting(settings);
-            }
+//            
+//            EditorGUILayout.Space();
+//            foreach (var folder in _settings.scenesFolderList)
+//            {
+//                FileInfo[] sceneFiles = BMEditUtility.GetAllFiles(folder, _settings.scenesPattern);
+//                    
+//                for (int i = 0; i < sceneFiles.Length; i++)
+//                {
+//                    string path = BMEditUtility.Absolute2Relativity(sceneFiles[i].DirectoryName) + "/" + sceneFiles[i].Name; //相对路径
+//                    int index = _settings.scenePaths.IndexOf(path);
+//                    EditorGUILayout.BeginHorizontal();
+//                    int oldVer = index == -1 ? 0 : _settings.sceneVersions[index];
+//                    if (index == -1)
+//                    {
+//                        EditorGUILayout.LabelField(path.Replace(_settings.resDir,""), "new", _newSceneStyle);
+//                    }
+//                    else
+//                    {
+//                        int ver = EditorGUILayout.IntField(path.Replace(_settings.resDir,""), oldVer);
+//                        if (oldVer != ver)
+//                        {
+//                            _settings.sceneVersions[i] = ver;
+//                            serializedObject.ApplyModifiedProperties();
+//                            BMEditUtility.SaveSetting(_settings);
+//                            Debug.Log("ApplyModifiedProperties scene version");
+//                        }
+//                    }
+//                    
+//                    EditorGUILayout.EndHorizontal();
+//                    
+//                }
+//            }
+           
         }
 
         private void GenerateAtlasSprite(bool forceGenerate)
         {
-            for (int i = 0; i < settings.atlasSpriteFolderList.Count; i++)
+            for (int i = 0; i < _settings.atlasSpriteFolderList.Count; i++)
             {
-                string atlasDir = settings.atlasSpriteFolderList[i];
+                string atlasDir = _settings.atlasSpriteFolderList[i];
                 if(forceGenerate || CheckModify(atlasDir))
                     GenerateAtlasSpritePrefab(atlasDir);
                 else
                 {
-                    Debug.Log(string.Format("There is not modify in atlas directory -- {0}", atlasDir));
+                    Debug.Log($"There is not modify in atlas directory -- {atlasDir}");
                 }
             }
         }
@@ -144,7 +183,7 @@ namespace BM
         {
             Dictionary<string, string> md5Map = new Dictionary<string, string>();
             string dirName = Path.GetFileName(atlasDir);
-            string outPath = settings.atlasSpritePrefabDir + dirName + "/";
+            string outPath = _settings.atlasSpritePrefabDir + dirName + "/";
             if (Directory.Exists(outPath))
                 BMEditUtility.DelFolder(outPath);
             Directory.CreateDirectory(outPath);

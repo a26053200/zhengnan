@@ -21,6 +21,8 @@ namespace BM
         //配置
         public static BMSettings settings;
 
+        public static Dictionary<string, string> scenesVersionDict;
+
         //历史记录
         public static Dictionary<string, BuildSampleInfo> historyBuildInfo;
 
@@ -181,16 +183,14 @@ namespace BM
                             break;
                         case BuildType.Scene:
                             name = BMUtility.Path2Name(dirName + "/" + Path.GetFileNameWithoutExtension(path));
-                            int index = settings.scenePaths.IndexOf(path);
-                            if (index == -1)
+                            if (scenesVersionDict.TryGetValue(path, out string verStr))
+                                version = int.Parse(verStr);
+                            else
                             {//新场景
                                 version = 1;
-                                settings.scenePaths.Add(path);
-                                settings.sceneVersions.Add(1);
-                                BMEditUtility.SaveSetting(settings);
+                                scenesVersionDict.Add(path,version.ToString());
+                                BMEditUtility.SaveDictionary(settings.scenesVersionFile, scenesVersionDict);
                             }
-                            else
-                                version = settings.sceneVersions[index];
                             break;
                         case BuildType.Shader:
                             name = BMUtility.Path2Name(buildInfo.buildName);

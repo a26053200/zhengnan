@@ -1,19 +1,29 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using System.Collections.Generic;
 using LuaInterface;
 
 namespace FastBehavior
 {
+    public enum StateOrder
+    {
+        Join,
+        Sequence,
+        Select,
+    }
     /// <summary>
     /// <para>Class Introduce</para>
     /// <para>Author: zhengnan</para>
     /// <para>Create: 2019/5/27 23:51:07</para>
     /// </summary> 
-    public class StateMachine : MonoBehaviour
+    public class StateMachine : PoolObject
     {
         static double s_id = 1;
 
-        private double id;
+        public bool isRunning = false;
+
+        public bool delete = false;
+        public double id { get; private set; }
 
         public FastLuaBehavior fastBehavior;
         public List<StateAction> state2DList = new List<StateAction>();
@@ -26,14 +36,14 @@ namespace FastBehavior
         private LuaFunction m_cycleOverCallback;
 
         
-        void Awake()
+        public StateMachine()
         {
             id = s_id;
             s_id++;
 
             //hideFlags = HideFlags.HideInInspector;
             m_currstateList = state2DList;
-            enabled = false;
+            isRunning = false;
         }
 
         public void Run(LuaFunction cycleOverCallback = null)
@@ -41,14 +51,15 @@ namespace FastBehavior
             m_cycleOverCallback = cycleOverCallback;
             m_currState = null;
             m_curr2DQueue = new Queue<StateAction>(state2DList);
-            enabled = true;
+            isRunning = true;
             NextState();
         }
 
         public void Stop()
         {
+            m_currState?.behavior?.Stop();
             m_currState = null;
-            enabled = false;
+            isRunning = false;
         }
 
 
@@ -57,36 +68,40 @@ namespace FastBehavior
             m_currstateList.Add(state);
         }
 
-        public void BeginScelet()
+        public void BeginSelect()
         {
-            StateAction subState = new StateAction(new StateNode());
+            var node = StateMachineManager.GetInstance().CreateStateNode();
+            StateAction subState = StateMachineManager.GetInstance().CreateStateAction(node);
             subState.order = StateOrder.Select;
             state2DList.Add(subState);
             m_currstateList = new List<StateAction>();
             subState.AddSubList(m_currstateList);
         }
 
-        public void EndScelet()
+        public void EndSelect()
         {
             m_currstateList = state2DList;
         }
 
-        public void BeginParallel()
+        public void BeginJoin()
         {
-            StateAction subState = new StateAction(new StateNode());
-            subState.order = StateOrder.Parallel;
+            var node = StateMachineManager.GetInstance().CreateStateNode();
+            StateAction subState = StateMachineManager.GetInstance().CreateStateAction(node);
+            subState.order = StateOrder.Join;
             state2DList.Add(subState);
             m_currstateList = new List<StateAction>();
             subState.AddSubList(m_currstateList);
         }
 
-        public void EndParallel()
+        public void EndJoin()
         {
             m_currstateList = state2DList;
         }
 
         public void NextState()
         {
+            if (!isRunning)
+                return;
             if (m_curr2DQueue.Count == 0)
             {
                 m_curr2DQueue = new Queue<StateAction>(state2DList);
@@ -97,10 +112,12 @@ namespace FastBehavior
                     m_cycleOverCallback.EndPCall();
                 }
             }
+            if(m_curr2DQueue.Count == 0)
+                return;
             m_currState = null;
             m_currStateExeList = null;
             StateAction state = m_curr2DQueue.Dequeue();
-            if (state.subStateList == null)
+            if (state.order == StateOrder.Sequence)
             {
                 m_currState = state;
                 m_currState.Start();
@@ -108,10 +125,14 @@ namespace FastBehavior
             else if (state.order == StateOrder.Select)
             {
                 int[] randoms = Utils.GetRandomArray(state.subStateList.Count);
-                m_currState = state.subStateList[randoms[0]];
-                m_currState.Start();
+                if (randoms.Length > 0)
+                {
+                    m_currState = state.subStateList[randoms[0]];
+//                    if(m_currState.execute) 
+                        m_currState.Start();
+                }
             }
-            else if (state.order == StateOrder.Parallel)
+            else if (state.order == StateOrder.Join)
             {
                 m_currStateExeList = new List<StateAction>(state.subStateList);
                 for (int i = 0; i < state.subStateList.Count; i++)
@@ -121,8 +142,10 @@ namespace FastBehavior
             }
         }
 
-        void Update()
+        public override void Update()
         {
+            if (!isRunning)
+                return;
             if (m_currState != null)
             {
                 StateAction state = m_currState;
@@ -134,18 +157,78 @@ namespace FastBehavior
                 }
                 if (isOver)
                     NextState();
+                else
+                {
+                    if(state.isTimeout)
+                        NextState();
+                    else 
+                        state.Update();
+                }
+                    
             }else if (m_currStateExeList != null)
             {
                 for (int i = 0; i < m_currStateExeList.Count; i++)
                 {
                     StateAction state = m_currStateExeList[i];
+                    bool isOver = state.IsOver();
                     if (!state.execute)
                     {
                         state.execute = true;
                         state.Execute();
                     }
+                    if (!isOver)
+                        state.Update();
                 }
             }
+        }
+        public void Pause()
+        {
+            if(!isRunning)
+                return;
+            if (m_currState != null)
+            {
+                m_currState.pauseStartTime = Time.time;
+            }else if (m_currStateExeList != null)
+            {
+                for (int i = 0; i < m_currStateExeList.Count; i++)
+                {
+                    m_currStateExeList[i].pauseStartTime = Time.time;
+                }
+            }
+
+            isRunning = false;
+        }
+        
+        public void Resume()
+        {
+            if(isRunning)
+                return;
+            if (m_currState != null)
+            {
+                m_currState.pauseStartTime = Time.time;
+                m_currState.startTime += Time.time - m_currState.pauseStartTime;
+                m_currState.pauseStartTime = 0;
+            }else if (m_currStateExeList != null)
+            {
+                for (int i = 0; i < m_currStateExeList.Count; i++)
+                {
+                    m_currStateExeList[i].pauseStartTime = Time.time;
+                    m_currStateExeList[i].startTime += Time.time - m_currStateExeList[i].pauseStartTime;
+                    m_currStateExeList[i].pauseStartTime = 0;
+                }
+            }
+            isRunning = true;
+        }
+        public override void Dispose()
+        {
+            for (int i = 0; i < state2DList.Count; i++)
+                state2DList[i].Dispose();
+            m_curr2DQueue = null;
+            isRunning = false;
+            state2DList.Clear();
+            m_currstateList = state2DList;
+            m_cycleOverCallback?.Dispose();
+            StateMachineManager.GetInstance().Store(this);
         }
     }
 }

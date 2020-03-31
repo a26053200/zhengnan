@@ -43,6 +43,9 @@ namespace ToLuaSupport
                 case LuaFolder.Vo:
                     luaFileText = _setting.LuaVoClassFile;
                     break;
+                case LuaFolder.Cmd:
+                    luaFileText = _setting.LuaCommandClassFile;
+                    break;
             }
 
             string instanceName = StringUtils.FirstToLower(className);
@@ -160,14 +163,18 @@ namespace ToLuaSupport
                     if (fileName != null)
                     {
                         for (int i = 0; i < lusFiles.Length; i++)
-                            if (lusFiles[i].LastIndexOf(fileName) != -1)
+                        {
+                            var tempFileName = lusFiles[i].Replace(folder.ToString(), "");
+                            tempFileName = Path.GetFileNameWithoutExtension(tempFileName);
+                            if (tempFileName == fileName)
                                 return LuaFileStatus.Folder_And_TagLuaFile;
+                        }
                     }
 
-                    if (hasFolderFile)
+//                    if (hasFolderFile)
                         return LuaFileStatus.Folder_And_LuaFile;
-                    else
-                        return LuaFileStatus.Nothing;
+//                    else
+//                        return LuaFileStatus.Nothing;
                 }
             }
 
@@ -220,6 +227,7 @@ namespace ToLuaSupport
         Model,
         Service,
         Vo,
+        Cmd,
     }
 
     public enum LuaFileStatus

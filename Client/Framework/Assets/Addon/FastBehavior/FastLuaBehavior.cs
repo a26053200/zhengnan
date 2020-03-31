@@ -9,7 +9,7 @@ namespace FastBehavior
     /// <para>Author: zhengnan</para>
     /// <para>Create: 2019/5/27 23:51:07</para>
     /// </summary> 
-    public class FastLuaBehavior
+    public class FastLuaBehavior : PoolObject
     {
         static double s_id = 1;
         public double id { get; private set; }
@@ -18,98 +18,111 @@ namespace FastBehavior
 
         public StateMachine stateMachine { get; private set; }
 
-        public List<FastLuaBehavior> subBehaviors { get; private set; }
+        //public List<FastLuaBehavior> subBehaviors { get; private set; }
 
-        public FastLuaBehavior(StateMachine machine)
+        public FastLuaBehavior lastBehavior;
+        public FastLuaBehavior()
+        {
+            //subBehaviors = new List<FastLuaBehavior>();
+        }
+
+        public void SetStateMachine(StateMachine machine)
         {
             id = s_id;
             s_id++;
 
             stateMachine = machine;
             machine.fastBehavior = this;
-            subBehaviors = new List<FastLuaBehavior>();
         }
 
         public void AppendState(LuaFunction onEnter, string name)
         {
-            StateNode node = new StateNode();
+            StateNode node = StateMachineManager.GetInstance().CreateStateNode();
             node.name = name;
-            node.OnEnter = delegate ()
-            {
-                onEnter.BeginPCall();
-                onEnter.PCall();
-                onEnter.EndPCall();
-            };
+            node.OnEnter = onEnter;
             AppendStateNode(node);
         }
 
         public void AppendState(LuaFunction onEnter, LuaFunction onUpdate, string name)
         {
-            StateNode node = new StateNode();
+            StateNode node = StateMachineManager.GetInstance().CreateStateNode();
             node.name = name;
-            if (onEnter != null)
-            {
-                node.OnEnter = delegate ()
-                {
-                    onEnter.BeginPCall();
-                    onEnter.PCall();
-                    onEnter.EndPCall();
-                };
-            }
-            if (onUpdate != null)
-            {
-                node.OnUpdate = delegate ()
-                {
-                    onUpdate.BeginPCall();
-                    onUpdate.PCall();
-                    onUpdate.EndPCall();
-                };
-            }
+            node.OnEnter = onEnter;
+            node.OnUpdate = onUpdate;
             AppendStateNode(node);
         }
 
 
         public void AppendBehavior(FastLuaBehavior behavior, string name)
         {
-            StateNode node = new StateNode();
+            StateNode node = StateMachineManager.GetInstance().CreateStateNode();
             node.name = name;
-            subBehaviors.Add(behavior);
-            behavior.stateMachine.hideFlags = HideFlags.HideInInspector;
+            var action = StateMachineManager.GetInstance().CreateStateAction(node);
+            action.parentBehavior = this;
+            action.behavior = behavior;
             behavior.parentNode = node;
-            node.OnEnter = delegate ()
-            {
-                behavior.Run();
-            };
-            AppendStateNode(node);
+            stateMachine.AppendState(action);
+        }
+
+
+        public void JoinBehavior(FastLuaBehavior behavior, string name)
+        {
+            StateNode node = StateMachineManager.GetInstance().CreateStateNode();
+            node.name = name;
+            var action = StateMachineManager.GetInstance().CreateStateAction(node);
+            action.parentBehavior = this;
+            action.behavior = behavior;
+            behavior.parentNode = node;
+            stateMachine.AppendState(action);
         }
 
         public void AppendInterval(float interval)
         {
-            StateNode node = new StateNode();
+            StateNode node = StateMachineManager.GetInstance().CreateStateNode();
             node.name = "AppendInterval interval:" + interval;
             node.duration = interval;
             AppendStateNode(node);
         }
 
-        public void AppendStateNode(StateNode node)
+        private void AppendStateNode(StateNode node)
         {
-            stateMachine.AppendState(new StateAction(node));
+            var action = StateMachineManager.GetInstance().CreateStateAction(node);
+            stateMachine.AppendState(action);
         }
-
-
         public void Run(LuaFunction cycleOverCallback = null)
         {
             stateMachine.Run(cycleOverCallback);
         }
 
+        public void Pause()
+        {
+            stateMachine.Pause();
+        }
+        
+        public void Resume()
+        {
+            stateMachine.Resume();
+        }
+        
         public void Stop()
         {
+            lastBehavior?.Stop();
+            lastBehavior = null;
             stateMachine.Stop();
         }
 
         public void NextState()
         {
             stateMachine.NextState();
+        }
+
+        public override void Dispose()
+        {
+            stateMachine.Dispose();
+            stateMachine = null;
+            lastBehavior = null;
+            parentNode = null;
+            StateMachineManager.GetInstance().Store(this);
         }
     }
 }

@@ -42,6 +42,7 @@ namespace ToLuaSupport
         string prefabUrl = "";
         string oldString = "";
         string newVoName = "";
+        string newCommandName = "";
         int oldInt;
         bool oldBool;
         LuaTable luaTable = null;
@@ -139,6 +140,7 @@ namespace ToLuaSupport
                 moduleInfo.modelDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Model);
                 moduleInfo.serviceDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Service);
                 moduleInfo.voDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Vo);
+                moduleInfo.commandDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Cmd);
                 //Views
                 if (!Directory.Exists(moduleDirPath))
                     continue;
@@ -165,20 +167,23 @@ namespace ToLuaSupport
                 }
 
                 //Vo
-                RefreshVos(moduleInfo);
+                moduleInfo.voList = RefreshSingleFile(moduleInfo, moduleInfo.voDirPath);
+                moduleInfo.cmdList = RefreshSingleFile(moduleInfo, moduleInfo.commandDirPath);
                 moduleInfoList.Add(moduleInfo);
             }
         }
 
-        void RefreshVos(LuaModuleInfo moduleInfo)
+        List<string> RefreshSingleFile(LuaModuleInfo moduleInfo, string dirPath)
         {
-            moduleInfo.voList = new List<string>();
-            if (Directory.Exists(moduleInfo.voDirPath))
+            List<string> fileList = new List<string>();
+            if (Directory.Exists(dirPath))
             {
-                string[] voFiles = Directory.GetFiles(moduleInfo.voDirPath, "*.lua");
-                for (int j = 0; j < voFiles.Length; j++)
-                    moduleInfo.voList.Add(Path.GetFileNameWithoutExtension(voFiles[j]));
+                string[] files = Directory.GetFiles(dirPath, "*.lua");
+                for (int j = 0; j < files.Length; j++)
+                    fileList.Add(Path.GetFileNameWithoutExtension(files[j]));
             }
+
+            return fileList;
         }
 
         void EditModulelist()
@@ -259,6 +264,15 @@ namespace ToLuaSupport
                         }
 
                         EditFolder(moduleInfo, LuaFolder.Vo);
+                        
+                        EditorGUILayout.LabelField("Commands:");
+                        if (moduleInfo.cmdList.Count > 0)
+                        {
+                            for (int j = 0; j < moduleInfo.cmdList.Count; j++)
+                                EditorGUILayout.LabelField((j + 1).ToString(), moduleInfo.cmdList[j] + ".lua");
+                        }
+
+                        EditFolder(moduleInfo, LuaFolder.Cmd);
                     }
                     EditorGUI.indentLevel--;
 
@@ -324,6 +338,8 @@ namespace ToLuaSupport
                 case LuaFileStatus.Folder_Only:
                     if (folder == LuaFolder.Vo)
                         AddVoFile(moduleInfo);
+                    else  if (folder == LuaFolder.Cmd)
+                        AddCommandFile(moduleInfo);
                     else if (GUILayout.Button("生成 " + folder + ".lua 文件"))
                         ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName,
                             moduleInfo.moduleName, folder);
@@ -331,6 +347,8 @@ namespace ToLuaSupport
                 case LuaFileStatus.Folder_And_LuaFile:
                     if (folder == LuaFolder.Vo)
                         AddVoFile(moduleInfo);
+                    else if (folder == LuaFolder.Cmd)
+                        AddCommandFile(moduleInfo);
                     else
                         EditorGUILayout.LabelField(moduleInfo.moduleName + folder + ".lua 文件已经生成");
                     break;
@@ -349,8 +367,27 @@ namespace ToLuaSupport
                     newVoName = newVoName.Substring(0, newVoName.Length - 2);
                 ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName, newVoName,
                     LuaFolder.Vo);
-                RefreshVos(moduleInfo);
+                moduleInfo.voList = RefreshSingleFile(moduleInfo, moduleInfo.voDirPath);
                 newVoName = "";
+            }
+
+            EditorGUILayout.EndHorizontal();
+        }
+        
+        void AddCommandFile(LuaModuleInfo moduleInfo)
+        {
+            EditorGUILayout.BeginHorizontal();
+            newCommandName = EditorGUILayout.TextField("新 Command 名称:", newCommandName);
+            if (GUILayout.Button("新增", endButtonWidth))
+            {
+                if (!ToLuaGenerater.FileNameValid(newCommandName, this))
+                    return;
+                if (newCommandName.EndsWith(LuaFolder.Cmd.ToString()))
+                    newCommandName = newCommandName.Substring(0, newCommandName.Length - 3);
+                ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName, newCommandName,
+                    LuaFolder.Cmd);
+                moduleInfo.cmdList = RefreshSingleFile(moduleInfo, moduleInfo.commandDirPath);
+                newCommandName = "";
             }
 
             EditorGUILayout.EndHorizontal();

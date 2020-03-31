@@ -22,10 +22,12 @@ namespace ToLuaSupport
         public string viewDirPath; //View目录
         public string modelDirPath; //Model目录
         public string serviceDirPath; //Service目录
-        public string voDirPath; //Service目录
+        public string voDirPath; //Vo目录
+        public string commandDirPath; //Command目录
         public List<LuaViewInfo> viewList;
         public List<string> voList;
-
+        public List<string> cmdList;
+        
         public bool isOpen;
         public string newViewMdrName { get; set; }
 

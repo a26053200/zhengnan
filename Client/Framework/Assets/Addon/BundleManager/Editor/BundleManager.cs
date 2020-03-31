@@ -1,6 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using LitJson;
 
@@ -68,13 +69,17 @@ namespace BM
 
         //配置路径
         public const string BMSettings_Path = "Assets/Res/BMSettings.asset";
-
+        
         static Dictionary<string, string> argDict;
 
         private static void StartBuild(bool forceBuild, Language language, BuildTarget buildTarget, bool moveBundle = false)
         {
             //加载打包配置
             BundleBuilder.settings = AssetDatabase.LoadAssetAtPath<BMSettings>(BMSettings_Path);
+            //加载场景版本号
+            BundleBuilder.scenesVersionDict = BMEditUtility.GetDictionaryFromFile(BundleBuilder.settings.scenesVersionFile);
+            if (BundleBuilder.scenesVersionDict == null)
+                BundleBuilder.scenesVersionDict = new Dictionary<string, string>();
             //Output_Path = Application.dataPath.Replace("Assets", "TestBundle");
             BundleBuilder.Output_Root_Path = Application.dataPath.Replace("Assets", BundleBuilder.settings.BuildOutputDirName);
             BundleBuilder.Output_Path = BundleBuilder.Output_Root_Path + "/" + language.ToString() + "/" + buildTarget.ToString();
