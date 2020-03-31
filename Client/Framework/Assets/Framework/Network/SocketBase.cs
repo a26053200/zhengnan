@@ -58,12 +58,12 @@ public class SocketBase : MonoBehaviour
     {
         if (e.SocketError == SocketError.NotConnected)
         {
-            MyDebug.LogError("[Socket] has connected:" + e.SocketError);
+            Logger.LogError("[Socket] has connected:" + e.SocketError);
             return;
         }
         if (e.LastOperation != SocketAsyncOperation.Connect || e.SocketError != SocketError.Success)
         {
-            MyDebug.LogError("[Socket] connect error:" + e.SocketError);
+            Logger.LogError("[Socket] connect error:" + e.SocketError);
             return;
         }
         Socket socket = e.UserToken as Socket;
@@ -74,14 +74,14 @@ public class SocketBase : MonoBehaviour
         bool willRaiseEvent = socket.ReceiveAsync(_recvArgs);
         if (!willRaiseEvent)
         {
-            MyDebug.LogError("[Socket] willRaiseEvent:");
+            Logger.LogError("[Socket] willRaiseEvent:");
             this.disconnect();
         }
         else
         {
             status = NetStatus.Connected;
             startConnectTime = Environment.TickCount;
-            MyDebug.Log(string.Format("[Socket] Client has connected successful from server:{0}:{1}", host, port));
+            Logger.Info(string.Format("[Socket] Client has connected successful from server:{0}:{1}", host, port));
         }
     }
 
@@ -89,12 +89,12 @@ public class SocketBase : MonoBehaviour
     {
         if (e.LastOperation != SocketAsyncOperation.Receive)
         {
-            MyDebug.LogError("[Socket] connect error:" + e.SocketError);
+            Logger.LogError("[Socket] connect error:" + e.SocketError);
             return;
         }
         if (e.SocketError == SocketError.ConnectionAborted)
         {
-            MyDebug.LogError("[Socket] connect has broken:" + e.SocketError);
+            Logger.LogError("[Socket] connect has broken:" + e.SocketError);
             disconnect();
             return;
         }
@@ -102,8 +102,8 @@ public class SocketBase : MonoBehaviour
         {
             if (GlobalConsts.EnableLogNetwork)
             {
-                MyDebug.LogError("[Socket] ProcessReceive e.BytesTransferred  " + e.BytesTransferred + ",LastOperation:" + e.LastOperation + ",SocketError:" + e.SocketError);
-                MyDebug.LogError("看到这条日志，因为收到空包，可能服务器把客户端踢掉了。请检查上条发送的指令逻辑");
+                Logger.LogError("[Socket] ProcessReceive e.BytesTransferred  " + e.BytesTransferred + ",LastOperation:" + e.LastOperation + ",SocketError:" + e.SocketError);
+                Logger.LogError("看到这条日志，因为收到空包，可能服务器把客户端踢掉了。请检查上条发送的指令逻辑");
             }
             disconnect();
             return;
@@ -111,9 +111,9 @@ public class SocketBase : MonoBehaviour
         try
         {
             //if (GlobalConsts.EnableLogNetwork)
-            //    MyDebug.Log("[Socket] Receive data len:" + e.BytesTransferred);
+            //    Logger.Log("[Socket] Receive data len:" + e.BytesTransferred);
             if (e.BytesTransferred >= MAX_READ)
-                MyDebug.LogError("[Socket] Receive data too long. len:" + e.BytesTransferred);
+                Logger.LogError("[Socket] Receive data too long. len:" + e.BytesTransferred);
             doOnReceive(_byteBuffer, e.BytesTransferred);
         }
         catch (Exception ex)
@@ -134,21 +134,21 @@ public class SocketBase : MonoBehaviour
         }
         catch (ObjectDisposedException ode) // socket already closed
         {
-            MyDebug.LogError("[Socket] ProcessReceive2  " + ode.Message);
+            Logger.LogError("[Socket] ProcessReceive2  " + ode.Message);
         }
         catch (SocketException exp)
         {
-            MyDebug.LogError("[Socket] ProcessReceive3  " + exp.Message);
+            Logger.LogError("[Socket] ProcessReceive3  " + exp.Message);
         }
     }
     protected virtual void OnConnectedError(string errorReason, string msg = "")
     {
-        MyDebug.mLogError(errorReason + msg);
+        Logger.LogError(errorReason + msg);
         eventDispatcher.dispatchEvent(new SocketEvent(SocketEvent.ERROR));
     }
     protected virtual void OnDataError(string errorReason, string msg = "")
     {
-        MyDebug.mLogError(errorReason + msg);
+        Logger.LogError(errorReason + msg);
         eventDispatcher.dispatchEvent(new SocketEvent(SocketEvent.READ_ERROR));
     }
     protected virtual void doOnReceive(byte[] bytes, int length)
@@ -159,7 +159,7 @@ public class SocketBase : MonoBehaviour
     {
         if (dataBytes.Length >= maxSend)
         {
-            MyDebug.LogError(string.Format("[Socket] send data is more than{0}. len:{1}", maxSend, dataBytes.Length));
+            Logger.LogError(string.Format("[Socket] send data is more than{0}. len:{1}", maxSend, dataBytes.Length));
             return;
         }
         sendComplete = false;
@@ -175,14 +175,14 @@ public class SocketBase : MonoBehaviour
         catch (Exception ex)
         {
             sendComplete = true;
-            MyDebug.LogError("[Socket] send Exception:" + ex.Message);
+            Logger.LogError("[Socket] send Exception:" + ex.Message);
         }
     }
     private void onSendError(Socket sender, SocketAsyncEventArgs e)
     {
         if (e.SocketError != SocketError.Success)
         {
-            MyDebug.Log("[Socket] send error:" + e.SocketError);
+            Logger.LogError("[Socket] send error:" + e.SocketError);
         }
     }
     private void onSendCompleted(object sender, SocketAsyncEventArgs e)
@@ -194,7 +194,7 @@ public class SocketBase : MonoBehaviour
         if (status == NetStatus.Disconnected)
             return;
         status = NetStatus.Disconnected;
-        MyDebug.Log("Try to close connect! This connection lasted " + (Environment.TickCount - startConnectTime) + "ms");
+        Debug.Log("Try to close connect! This connection lasted " + (Environment.TickCount - startConnectTime) + "ms");
         if (socket != null)
         {
             try
@@ -206,11 +206,11 @@ public class SocketBase : MonoBehaviour
                 if (_recvArgs != null)
                     _recvArgs.Completed -= onReceiveCompleted;
                 _recvArgs = null;
-                MyDebug.Log("[Socket] close success! This connection lasted ");
+                Debug.Log("[Socket] close success! This connection lasted ");
             }
             catch (System.Exception ex)
             {
-                MyDebug.LogError("[Socket] socket Shutdown Exception:" + ex.Message);
+                Debug.LogError("[Socket] socket Shutdown Exception:" + ex.Message);
             }
             try
             {
@@ -218,7 +218,7 @@ public class SocketBase : MonoBehaviour
             }
             catch (System.Exception ex1)
             {
-                MyDebug.LogError("[Socket] socket close Exception:" + ex1.Message);
+                Debug.LogError("[Socket] socket close Exception:" + ex1.Message);
             }
         }
     }

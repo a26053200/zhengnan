@@ -2,20 +2,23 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using MiscUtil.Conversion;
+using MiscUtil.IO;
 
 
 public class CommandReader
 {
+    public delegate void Response(EndianBinaryReader reader, int dataLen);
     private MemoryStream memStream;
-    private BinaryReader reader;
+    private EndianBinaryReader reader;
 
     private int packLen;
     public CommandReader()
     {
 		memStream = new MemoryStream();
-		reader = new BinaryReader(memStream);
+		reader = new EndianBinaryReader(EndianBitConverter.Big, memStream);
 	}
-    public void decode(byte[] receiveData, int length, List<byte[]> datas)
+    public void decode(byte[] receiveData, int length, Response response)
     {
         memStream.Seek(0, SeekOrigin.End);
         memStream.Write(receiveData, 0, length);
@@ -23,11 +26,11 @@ public class CommandReader
         memStream.Seek(0, SeekOrigin.Begin);
         while (remainingBytesLen > 4)
         {
-            packLen = IPAddress.NetworkToHostOrder(reader.ReadInt32());//包长
+            //packLen = IPAddress.NetworkToHostOrder(reader.ReadInt32());//包长
+            packLen = reader.ReadInt32();//包长
             if(remainingBytesLen >= packLen)
             {
-                byte[] dataBytes = reader.ReadBytes(packLen);
-                datas.Add(dataBytes);
+                response(reader, packLen);
             }
             else
             {

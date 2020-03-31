@@ -61,7 +61,7 @@ public class LuaBootstrap : LuaClient
                         name = name.Substring(0, name.Length - tailLength); //去掉md5后缀,转化为正确的Lua文件名
                         name = name.Replace(luaRootDir.ToLower() + "/", "");
                         name = "lua_" + BMUtility.Path2Name(name);
-                        Debug.LogFormat("{0} - {1}", name, allNames[j]);
+                        //Debug.LogFormat("{0} - {1}", name, allNames[j]);
                         LuaFileUtils.Instance.AddLuaNameMap(name, allNames[j]);
                     }
                 }

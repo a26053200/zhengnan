@@ -1,10 +1,8 @@
-﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Framework;
 using LitJson;
 using LuaInterface;
-using System.Text;
+
 /// <summary>
 /// <para>Class Introduce</para>
 /// <para>Author: zhengnan</para>
@@ -32,6 +30,10 @@ public class NetworkManager : BaseManager
         jsonClient.eventDispatcher.addEventListener(JsonSocketEvent.SERVER_SOCKET_FAIL, OnSocketConnectFail);
     }
 
+    public void SetCompress(bool isCompress)
+    {
+        jsonClient.socket.isCompress = isCompress;
+    }
     public void SetLuaFun(string funName, LuaFunction func)
     {
         luaFun[funName] = func;
@@ -46,9 +48,14 @@ public class NetworkManager : BaseManager
     public void SendJson(string json)
     {
         JsonData netData = JsonMapper.ToObject(json);
-        jsonClient.sendJson(netData);
+        jsonClient.SendJson(netData);
     }
-
+    
+    public void SendRequest(IRequest rqst)
+    {
+        jsonClient.Send(rqst);
+    }
+    
     void OnHttpRspd(JsonData json)
     {
         luaFun[NetworkFunction.OnHttpRspd].Call(json.ToJson());
@@ -59,9 +66,12 @@ public class NetworkManager : BaseManager
         jsonClient.SetJsonCallback(OnJsonRspd);
     }
 
-    private void OnJsonRspd(StringBuilder sb)
+    private void OnJsonRspd(ReignResponse response)
     {
-        luaFun[NetworkFunction.OnJsonRspd].Call(sb.ToString());
+        luaFun[NetworkFunction.OnJsonRspd].BeginPCall();
+        luaFun[NetworkFunction.OnJsonRspd].Push(response);
+        luaFun[NetworkFunction.OnJsonRspd].PCall();
+        luaFun[NetworkFunction.OnJsonRspd].EndPCall();
     }
 
     private void OnSocketConnect(EventObj evt)

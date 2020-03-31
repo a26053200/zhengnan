@@ -3,6 +3,8 @@ using UnityEngine;
 using System.Collections.Generic;
 using System.Text;
 using System.Collections;
+using Framework;
+
 //
 // Class Introduce
 // Author: zhengnan
@@ -130,7 +132,7 @@ public abstract class ClientBase:MonoBehaviour
             status = ClientStatus.Disconnected;//连接已经断开
         }
     }
-    protected virtual void OnReceiveHandler(StringBuilder json)
+    protected virtual void OnReceiveHandler(IResponse response)
     {
 
     }

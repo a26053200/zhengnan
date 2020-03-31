@@ -8,6 +8,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using LuaInterface;
+using PathCreation;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
@@ -15,11 +16,20 @@ namespace Framework
 {
     public static class LuaHelper
     {
+        private static Vector3 tempVec3 = Vector3.zero;
         public static bool isNullObj(UnityEngine.Object obj)
         {
             return !obj;
         }
-
+        
+        public static Vector3 ScreenToCanvasPoint(Vector2 pos,Canvas uiCanvas, RectTransform parent = null)
+        {
+            Vector2 p = Vector2.zero;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(parent, pos, uiCanvas.worldCamera, out p);
+            tempVec3.Set(p.x, p.y, uiCanvas.GetComponent<RectTransform>().anchoredPosition3D.z);
+            return tempVec3;
+        }
+        
         public static void AddScrollListOnItemRender(ScrollList list, LuaFunction OnItemRender)
         {
             list.onItemRender = delegate (int index, Transform item)
@@ -93,171 +103,78 @@ namespace Framework
             return t;
         }
 
+        public static int GetLayerMask(int layer)
+        {
+            return 1 << layer;
+        }
+
+        public static int Bit_Or(int bit1, int bit2)
+        {
+            return bit1 | bit2;
+        }
+        
+        public static int Bit_And(int bit1, int bit2)
+        {
+            return bit1 & bit2;
+        }
+        
+        public static Vector3[] GetBezierPath(PathCreator pc)
+        {
+            Vector3[] path = new Vector3[pc.bezierPath.NumPoints];
+            for (int i = 0; i < path.Length; i++)
+            {
+                path[i] = pc.bezierPath[i];
+            }
+
+            return path;
+        }
         /// <summary>
         /// 给GameObject 注册点击事件
         /// </summary>
         /// <param name="go"></param>
         /// <param name="luaFunc"></param>
         /// <returns></returns>
-        public static LuaFunction AddObjectClickEvent(GameObject go, LuaFunction luaFunc)
+        public static LuaFunction AddObjectClickEvent(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            return AddObjectEvent(go, EventTriggerType.PointerClick, luaFunc);
+            return EventHelper.AddObjectEvent(go, EventTriggerType.PointerClick, luaFunc, passEvent);
         }
-        public static LuaFunction AddObjectPointerEnter(GameObject go, LuaFunction luaFunc)
+        public static LuaFunction AddObjectPointerEnter(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            return AddObjectEvent(go, EventTriggerType.PointerEnter, luaFunc);
+            return EventHelper.AddObjectEvent(go, EventTriggerType.PointerEnter, luaFunc, passEvent);
         }
-        public static LuaFunction AddObjectPointerExit(GameObject go, LuaFunction luaFunc)
+        public static LuaFunction AddObjectPointerExit(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            return AddObjectEvent(go, EventTriggerType.PointerExit, luaFunc);
+            return EventHelper.AddObjectEvent(go, EventTriggerType.PointerExit, luaFunc, passEvent);
         }
-        public static LuaFunction AddObjectPointerDown(GameObject go, LuaFunction luaFunc)
+        public static LuaFunction AddObjectPointerDown(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            return AddObjectEvent(go, EventTriggerType.PointerDown, luaFunc);
+            return EventHelper.AddObjectEvent(go, EventTriggerType.PointerDown, luaFunc, passEvent);
         }
-        public static LuaFunction AddObjectPointerUp(GameObject go, LuaFunction luaFunc)
+        public static LuaFunction AddObjectPointerUp(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            return AddObjectEvent(go, EventTriggerType.PointerUp, luaFunc);
+            return EventHelper.AddObjectEvent(go, EventTriggerType.PointerUp, luaFunc, passEvent);
         }
-        public static LuaFunction AddObjectBeginDrag(GameObject go, LuaFunction luaFunc)
+        public static LuaFunction AddObjectBeginDrag(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            return AddObjectEvent(go, EventTriggerType.BeginDrag, luaFunc);
+            return EventHelper.AddObjectEvent(go, EventTriggerType.BeginDrag, luaFunc, passEvent);
         }
-        public static LuaFunction AddObjectDrag(GameObject go, LuaFunction luaFunc)
+        public static LuaFunction AddObjectDrag(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            return AddObjectEvent(go, EventTriggerType.Drag, luaFunc);
+            return EventHelper.AddObjectEvent(go, EventTriggerType.Drag, luaFunc, passEvent);
         }
-        public static LuaFunction AddObjectDrop(GameObject go, LuaFunction luaFunc)
+        public static LuaFunction AddObjectDrop(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            return AddObjectEvent(go, EventTriggerType.Drop, luaFunc);
+            return EventHelper.AddObjectEvent(go, EventTriggerType.Drop, luaFunc, passEvent);
         }
-        public static LuaFunction AddObjectEndDrag(GameObject go, LuaFunction luaFunc)
+        public static LuaFunction AddObjectEndDrag(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            return AddObjectEvent(go, EventTriggerType.EndDrag, luaFunc);
+            return EventHelper.AddObjectEvent(go, EventTriggerType.EndDrag, luaFunc, passEvent);
         }
         
-        public static LuaFunction AddObjectEvent(GameObject gameObject, EventTriggerType type, LuaFunction luaFunc)
+        public static void RemoveObjectEvent(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
-            EventTriggerListener.EventDelegate ed = delegate (BaseEventData eventData)
-            {
-                luaFunc.BeginPCall();
-                luaFunc.Push(eventData);
-                luaFunc.PCall();
-                luaFunc.EndPCall();
-            };
-            EventTriggerListener listener = EventTriggerListener.Get(gameObject);
-            //EventTriggerListener.Entry entry = new EventTriggerListener.Entry(luaFunc, ed);
-            listener.GetLuaFuncHashSet(type, luaFunc).Add(ed);
-            switch (type)
-            {
-                case EventTriggerType.PointerClick:
-                    listener.onEventClick += ed;
-                    break;
-                case EventTriggerType.PointerEnter:
-                    listener.onEventEnter += ed;
-                    break;
-                case EventTriggerType.PointerExit:
-                    listener.onEventExit += ed;
-                    break;
-                case EventTriggerType.PointerDown:
-                    listener.onEventDown += ed;
-                    break;
-                case EventTriggerType.PointerUp:
-                    listener.onEventUp += ed;
-                    break;
-                case EventTriggerType.BeginDrag:
-                    listener.onEventBeginDrag += ed;
-                    break;
-                case EventTriggerType.Drag:
-                    listener.onEventDrag += ed;
-                    break;
-                case EventTriggerType.Drop:
-                    listener.onEventDrop += ed;
-                    break;
-                case EventTriggerType.EndDrag:
-                    listener.onEventEndDrag += ed;
-                    break;
-                default:
-                    listener.GetLuaFuncHashSet(type, luaFunc).Remove(ed);
-                    Logger.Error("No Register EventTriggerType:" + type.ToString());
-                    break;
-            }
-            return luaFunc;
+            EventHelper.RemoveObjectEvent(go, luaFunc);
         }
-
-        public static void RemoveObjectEvent(GameObject gameObject, LuaFunction luaFunc)
-        {
-            EventTriggerListener listener = EventTriggerListener.Get(gameObject);
-            foreach(var type in listener.luaFuncHash.Keys)
-            {
-                List<EventTriggerListener.EventDelegate> list = listener.GetLuaFuncHashSet(type, luaFunc);
-                foreach (var ed in list)
-                {
-                    switch (type)
-                    {
-                        case EventTriggerType.PointerClick:
-                            listener.onEventClick -= ed;
-                            break;
-                        case EventTriggerType.PointerEnter:
-                            listener.onEventEnter -= ed;
-                            break;
-                        case EventTriggerType.PointerExit:
-                            listener.onEventExit -= ed;
-                            break;
-                        case EventTriggerType.BeginDrag:
-                            listener.onEventBeginDrag -= ed;
-                            break;
-                        case EventTriggerType.Drag:
-                            listener.onEventDrag -= ed;
-                            break;
-                        case EventTriggerType.Drop:
-                            listener.onEventDrop -= ed;
-                            break;
-                        case EventTriggerType.EndDrag:
-                            listener.onEventEndDrag -= ed;
-                            break;
-                        default:
-                            Logger.Error("No Register EventTriggerType:" + type.ToString());
-                            break;
-                    }
-                }
-            }
-        }
-        /// <summary>
-        /// 给GameObject 注册事件
-        /// </summary>
-        /// <param name="go"></param>
-        /// <param name="type"></param>
-        /// <param name="luaFunc"></param>
-        //public static UnityEngine.EventSystems.EventTrigger.Entry AddObjectEvent(GameObject go, EventTriggerType type, LuaFunction luaFunc)
-        //{
-        //    UnityEngine.EventSystems.EventTrigger trigger = go.GetComponent<UnityEngine.EventSystems.EventTrigger>();
-        //    if (trigger == null)
-        //        trigger = go.AddComponent<UnityEngine.EventSystems.EventTrigger>();
-
-        //    UnityEngine.EventSystems.EventTrigger.Entry entry = new UnityEngine.EventSystems.EventTrigger.Entry();
-        //    entry.eventID = type;
-        //    UnityEngine.Events.UnityAction<BaseEventData> eventHandler = new UnityEngine.Events.UnityAction<BaseEventData>(delegate(BaseEventData eventData)
-        //    {
-        //        luaFunc.BeginPCall();
-        //        luaFunc.Call<BaseEventData> (eventData);
-        //        luaFunc.EndPCall();
-        //    });
-        //    entry.callback.AddListener(eventHandler);
-        //    //trigger.triggers.Clear();
-        //    trigger.triggers.Add(entry);
-        //    return entry;
-        //}
-
-//        public static void RemoveObjectEvent(GameObject go, UnityEngine.EventSystems.EventTrigger.Entry entry)
-//        {
-//            UnityEngine.EventSystems.EventTrigger trigger = go.GetComponent<UnityEngine.EventSystems.EventTrigger>();
-//            if (trigger != null)
-//            {
-//                if (trigger.triggers.Contains(entry))
-//                    trigger.triggers.Remove(entry);
-//            }
-//        }
         /// <summary>
         /// 判断是否按下(跨平台)
         /// </summary>
