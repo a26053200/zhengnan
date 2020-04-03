@@ -3,55 +3,41 @@ using UnityEditor;
 
 namespace FastBehavior
 {
-    [CustomEditor(typeof(StateMachine))]
+    [CustomEditor(typeof(StateMachineManager))]
     public class FastLuaBehaviorEditor : BaseBehaviorEditor
     {
         private void OnEnable()
         {
-            stateMachine = target as StateMachine;
+            mgr = target as StateMachineManager;
+            EditorApplication.update += OnEditUpdate;
+        }
+
+        private void DisplayPool<T>(string title, ObjectPool<T> pool) where T : PoolObject
+        {
+            LabelField(title,
+                pool.ObjList.list.Count,
+                pool.ObjPool.Count,
+                pool.maxNum,
+                pool.counter);
         }
         public override void OnInspectorGUI()
         {
-            if (stateMachine.hideFlags == HideFlags.HideInInspector)
-                return;
-            //EditorGUI.BeginDisabledGroup(false);
-            //{
-            //    EditorGUILayout.ObjectField("Root Obj", stateMachine.gameObject, typeof(GameObject), true);
-            //    EditorGUILayout.ObjectField("Root Machine", stateMachine, typeof(StateMachine), true);
-            //}
-            //EditorGUI.EndDisabledGroup();
-
-            for (int i = 0; i < stateMachine.state2DList.Count; i++)
-            {
-                StateAction stateAction = stateMachine.state2DList[i];
-                bool activeAction = stateAction == stateMachine.currState;
-                LabelField("Action", stateAction.node.name, activeAction);
-                EditorGUI.indentLevel++;
-                for (int j = 0; j < stateMachine.fastBehavior.subBehaviors.Count; j++)
-                {
-                    FastLuaBehavior subBehavior = stateMachine.fastBehavior.subBehaviors[j];
-                    if (subBehavior.parentNode == stateAction.node)
-                    {
-                        LabelField("Sub Behavior", subBehavior.id.ToString(), activeAction && subBehavior.stateMachine.enabled);
-                        EditorGUI.indentLevel++;
-                        DisplayStateMachine(subBehavior.stateMachine);
-                        EditorGUI.indentLevel--;
-                    }
-                }
-                EditorGUI.indentLevel--;
-            }
-            //DisplayStateMachine(stateMachine);
-
-            
+            DisplayPool("Fast Lua Behavior", mgr.FastLuaBehaviorPool);
+            DisplayPool("State Machine", mgr.StateMachinePool);
+            DisplayPool("State Action ", mgr.StateActionPool);
+            DisplayPool("State Node", mgr.StateNodePool);
         }
-
-        private void DisplayStateMachine(StateMachine machine)
+        void OnEditUpdate()
         {
-            for (int i = 0; i < machine.state2DList.Count; i++)
-            {
-                StateAction stateAction = machine.state2DList[i];
-                LabelField("Action", stateAction.node.name, stateAction == machine.currState);
-            }
+            Repaint();
+        }
+        void OnDestroy()
+        {
+            EditorApplication.update -= OnEditUpdate;
+        }
+        void OnDisable()
+        {
+            EditorApplication.update -= OnEditUpdate;
         }
     }
 }
