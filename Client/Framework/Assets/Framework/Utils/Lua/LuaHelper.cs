@@ -8,7 +8,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using LuaInterface;
-using PathCreation;
+//using PathCreation;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
@@ -118,16 +118,16 @@ namespace Framework
             return bit1 & bit2;
         }
         
-        public static Vector3[] GetBezierPath(PathCreator pc)
-        {
-            Vector3[] path = new Vector3[pc.bezierPath.NumPoints];
-            for (int i = 0; i < path.Length; i++)
-            {
-                path[i] = pc.bezierPath[i];
-            }
-
-            return path;
-        }
+//        public static Vector3[] GetBezierPath(PathCreator pc)
+//        {
+//            Vector3[] path = new Vector3[pc.bezierPath.NumPoints];
+//            for (int i = 0; i < path.Length; i++)
+//            {
+//                path[i] = pc.bezierPath[i];
+//            }
+//
+//            return path;
+//        }
         /// <summary>
         /// 给GameObject 注册点击事件
         /// </summary>

@@ -23,7 +23,7 @@ public class Client : MonoBehaviour
             return;
             //throw new Exception("There is only one Client instance in this app");
         }
-        SRDebug.Init();
+        //SRDebug.Init();
         DontDestroyOnLoad(this);
         // 初始变量赋值
         Application.targetFrameRate = 60;
