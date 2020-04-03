@@ -1,10 +1,10 @@
 package com.betel.mrpg.server.balance;
 
-import com.betel.mrpg.core.consts.ServerName;
-import com.betel.mrpg.core.utils.ServerTools;
+import com.betel.center.core.consts.ServerName;
 import com.betel.config.ServerConfigVo;
 import com.betel.servers.center.CenterServer;
 import com.betel.servers.http.HttpServer;
+import com.betel.utils.ServerTools;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,6 +26,6 @@ public class BalanceServer extends CenterServer
 
     public static void main(String[] args) throws Exception
     {
-        new BalanceServer(ServerTools.createServerConfig(args,ServerName.BALANCE_SERVER)).run();
+        new BalanceServer(ServerTools.createServerConfig(args, ServerName.BALANCE_SERVER)).run();
     }
 }

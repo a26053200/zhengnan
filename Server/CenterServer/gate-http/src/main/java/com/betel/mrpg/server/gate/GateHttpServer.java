@@ -1,12 +1,12 @@
 package com.betel.mrpg.server.gate;
 
-import com.betel.mrpg.core.consts.ServerName;
-import com.betel.mrpg.core.utils.ServerTools;
+import com.betel.center.core.consts.ServerName;
 import com.betel.common.Monitor;
 import com.betel.config.ServerConfigVo;
 import com.betel.servers.forward.ServerClient;
 import com.betel.servers.http.HttpServer;
 import com.betel.servers.http.HttpServerMonitor;
+import com.betel.utils.ServerTools;
 
 /**
  * @ClassName: GateHttpServer
@@ -24,7 +24,7 @@ public class GateHttpServer extends HttpServer
 
     public static void main(String[] args) throws Exception
     {
-        ServerConfigVo accountSrvCfg = ServerTools.createServerConfig(args,ServerName.GATE_HTTP_SERVER, ServerName.BALANCE_SERVER);
+        ServerConfigVo accountSrvCfg = ServerTools.createServerConfig(args, ServerName.GATE_HTTP_SERVER, ServerName.BALANCE_SERVER);
         HttpServerMonitor mnt = new HttpServerMonitor(accountSrvCfg);
         GateHttpServer server = new GateHttpServer(accountSrvCfg,mnt);
         server.setServerClient(new ServerClient(accountSrvCfg, mnt));

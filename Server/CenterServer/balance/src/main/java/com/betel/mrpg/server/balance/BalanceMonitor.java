@@ -1,6 +1,5 @@
 package com.betel.mrpg.server.balance;
 
-import com.betel.mrpg.core.consts.ServerName;
 import com.betel.config.ServerConfigVo;
 import com.betel.servers.center.CenterMonitor;
 

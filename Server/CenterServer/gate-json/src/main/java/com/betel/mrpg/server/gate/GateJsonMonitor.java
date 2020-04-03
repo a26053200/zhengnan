@@ -1,8 +1,8 @@
 package com.betel.mrpg.server.gate;
 
 import com.alibaba.fastjson.JSONObject;
-import com.betel.mrpg.core.consts.Action;
-import com.betel.mrpg.core.consts.ServerName;
+import com.betel.center.core.consts.Action;
+import com.betel.center.core.consts.ServerName;
 import com.betel.config.ServerConfigVo;
 import com.betel.consts.FieldName;
 import com.betel.servers.forward.ForwardContext;

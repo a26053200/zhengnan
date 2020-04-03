@@ -4,22 +4,19 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.cardwar.server</groupId>
-  <artifactId>cardwar</artifactId>
+  <groupId>com.center.server</groupId>
+  <artifactId>center</artifactId>
   <version>1.0</version>
   <modules>
-    <module>core</module>
     <module>balance</module>
     <module>account</module>
     <module>gate-http</module>
-    <module>lobby</module>
-    <module>room</module>
     <module>gate-json</module>
-    <module>robot</module>
+    <module>core</module>
   </modules>
 
   <packaging>pom</packaging>
-  <name>cardwar</name>
+  <name>center</name>
   <!-- FIXME change it to the project's website -->
   <!--<url>http://www.example.com</url> -->
 
