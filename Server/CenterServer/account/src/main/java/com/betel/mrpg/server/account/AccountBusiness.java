@@ -2,8 +2,8 @@ package com.betel.mrpg.server.account;
 
 import com.alibaba.fastjson.JSONObject;
 import com.betel.asd.Business;
-import com.betel.mrpg.core.consts.Action;
-import com.betel.mrpg.core.consts.ReturnCode;
+import com.betel.center.core.consts.Action;
+import com.betel.center.core.consts.ReturnCode;
 import com.betel.mrpg.server.account.beans.Account;
 import com.betel.consts.FieldName;
 import com.betel.session.Session;
@@ -71,7 +71,7 @@ public class AccountBusiness extends Business<Account>
                 updateAccount(session,account.getId());
             } else {//密码错误，登陆失败
                 logger.info(String.format("用户:%s 登陆失败", username));
-                rspdMessage(session,ReturnCode.Wrong_password);
+                rspdMessage(session, ReturnCode.Wrong_password);
             }
         }else{//还未注册过
             logger.info(String.format("用户:%s 登陆失败", username));
