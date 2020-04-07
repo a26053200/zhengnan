@@ -63,6 +63,12 @@ public static class CustomWrap
         //================
         // DoTween
         //================
+        _GT(typeof(DG.Tweening.AutoPlay)),
+        _GT(typeof(DG.Tweening.AxisConstraint)),
+        _GT(typeof(DG.Tweening.LogBehaviour)),
+        _GT(typeof(DG.Tweening.ScrambleMode)),
+        _GT(typeof(DG.Tweening.TweenType)),
+        _GT(typeof(DG.Tweening.UpdateType)),
         _GT(typeof(RectTransform)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions46)),
         _GT(typeof(Image)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions46)),
         _GT(typeof(Text)).AddExtendType(typeof(DG.Tweening.ShortcutExtensions46)),
