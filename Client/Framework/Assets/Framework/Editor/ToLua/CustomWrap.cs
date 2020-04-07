@@ -84,6 +84,7 @@ public static class CustomWrap
         _GT(typeof(StringUtils)),
         _GT(typeof(SystemUtils)),
         _GT(typeof(Ticker)),
+        _GT(typeof(AttachCamera)),
         _GT(typeof(Hud)),
 
 

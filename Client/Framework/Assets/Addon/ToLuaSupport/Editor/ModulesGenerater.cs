@@ -140,7 +140,7 @@ namespace ToLuaSupport
                 moduleInfo.modelDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Model);
                 moduleInfo.serviceDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Service);
                 moduleInfo.voDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Vo);
-                moduleInfo.commandDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Cmd);
+                moduleInfo.controllerDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Controllers);
                 //Views
                 if (!Directory.Exists(moduleDirPath))
                     continue;
@@ -168,7 +168,7 @@ namespace ToLuaSupport
 
                 //Vo
                 moduleInfo.voList = RefreshSingleFile(moduleInfo, moduleInfo.voDirPath);
-                moduleInfo.cmdList = RefreshSingleFile(moduleInfo, moduleInfo.commandDirPath);
+                moduleInfo.ctrlList = RefreshSingleFile(moduleInfo, moduleInfo.controllerDirPath);
                 moduleInfoList.Add(moduleInfo);
             }
         }
@@ -265,14 +265,14 @@ namespace ToLuaSupport
 
                         EditFolder(moduleInfo, LuaFolder.Vo);
                         
-                        EditorGUILayout.LabelField("Commands:");
-                        if (moduleInfo.cmdList.Count > 0)
+                        EditorGUILayout.LabelField("Controllers:");
+                        if (moduleInfo.ctrlList.Count > 0)
                         {
-                            for (int j = 0; j < moduleInfo.cmdList.Count; j++)
-                                EditorGUILayout.LabelField((j + 1).ToString(), moduleInfo.cmdList[j] + ".lua");
+                            for (int j = 0; j < moduleInfo.ctrlList.Count; j++)
+                                EditorGUILayout.LabelField((j + 1).ToString(), moduleInfo.ctrlList[j] + ".lua");
                         }
 
-                        EditFolder(moduleInfo, LuaFolder.Cmd);
+                        EditFolder(moduleInfo, LuaFolder.Controllers);
                     }
                     EditorGUI.indentLevel--;
 
@@ -338,7 +338,7 @@ namespace ToLuaSupport
                 case LuaFileStatus.Folder_Only:
                     if (folder == LuaFolder.Vo)
                         AddVoFile(moduleInfo);
-                    else  if (folder == LuaFolder.Cmd)
+                    else  if (folder == LuaFolder.Controllers)
                         AddCommandFile(moduleInfo);
                     else if (GUILayout.Button("生成 " + folder + ".lua 文件"))
                         ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName,
@@ -347,7 +347,7 @@ namespace ToLuaSupport
                 case LuaFileStatus.Folder_And_LuaFile:
                     if (folder == LuaFolder.Vo)
                         AddVoFile(moduleInfo);
-                    else if (folder == LuaFolder.Cmd)
+                    else if (folder == LuaFolder.Controllers)
                         AddCommandFile(moduleInfo);
                     else
                         EditorGUILayout.LabelField(moduleInfo.moduleName + folder + ".lua 文件已经生成");
@@ -377,16 +377,16 @@ namespace ToLuaSupport
         void AddCommandFile(LuaModuleInfo moduleInfo)
         {
             EditorGUILayout.BeginHorizontal();
-            newCommandName = EditorGUILayout.TextField("新 Command 名称:", newCommandName);
+            newCommandName = EditorGUILayout.TextField("新 Controller 名称:", newCommandName);
             if (GUILayout.Button("新增", endButtonWidth))
             {
                 if (!ToLuaGenerater.FileNameValid(newCommandName, this))
                     return;
-                if (newCommandName.EndsWith(LuaFolder.Cmd.ToString()))
+                if (newCommandName.EndsWith(LuaFolder.Controllers.ToString()))
                     newCommandName = newCommandName.Substring(0, newCommandName.Length - 3);
                 ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName, newCommandName,
-                    LuaFolder.Cmd);
-                moduleInfo.cmdList = RefreshSingleFile(moduleInfo, moduleInfo.commandDirPath);
+                    LuaFolder.Controllers);
+                moduleInfo.ctrlList = RefreshSingleFile(moduleInfo, moduleInfo.controllerDirPath);
                 newCommandName = "";
             }
 
