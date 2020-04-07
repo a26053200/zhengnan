@@ -100,7 +100,9 @@ public static class CustomWrap
         _GT(typeof(FastBehavior.StateAction)),
         _GT(typeof(FastBehavior.StateMachine)),
         _GT(typeof(FastBehavior.StateNode)),
+        _GT(typeof(FastBehavior.StateMachineManager)),
         _GT(typeof(FastBehavior.FastLuaBehavior)),
+        
 
         // Custom Components
         _GT(typeof(ListView)),
