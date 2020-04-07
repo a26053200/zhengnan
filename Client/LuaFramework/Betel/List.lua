@@ -4,8 +4,8 @@
 --- DateTime: 2018/6/20 16:29
 ---
 
-local LuaObject = require("Core.LuaObject")
----@class List : Core.LuaObject
+local LuaObject = require("Betel.LuaObject")
+---@class List : Betel.LuaObject
 ---@field New fun(table:table<number, any>) : List
 local List = class("List",LuaObject)
 

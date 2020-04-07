@@ -4,7 +4,7 @@
 --- DateTime: 2018/6/11 0:23
 ---
 
-require "Core.string"
+require "Core.String"
 require "Core.Function"
 require "Core.Define"
 require "Core.Log"

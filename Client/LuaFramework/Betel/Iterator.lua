@@ -5,8 +5,8 @@
 --- 迭代器
 ---
 
-local LuaObject = require("Core.LuaObject")
----@class Iterator : Core.LuaObject
+local LuaObject = require("Betel.LuaObject")
+---@class Iterator : Betel.LuaObject
 ---@field New fun(table:table<number, any>) : Iterator
 ---@field list List
 ---@field private _current any

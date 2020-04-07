@@ -5,7 +5,7 @@
 --- Super class of all oop lua object classes
 ---
 
----@class Core.LuaObject
+---@class Betel.LuaObject
 local LuaObject = class("LuaObject")
 
 function LuaObject:Ctor()

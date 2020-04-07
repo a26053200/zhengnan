@@ -4,6 +4,7 @@
 --- DateTime: 2018/6/11 23:39
 ---
 
+---@class Betel.Ioc.IocBinder
 local IocBinder = class("IocBinder")
 
 function IocBinder:Ctor()
