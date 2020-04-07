@@ -6,12 +6,22 @@
 
 Res = {}
 
+Res.SpriteCache = {}
+
 assetsMgr = Framework.GameManager.GetAssetsManager()
+
+---@param path string
+---@return UnityEngine.Material
+function Res.UnloadAssetBundle(path, unloadAllDependence, unloadAllLoadedObjects)
+    unloadAllDependence = unloadAllDependence or false
+    unloadAllLoadedObjects = unloadAllLoadedObjects or false
+    return assetsMgr:UnloadAssetBundle(path, unloadAllDependence, unloadAllLoadedObjects);
+end
 
 
 ---@param path string
 ---@return UnityEngine.Material
-function Res.LoadObject(path)
+function Res.LoadAsset(path)
     return assetsMgr:LoadObject(path);
 end
 
@@ -34,9 +44,26 @@ function Res.LoadPrefab(path)
 end
 
 ---@param path string
+---@return UnityEngine.GameObject
+function Res.LoadPrefabAsync(path, callback)
+    return assetsMgr:LoadPrefabAsync(path, callback);
+end
+
+---@param path string
 ---@return UnityEngine.Sprite
 function Res.LoadSprite(path)
-    return assetsMgr:LoadSprite(path);
+    local sp = Res.SpriteCache[path]
+    if sp == nil then
+        sp = assetsMgr:LoadSprite(path)
+        Res.SpriteCache[path] = sp
+    end
+    return sp;
+end
+
+---@param path string
+---@return UnityEngine.Sprite
+function Res.LoadSingleSprite(path)
+    return assetsMgr:LoadSingleSprite(path);
 end
 
 ---@param path string
@@ -55,4 +82,26 @@ end
 ---@return UnityEngine.Material
 function Res.LoadMesh(path)
     return assetsMgr:LoadMesh(path);
+end
+
+---@param path string
+---@return UnityEngine.Material
+function Res.LoadShader(path)
+    return assetsMgr:LoadShader(path);
+end
+
+---@param path string
+---@param callback Handler
+---@return UnityEngine.AudioClip
+function Res.LoadAudioClipAsync(path, callback)
+    return assetsMgr:LoadAudioClipAsync(path, function(audioClip)
+        callback:Execute(audioClip)
+        callback:Recycl()
+    end);
+end
+
+---@param path string
+---@return UnityEngine.RuntimeAnimatorController
+function Res.LoadAnimatorController(path)
+    return assetsMgr:LoadAnimatorController(path);
 end

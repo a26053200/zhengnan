@@ -4,10 +4,10 @@
 --- DateTime: 2018/6/11 0:23
 ---
 
-require "Betel.string"
-require "Betel.Function"
-require "Betel.Define"
-require "Betel.Log"
-require "Betel.Res"
+require "Core.string"
+require "Core.Function"
+require "Core.Define"
+require "Core.Log"
+require "Core.Res"
 
 log("Global define has all require")

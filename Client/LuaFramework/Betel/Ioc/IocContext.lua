@@ -4,6 +4,7 @@
 --- DateTime: 2018/6/12 10:35
 ---
 
+---@class Core.Ioc.IocContext
 local IocContext = class("IocContext")
 
 function IocContext:Ctor(binder)

@@ -4,109 +4,114 @@
 --- DateTime: 2019/1/20 1:09
 ---
 
----@class Betel.Events.EventDispatcher
----@field New fun() : Betel.Events.EventDispatcher
-local EventDispatcher = class("Betel.Events.EventDispatcher")
-local _Events = nil
+---@class Core.Events.EventDispatcher
+---@field New fun() : Core.Events.EventDispatcher
+---@field eventMap table<table, any>
+local EventDispatcher = class("Core.Events.EventDispatcher")
+
+local _type = type
 
 function EventDispatcher:Ctor()
-    _Events = {}
+    self.eventMap = {}
 end
---[[
-        表结构
-        {
-                type = {
-                        Listener1,
-                        Listener2
-                }
-        }
-]]
---注册监听事件
-function EventDispatcher:AddEventListener(sType, Listener)
-    if type(sType) ~= "string" or type(Listener) ~= "function" then
-        error("AddEventListener error : type error ", 2)
+---
+---@param type string
+---@param callback fun()
+---@param caller any
+---@return Handler
+function EventDispatcher:AddEventListener(type, callback, caller)
+    if callback == nil or caller == nil then
+        logError("error params! callback or caller can not be nil!")
         return
     end
-    --获取_Events里面事件
-    local eventList = _Events[sType]
-
-    if eventList == nil then
-        eventList = {}
-        table.insert(eventList, Listener) --想队列里面插入一个事件
-        _Events[sType] = eventList   --放到大表里面
+    if not isString(type) or not isFunction(callback) then
+        logError("AddEventListener error : type error ", 2)
+        return
+    end
+    local list = self.eventMap[type]
+    if list == nil then
+        list = {}
+        self.eventMap[type] = list
     else
-        for i, v in ipairs(eventList) do
-            if v == Listener then
-                error("AddEventListener error : Listener already add!")
-                return Listener
+        for i = 1, #list do
+            if list[i].callback == callback and list[i].caller == caller then
+                local callerCls = caller == nil and "" or (caller.__classname or "")
+                --logWarning(string.format("Re add event listener caller:%s, type:%s",callerCls or "",type))
+                return
             end
         end
-        table.insert(eventList, Listener)
     end
-    return Listener
+    local handler = Handler.New(callback, caller)
+    --log("add handler " .. tostring(callback))
+    table.insert(list, handler)
+    return handler
 end
 
-
---[[
-        触发
-        ]]
-function EventDispatcher:Dispatcher(sType, ...)
-    if type(sType) ~= "string" then
-        error("Dispatcher error : sType error", 1)
+---@param type string
+---@param callback fun()
+---@param caller any
+---@return Handler
+function EventDispatcher:RemoveEventListener(type, callback, caller)
+    if callback == nil or caller == nil then
+        logError("Error params! callback or caller can not be nil!")
         return
     end
-
-    local listeners = _Events[sType]
-    if listeners == nil or #listeners <= 0 then
+    if not isString(type) or not isFunction(callback) then
+        logError("RemoveEventListener error : type error ", 2)
         return
     end
-    for i, v in ipairs(listeners) do
-        v(...)
+    local list = self.eventMap[type]
+    if list == nil then
+        logError("There no event listener name " .. type)
+        return
     end
-end
-
-
---[[
-        移除指定类型的所有关联事件侦听,如果参数为nil则删除当前注册器中所有的函数侦听
-        listener ~= nil 删除这个类型里面这个监听
-]]
-function EventDispatcher:RemoveEventListeners(sType, listener)
-    --空删除所有清空表
-    if sType == nil then
-        --获取keys
-        local keys = table.keys(_Events)
-        for i, v in ipairs(keys) do
-            _Events[v] = nil --设置为空
+    local handler
+    local del = {}
+    local len = #list
+    for i = 1, len do
+        if list[i].callback == callback and list[i].caller == caller then
+            handler = list[i]
+            table.insert(del, i)
+            break
         end
+    end
+    for i = 1, #del do
+        table.remove(list, del[i])
+    end
+    if handler == nil then
+        --logError("not found handler " .. tostring(callback))
         return
     end
-    if type(sType) ~= "string" then
-        error("RemoveEventListeners error : stype no string", 2)
+    return handler
+end
+
+---@param event Core.Events.Event
+function EventDispatcher:DispatchEvent(event, ...)
+    if event == nil then
+        error("Dispatcher error : event is nil", 1)
         return
     end
-    local typeListeners = _Events[sType] --取出里面所有的这个类型的func
-    --根据类型删除
-    if listener ~= nil and type(listener) == "function" then
-        if typeListeners ~= nil and table.nums(typeListeners) > 0 then
-            if typeListeners[listener] ~= nil then
-                typeListeners[listener] = nil
+    local list = self.eventMap[event.type]
+    if list ~= nil then
+        -- 当前节点有侦听该事件
+        local len = #list
+        if len > 0 then
+            list = copy(list)
+            for i = 1, len do
+                local handler = list[i] ---@type Handler
+                handler:Execute(event, ...)
             end
         end
-        return
-    end
-    --删除一个类型
-    if typeListeners ~= nil then
-        _Events[sType] = nil
     end
 end
 
-function EventDispatcher:RemoveAllEventListeners(sType)
-    if type(sType) ~= "string" then
-        error("RemoveEventListeners error : stype no string", 2)
+function EventDispatcher:RemoveAllEventListeners(type)
+    if _type(type) ~= "string" then
+        error("RemoveEventListeners error : type no string", 2)
         return
     end
     --空删除所有清空表
-    _Events[sType] = nil
+    self.eventMap[type] = nil
 end
 
 --function EventDispatcher:DumpEvent()

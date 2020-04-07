@@ -5,7 +5,17 @@
 ---
 
 ---Lua基本类型分别为
-
+BehaviourFun =
+{
+    Awake = "Awake",
+    Start = "Start",
+    OnEnable = "OnEnable",
+    OnDisable = "OnDisable",
+    OnDestroy = "OnDestroy",
+    Update = "Update",
+    LateUpdate = "LateUpdate",
+    FixedUpdate = "FixedUpdate"
+}
 
 TYPE = {}
 --TYPE.nil = "nil"          --这个最简单，只有值nil属于该类，表示一个无效值（在条件表达式中相当于false）。
@@ -18,9 +28,27 @@ TYPE.thread = "thread"        --表示执行的独立线路，用于执行协同
 TYPE.table = "table"        --Lua 中的表（table）其实是一个"关联数组"（associative arrays），数组的索引可以是数字或者是字符串。在 Lua 里，table 的创建是通过"构造表达式"来完成，最简单构造表达式是{}，用来创建一个空表。
 
 ---UnityEngine
+---@class GameObject:UnityEngine.GameObject
+---@class Application:UnityEngine.Application
+---@class PlayerPrefs:UnityEngine.PlayerPrefs
+---@class Shader:UnityEngine.Shader
+---@class Material:UnityEngine.Material
+---@class Color:UnityEngine.Color
+---@class Vector2:UnityEngine.Vector2
+---@class Vector3:UnityEngine.Vector3
+---@class Vector4:UnityEngine.Vector4
+---@class Mathf:UnityEngine.Mathf
+---@class Camera:UnityEngine.Camera
+---@class Rect:UnityEngine.Rect
+---@class LayerMask:UnityEngine.LayerMask
+---
+---
 GameObject = UnityEngine.GameObject;
+RuntimePlatform = UnityEngine.RuntimePlatform;
 Application = UnityEngine.Application;
 PlayerPrefs = UnityEngine.PlayerPrefs;
+Shader = UnityEngine.Shader
+Material = UnityEngine.Material
 Vector2 = UnityEngine.Vector2
 Vector3 = UnityEngine.Vector3
 Vector4 = UnityEngine.Vector4
@@ -31,18 +59,18 @@ Mathf = UnityEngine.Mathf;
 Camera = UnityEngine.Camera
 Rect = UnityEngine.Rect
 LayerMask = UnityEngine.LayerMask;
-
+RectTransformUtility = UnityEngine.RectTransformUtility;
 ---@class UnityEngine.EventSystems
 ---@field EventTrigger UnityEngine.EventSystems.EventTrigger
 ---@field EventTriggerType UnityEngine.EventSystems.EventTriggerType
-EventSystems = {
-    EventTrigger = UnityEngine.EventSystems.EventTrigger;
-    EventTriggerType = UnityEngine.EventSystems.EventTriggerType;
-    InputButton = UnityEngine.EventSystems.PointerEventData.InputButton;
-}
-EventTrigger = EventSystems.EventTrigger
-EventTriggerType = EventSystems.EventTriggerType
-InputButton = EventSystems.InputButton
+--EventSystems = {
+--    EventTrigger = UnityEngine.EventSystems.EventTrigger;
+--    EventTriggerType = UnityEngine.EventSystems.EventTriggerType;
+--    InputButton = UnityEngine.EventSystems.PointerEventData.InputButton;
+--}
+--EventTrigger = EventSystems.EventTrigger
+--EventTriggerType = EventSystems.EventTriggerType
+--InputButton = EventSystems.InputButton
 ---3rd
 
 ---@class DT
@@ -56,29 +84,25 @@ DT = {
     LoopType = DG.Tweening.LoopType,
     RotateMode = DG.Tweening.RotateMode
 }
-DOTween = DT.DOTween
-Ease = DT.Ease
-LoopType = DT.LoopType
-RotateMode = DT.RotateMode
+--DOTween = DT.DOTween
+--Ease = DT.Ease
+--LoopType = DT.LoopType
+--RotateMode = DT.RotateMode
 
 ---Framework
 logger = Logger
-Tools = require("Betel.Utils.Tools")
-Math3D = require("Betel.Utils.Math3D")
-Event = require("Betel.Events.Event")
-Handler = require("Betel.Handler")
-EventDispatcher = require("Betel.Events.EventDispatcher")
-edp = EventDispatcher.New() --全局事件派发器
-ListViewEvent = require("Betel.UI.ListViewEvent")
-BaseList = require("Betel.UI.BaseList")
-ListItemRenderer = require("Betel.UI.ListItemRenderer")
+--Math3D = require("Core.Utils.Math3D")
+Handler = require("Core.Handler")
+Delegate = require("Core.Delegate")
+Event = require("Core.Events.Event")
+EventDispatcher = require("Core.Events.EventDispatcher")
 
-StateAction = FastBehavior.StateAction
-StateMachine = FastBehavior.StateMachine
-StateNode = FastBehavior.StateNode
-FastLuaBehavior = FastBehavior.FastLuaBehavior
 
 ---=============---
 ---Global Define
 ---=============---
-List = require("Betel.List")
+List = require("Core.List")
+Iterator = require("Core.Iterator")
+
+Handler.Init()
+Delegate.Init()

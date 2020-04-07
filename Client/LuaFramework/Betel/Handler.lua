@@ -14,32 +14,102 @@ local remove = table.remove
 ---@field caller any
 ---@field startTime any
 ---@field delay any
+---@field isPoolObj boolean
+---@field delete boolean
 ---@field args any[]
 local Handler = class("Handler")
+
+local handlerList ---@type List | table<number, Handler>
+local handlerPool ---@type List | table<number, Handler>
+local totalNum = 0
+local totalNewNum = 0
+local s_id = 0
+
+function Handler.Init()
+    handlerList = List.New()
+    handlerPool = List.New()
+end
+
+--从对象池中获取
+---@param callback fun()
+---@param caller any
+---@return Handler
+function Handler.Get(callback, caller)
+    totalNum = totalNum + 1
+    --if handlerPool:Size() == 0 then
+        local handler = Handler.New(callback, caller)
+        --totalNewNum = totalNewNum - 1
+        handler.delete = false
+        --handler.isPoolObj = true
+        handlerPool:UnShift(handler)
+    --end
+    --local handler = handlerPool:Shift()
+    --logError("the [handler " .. handler.id .. "] has been Get!")
+    --handler.callback = callback
+    --handler.caller = caller
+    --handler.delete = false
+    --handlerList:UnShift(handler)
+    return handler
+end
+
+--从对象池中获取
+---@param handler Handler
+function Handler.Store(handler)
+    --if not handler.isPoolObj then
+    --    --logError("handler " .. self.id .. " is not pool obj")
+    --    return
+    --end
+    --if handlerList:Contain(handler) then
+    --    handlerList:Remove(handler)
+    --    handlerPool:UnShift(handler)
+    --    handler.delete = true
+    --    handler.caller = nil
+    --    handler.callback = nil
+    --    --logError(string.format("Handler Pool [%s]: %s / %s - %s / %s", handler.id, handlerList:Size(),handlerList:Size() + handlerPool:Size(),totalNum,totalNewNum))
+    --else
+    --    if handler.delete then
+    --        if handler.caller and handler.caller.avatar then
+    --            handler.caller.avatar:_debug("重复回收")
+    --        else
+    --            --logError("重复回收")
+    --        end
+    --    end
+    --end
+end
 
 ---@param callback fun()
 ---@param caller any
 ---@vararg any 参数
 function Handler:Ctor(callback, caller, ...)
-    if callback == nil then
-        logError("error params! callback can not be nil!")
-        return
-    end
+    --if callback == nil then
+    --    logError("error params! callback can not be nil!")
+    --    return
+    --end
+    s_id = s_id + 1
+    self.id = s_id
+    --logError("the [handler " .. self.id .. "] new!!!")
+    totalNewNum = totalNewNum + 1
     self.callback = callback
     self.caller = caller
     self.startTime = nil
     self.delay = 0
     self.args = { ... }
-    self.Delegate = handler(caller, callback)
+    --self.Delegate = handler(caller, callback)
 end
 
 function Handler:Execute(...)
-
+    if self.delete then
+        --logError("the [handler " .. self.id .. "] has been deleten!")
+        return
+    end
     local callback = self.callback
     local caller = self.caller
     local new_args = { ... }
     local new_args_count = select("#", ...)
-    local args = clone(self.args)
+    local args = {}
+    for i = 1, #self.args do
+        table.insert(args,self.args[i])
+    end
     local args_count = select("#", unpack(self.args))
     for i = 1, new_args_count do
         args[args_count + i] = new_args[i]
@@ -51,6 +121,14 @@ function Handler:Execute(...)
             return callback(unpack(args, 1, new_args_count + args_count))
         end
     end
+end
+
+--function Handler:Clean()
+--    CancelDelayCallback(self)
+--end
+
+function Handler:Recycl()
+    Handler.Store(self)
 end
 
 return Handler

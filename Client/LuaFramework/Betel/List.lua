@@ -4,10 +4,10 @@
 --- DateTime: 2018/6/20 16:29
 ---
 
-local LuaObject = require("Betel.LuaObject")
----@class List : Betel.LuaObject
----@field New fun(table<any, any>) : List
-local _List = class("List",LuaObject)
+local LuaObject = require("Core.LuaObject")
+---@class List : Core.LuaObject
+---@field New fun(table:table<number, any>) : List
+local List = class("List",LuaObject)
 
 local function Operator(list)
     local mt = getmetatable(list).__index
@@ -19,22 +19,22 @@ local function Operator(list)
     end})
 end
 
-function _List:Ctor(table)
-    _List.super.Ctor(self, table)
+function List:Ctor(table)
+    List.super.Ctor(self, table)
     Operator(self)
     self._array = table and table or {}
 end
 
-function _List:Clear()
+function List:Clear()
     self._array = nil
     self._array = {}
 end
 
-function _List:Size()
+function List:Size()
     return  #self._array
 end
 
-function _List:Insert(item,pos)
+function List:Insert(item, pos)
     if pos <= 0 then
         logError("List out of range")
     elseif pos >= #self._array then
@@ -44,52 +44,53 @@ function _List:Insert(item,pos)
     end
 end
 
-function _List:RemoveAt(idx)
+function List:RemoveAt(idx)
     return table.remove(self._array,idx)
 end
 
 --在列表末尾添加一个数据项，
 -- UnShift() Push()的等价操作
-function _List:Add(item)
+function List:Add(item)
     table.insert(self._array,item)
 end
 
 --在列表末尾添加一个数据项，
-function _List:UnShift(item)
+function List:UnShift(item)
     table.insert(self._array,item)
 end
 
 --在列表末尾添加一个数据项，
-function _List:Push(item)
+function List:Push(item)
     table.insert(self._array,item)
 end
 
 --列表删除列表首位数据项
-function _List:Shift()
+function List:Shift()
     return table.remove(self._array,1)
 end
 
 --列表首位数据项
-function _List:Peek()
+function List:Peek()
     if #self._array == 0 then
-        logError("List is Empty")
+        --logError("List is Empty")
+        return nil
     end
     return self._array[1]
 end
 
 --列表末位数据项
-function _List:Tail()
+function List:Tail()
     if #self._array == 0 then
         logError("List is Empty")
     end
     return self._array[#self._array]
 end
 --
-function _List:Pop()
+function List:Pop()
     return table.remove(self._array,#self._array)
 end
 
-function _List:Remove(item)
+function List:Remove(item)
     if nil == item then
         logError("List remove a item that is not nil")
     else
@@ -102,7 +103,20 @@ function _List:Remove(item)
     end
 end
 
-function _List:Contain(item)
+function List:IndexOf(item)
+    if nil == item then
+        logError("List index of a item that is not nil")
+    else
+        for i = 1,#self._array do
+            if self._array[i] == item then
+                return i
+            end
+        end
+    end
+    return -1
+end
+
+function List:Contain(item)
     if nil == item then
         logError("List contain a item that is not nil")
         return false
@@ -113,9 +127,10 @@ function _List:Contain(item)
             end
         end
     end
+    return false
 end
 
-function _List:At(idx)
+function List:At(idx)
     if idx <= 0 or idx > #self._array then
         logError("Index out of range. index")
         return false
@@ -123,7 +138,7 @@ function _List:At(idx)
     return self._array[idx]
 end
 
-function _List:Concat(other)
+function List:Concat(other)
     if nil == other then
         logError("List Concat a other is not nil")
     else
@@ -133,19 +148,28 @@ function _List:Concat(other)
     end
 end
 
-function _List:Clone()
-    local newList = _List.New()
+function List:Clone()
+    local newList = List.New()
     newList:Concat(self)
     return newList
 end
 
-function _List:Sort(compFunc)
+
+function List:Reverse()
+    local newList = List.New()
+    for i = 1, self:Size() do
+        newList:Push(self:Pop())
+    end
+    return newList
+end
+
+function List:Sort(compFunc)
     table.sort(self._array,compFunc)
 end
 
-function _List:SortClone(compFunc)
+function List:SortClone(compFunc)
     local newList = self:Clone()
     return newList:Sort(compFunc)
 end
-return _List
+return List
 

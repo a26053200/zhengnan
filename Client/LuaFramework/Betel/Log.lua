@@ -11,8 +11,17 @@ logger.GetInstance().LogInfoTraceStack = false;
 --- 是否输出到文本文件
 logger.GetInstance().WriteToFile = true;
 
+--获取...的参数数组
+local function GetArgs(...)
+    local args = {}
+    for i = 1, select("#",...) do
+        args[i] = select(i,...)
+    end
+    return args
+end
+
 function log(msg,...)
-    local args = Tools.GetArgs(...)
+    local args = GetArgs(...)
     msg = debug.traceback(msg, 1)
     local argNum = #args
     if argNum == 1 then
@@ -41,7 +50,7 @@ function log(msg,...)
 end
 
 function logError(msg,...)
-    local args = Tools.GetArgs(...)
+    local args = GetArgs(...)
     local argNum = #args
     msg = debug.traceback(msg, 1)
     if argNum == 1 then
@@ -69,11 +78,11 @@ function logError(msg,...)
     end
 end
 
-function logWarn(msg,...)
+function logWarning(msg,...)
     local arg = ...
     logger.Warning(msg,arg)
 end
 
-function logStack()
-    logger.Error(debug.traceback("",2))
+function logStack(msg)
+    logger.Error(debug.traceback(msg,2))
 end

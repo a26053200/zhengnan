@@ -27,7 +27,7 @@ function class(className, super)
             cls.ctor = function() end
         end
 
-        cls.__cname = className
+        cls.__classname = className
         cls.__ctype = 1
 
         function cls.New(...)
@@ -49,7 +49,7 @@ function class(className, super)
             cls = {ctor = function() end}
         end
 
-        cls.__cname = className
+        cls.__classname = className
         cls.__ctype = 2 -- lua
         cls.__index = cls
 
@@ -86,7 +86,7 @@ local __Userdata = "userdata"
 ---@return table
 function class(className, super)
     local cls = {}
-    cls.__cname = className
+    cls.__classname = className
     cls.__class = cls
     cls.__index = cls
 
@@ -102,14 +102,28 @@ function class(className, super)
     function cls.New(...)
         local instance = setmetatable({}, cls)
         for k,v in pairs(cls) do
-            instance[k] = clone(v)
+            instance[k] = v
         end
         instance:Ctor(...)
+        --print("className " .. className)
         return instance
     end
     return cls
 end
 
+--- 浅拷贝 table
+---@param from table
+---@param to table
+---@return table
+function copy(from, to)
+    to = to or {}
+    for k, v in pairs(from) do
+        to[k] = v
+    end
+    return to
+end
+
+--- 深度克隆
 ---@param object table 要克隆的值
 ---@return table 返回值的副本
 function clone( object )
@@ -157,9 +171,9 @@ end
 
 ---回调
 function handler(caller,method)
-    if method == nil then
-        logError("method is nil")
-    end
+    --if method == nil then
+    --    logError("method is nil")
+    --end
     return function (...)
         return method(caller, ...)
     end
@@ -174,6 +188,16 @@ function isNumber(tbl)
     end
 end
 
+---是否为Boolean对象
+function isBoolean(tbl)
+    if tbl == nil then
+        return false
+    elseif isString(tbl) then
+        return string.lower(tbl) == "true" or string.lower(tbl) == "false"
+    else
+        return type(tbl) == __Boolean
+    end
+end
 ---是否为String对象
 function isString(tbl)
     if tbl == nil then
@@ -192,8 +216,26 @@ function isFunction(tbl)
     end
 end
 
+---是否为Table对象
+function isTable(tbl)
+    if tbl == nil then
+        return false
+    else
+        return type(tbl) == __Table
+    end
+end
+
 ---是否为Unity空对象
 function isNull(obj)
+    if obj == nil then
+        return true
+    else
+        return LuaHelper.isNullObj(obj)
+    end
+end
+
+---是否为Unity空对象
+function isnull(obj)
     if obj == nil then
         return true
     else
@@ -204,7 +246,7 @@ end
 ---异步销毁
 ---@param obj UnityEngine.GameObject
 ---@param delay number 延时销毁
-function destroy(obj,delay)
+function Destroy(obj,delay)
     delay = delay or 0
     GameObject.Destroy(obj,delay)
 end

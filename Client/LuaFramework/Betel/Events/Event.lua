@@ -4,15 +4,41 @@
 --- DateTime: 2019/1/20 1:17
 ---
 
----@class Betel.Events.Event
-local Event = class("Betel.Events.Event")
+---@class Core.Events.Event
+---@field New fun(type:string) : Core.Events.Event
+---@field type string
+local Event = class("Core.Events.Event")
 
-Event.Update = "Update"
-Event.LateUpdate = "LateUpdate"
-Event.FixedUpdate = "FixedUpdate"
+--- 帧更新事件。该事件只会在 Stage 上抛出
+Event.UPDATE = "Event_Update"
 
-function Event:Ctor()
+--- 渲染前更新，在 Event.UPDATE 事件之后。该事件只会在 Stage 上抛出
+Event.LATE_UPDATE = "Event_LateUpdate"
 
+--- 固定时间更新（Edit -> Project Setting -> time -> Fixed timestep）。该事件只会在 Stage 上抛出
+Event.FIXED_UPDATE = "Event_FixedUpdate"
+
+--- 屏幕尺寸有改变。该事件只会在 Stage 上抛出
+Event.RESIZE = "Event_Resize"
+
+--- 当前场景有改变。该事件只会在 Stage 上抛出
+Event.SCENE_CHANGED = "Event_SceneChanged"
+
+--- 当前程序被激活（从后台切回）。该事件只会在 Stage 上抛出
+Event.ACTIVATED = "Event_Activated"
+
+--- 当前程序切入后台运行。该事件只会在 Stage 上抛出
+Event.DEACTIVATED = "Event_Deactivated"
+
+--- 音频播放完毕，event.data = "audio path"。该事件只会在 Audio 上抛出
+Event.AUDIO_COMPLETE = "Event_AudioComplete"
+
+--- GameObject 被销毁。所有的 GameObject 都可以抛出该事件
+Event.DESTROY = "DestroyEvent_Destroy"
+
+---@param type string
+function Event:Ctor(type)
+    self.type = type
 end
 
 return Event
