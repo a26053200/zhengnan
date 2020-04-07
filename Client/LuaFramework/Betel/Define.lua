@@ -28,21 +28,6 @@ TYPE.thread = "thread"        --表示执行的独立线路，用于执行协同
 TYPE.table = "table"        --Lua 中的表（table）其实是一个"关联数组"（associative arrays），数组的索引可以是数字或者是字符串。在 Lua 里，table 的创建是通过"构造表达式"来完成，最简单构造表达式是{}，用来创建一个空表。
 
 ---UnityEngine
----@class GameObject:UnityEngine.GameObject
----@class Application:UnityEngine.Application
----@class PlayerPrefs:UnityEngine.PlayerPrefs
----@class Shader:UnityEngine.Shader
----@class Material:UnityEngine.Material
----@class Color:UnityEngine.Color
----@class Vector2:UnityEngine.Vector2
----@class Vector3:UnityEngine.Vector3
----@class Vector4:UnityEngine.Vector4
----@class Mathf:UnityEngine.Mathf
----@class Camera:UnityEngine.Camera
----@class Rect:UnityEngine.Rect
----@class LayerMask:UnityEngine.LayerMask
----
----
 GameObject = UnityEngine.GameObject;
 RuntimePlatform = UnityEngine.RuntimePlatform;
 Application = UnityEngine.Application;
