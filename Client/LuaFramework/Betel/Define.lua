@@ -76,18 +76,18 @@ DT = {
 
 ---Framework
 logger = Logger
---Math3D = require("Core.Utils.Math3D")
-Handler = require("Core.Handler")
-Delegate = require("Core.Delegate")
-Event = require("Core.Events.Event")
-EventDispatcher = require("Core.Events.EventDispatcher")
+--Math3D = require("Betel.Utils.Math3D")
+Handler = require("Betel.Handler")
+Delegate = require("Betel.Delegate")
+Event = require("Betel.Events.Event")
+EventDispatcher = require("Betel.Events.EventDispatcher")
 
 
 ---=============---
 ---Global Define
 ---=============---
-List = require("Core.List")
-Iterator = require("Core.Iterator")
+List = require("Betel.List")
+Iterator = require("Betel.Iterator")
 
 Handler.Init()
 Delegate.Init()

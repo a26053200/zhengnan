@@ -7,7 +7,7 @@
 ---@class Core.Events.EventDispatcher
 ---@field New fun() : Core.Events.EventDispatcher
 ---@field eventMap table<table, any>
-local EventDispatcher = class("Core.Events.EventDispatcher")
+local EventDispatcher = class("Betel.Events.EventDispatcher")
 
 local _type = type
 

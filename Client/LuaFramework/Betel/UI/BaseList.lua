@@ -15,7 +15,7 @@ local LuaMonoBehaviour = require("Betel.LuaMonoBehaviour")
 ---@field dataList List
 ---@field itemList table<any, Betel.UI.ListItemRenderer>
 ---@field listExtend Betel.LuaMonoBehaviour
-local BaseList = class("Core.UI.BaseList",LuaMonoBehaviour)
+local BaseList = class("Betel.UI.BaseList",LuaMonoBehaviour)
 
 ---@param gameObject UnityEngine.GameObject
 ---@param itemRendererClass table

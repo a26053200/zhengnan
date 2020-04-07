@@ -7,7 +7,7 @@
 ---@class Core.Events.Event
 ---@field New fun(type:string) : Core.Events.Event
 ---@field type string
-local Event = class("Core.Events.Event")
+local Event = class("Betel.Events.Event")
 
 --- 帧更新事件。该事件只会在 Stage 上抛出
 Event.UPDATE = "Event_Update"

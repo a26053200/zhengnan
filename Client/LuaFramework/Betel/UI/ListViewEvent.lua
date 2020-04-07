@@ -4,8 +4,8 @@
 --- DateTime: 2019/1/20 1:22
 ---
 
-local Event = require("Core.Events.Event")
----@class Betel.UI.ListViewEvent : Core.Events.Event
+local Event = require("Betel.Events.Event")
+---@class Betel.UI.ListViewEvent : Betel.Events.Event
 local ListViewEvent = class("Game.UI.ListViewEvent", Event)
 
 ListViewEvent.ItemClick = "ItemClick"
