@@ -5,7 +5,7 @@
 ---
 
 local Event = require("Core.Events.Event")
----@class Game.UI.ListViewEvent : Core.Events.Event
+---@class Betel.UI.ListViewEvent : Core.Events.Event
 local ListViewEvent = class("Game.UI.ListViewEvent", Event)
 
 ListViewEvent.ItemClick = "ItemClick"

@@ -5,7 +5,7 @@
 ---
 
 local LuaMonoBehaviour = require("Betel.LuaMonoBehaviour")
----@class Core.UI.BaseList : Betel.LuaMonoBehaviour
+---@class Betel.UI.BaseList : Betel.LuaMonoBehaviour
 ---@field New fun(gameObject:UnityEngine.GameObject, itemRendererClass:table, noPassEvent:boolean)
 ---@field listView ListView
 ---@field scroll UnityEngine.UI.ScrollRect
@@ -13,8 +13,8 @@ local LuaMonoBehaviour = require("Betel.LuaMonoBehaviour")
 ---@field adapter LuaListViewAdapter
 ---@field cell LuaListViewCell
 ---@field dataList List
----@field itemList table<any, Game.UI.ListItemRenderer>
----@field listExtend Module.Common.View.ListExtend
+---@field itemList table<any, Betel.UI.ListItemRenderer>
+---@field listExtend Betel.LuaMonoBehaviour
 local BaseList = class("Core.UI.BaseList",LuaMonoBehaviour)
 
 ---@param gameObject UnityEngine.GameObject
@@ -43,7 +43,7 @@ end
 ---@param index number
 function BaseList:OnItemCreate(cell, index)
     local data = self.dataList[index + 1]
-    local item = self.itemRendererClass.New(cell.gameObject) ---@type Game.UI.ListItemRenderer
+    local item = self.itemRendererClass.New(cell.gameObject) ---@type Betel.UI.ListItemRenderer
     if not self.noPassEvent then --项目事件是否穿透
         local listener = cell.gameObject:GetOrAddComponent(typeof(ListItemEventListener))
         listener.scroll = self.scroll
@@ -64,7 +64,7 @@ end
 
 --获取当项目
 ---@param index number
----@return Game.UI.ListItemRenderer
+---@return Betel.UI.ListItemRenderer
 function BaseList:GetItemRenderByIndex(index)
     local item = self.itemList[index]
     return item
