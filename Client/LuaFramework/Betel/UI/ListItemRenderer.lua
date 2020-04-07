@@ -5,11 +5,11 @@
 ---
 
 local LuaMonoBehaviour = require("Betel.LuaMonoBehaviour")
----@class Betel.UI.ListItemRenderer : Betel.LuaMonoBehaviour
+---@class Game.UI.ListItemRenderer : Betel.LuaMonoBehaviour
 ---@field listView ListView
 ---@field adapter LuaListViewAdapter
 ---@field cell LuaListViewCell
-local ListItemRenderer = class("Betel.UI.ListItemRenderer",LuaMonoBehaviour)
+local ListItemRenderer = class("Game.UI.ListItemRenderer",LuaMonoBehaviour)
 
 ---@param gameObject UnityEngine.GameObject
 function ListItemRenderer:Ctor(gameObject)
@@ -18,6 +18,11 @@ end
 
 function ListItemRenderer:UpdateItem(data, index)
     self.data = data
+    self:AddLuaMonoBehaviour(self.gameObject,"ListItemRenderer")
+end
+
+function ListItemRenderer:Update()
+
 end
 
 function ListItemRenderer:OnDestroy()

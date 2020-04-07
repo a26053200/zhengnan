@@ -5,20 +5,26 @@
 ---
 
 local LuaMonoBehaviour = require("Betel.LuaMonoBehaviour")
----@class Betel.UI.BaseList : Betel.LuaMonoBehaviour
+---@class Core.UI.BaseList : Betel.LuaMonoBehaviour
+---@field New fun(gameObject:UnityEngine.GameObject, itemRendererClass:table, noPassEvent:boolean)
 ---@field listView ListView
+---@field scroll UnityEngine.UI.ScrollRect
+---@field noPassEvent boolean 是否禁止项目事件穿透
 ---@field adapter LuaListViewAdapter
 ---@field cell LuaListViewCell
 ---@field dataList List
----@field itemList table<any, Betel.UI.ListItemRenderer>
-local BaseList = class("Betel.UI.BaseList",LuaMonoBehaviour)
+---@field itemList table<any, Game.UI.ListItemRenderer>
+---@field listExtend Module.Common.View.ListExtend
+local BaseList = class("Core.UI.BaseList",LuaMonoBehaviour)
 
 ---@param gameObject UnityEngine.GameObject
 ---@param itemRendererClass table
-function BaseList:Ctor(gameObject, itemRendererClass)
+function BaseList:Ctor(gameObject, itemRendererClass, noPassEvent)
     BaseList.super.Ctor(self,gameObject)
+    self.noPassEvent = noPassEvent
     self.itemRendererClass = itemRendererClass
     self.listView = GetListView(gameObject:FindChild("Content"))
+    self.scroll = gameObject:GetComponent(typeof(UnityEngine.UI.ScrollRect))
     self.adapter = self.listView.Adapter
     self.eventDispatcher = EventDispatcher.New()
     self.itemList = {}
@@ -37,11 +43,15 @@ end
 ---@param index number
 function BaseList:OnItemCreate(cell, index)
     local data = self.dataList[index + 1]
-    local item = self.itemRendererClass.New(cell.gameObject) ---@type Betel.UI.ListItemRenderer
+    local item = self.itemRendererClass.New(cell.gameObject) ---@type Game.UI.ListItemRenderer
+    if not self.noPassEvent then --项目事件是否穿透
+        local listener = cell.gameObject:GetOrAddComponent(typeof(ListItemEventListener))
+        listener.scroll = self.scroll
+    end
     self.itemList[index + 1] = item
     item:UpdateItem(data,index + 1)
-    LuaHelper.AddButtonClick(cell.gameObject,handler(self,function ()
-        self.eventDispatcher:Dispatcher(ListViewEvent.ItemClick, data)
+    LuaHelper.AddObjectClickEvent(cell.gameObject,handler(self,function ()
+        self.eventDispatcher:DispatchEvent(ListViewEvent.New(ListViewEvent.ItemClick), data, index + 1)
     end))
 end
 
@@ -52,7 +62,26 @@ function BaseList:UpdateItem(index)
     item:UpdateItem(self.dataList[index],index)
 end
 
+--获取当项目
+---@param index number
+---@return Game.UI.ListItemRenderer
+function BaseList:GetItemRenderByIndex(index)
+    local item = self.itemList[index]
+    return item
+end
+
+--更新全部
+function BaseList:UpdateAll()
+    for index, item in ipairs(self.itemList) do
+        item:UpdateItem(self.dataList[index], index)
+    end
+end
+
 function BaseList:OnDestroy()
+    if self.listExtend then
+        self.listExtend:Dispose()
+        self.listExtend = nil
+    end
     self.eventDispatcher:RemoveAllEventListeners(ListViewEvent.ItemClick)
 end
 

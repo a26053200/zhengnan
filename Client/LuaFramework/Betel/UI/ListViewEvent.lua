@@ -4,13 +4,14 @@
 --- DateTime: 2019/1/20 1:22
 ---
 
----@class Betel.UI.ListViewEvent
-local ListViewEvent = class("Betel.UI.ListViewEvent")
+local Event = require("Core.Events.Event")
+---@class Game.UI.ListViewEvent : Core.Events.Event
+local ListViewEvent = class("Game.UI.ListViewEvent", Event)
 
 ListViewEvent.ItemClick = "ItemClick"
 
-function ListViewEvent:Ctor()
-
+function ListViewEvent:Ctor(type)
+    ListViewEvent.super.Ctor(self, type)
 end
 
 return ListViewEvent
