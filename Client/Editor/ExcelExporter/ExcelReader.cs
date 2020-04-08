@@ -9,6 +9,8 @@ namespace ExcelExporter
     public class ExcelReader
     {
         private string _path;
+        private readonly string dot = "|";
+        private readonly string _NULL = "null";
         public ExcelReader(string path)
         {
             _path = path;
@@ -19,17 +21,26 @@ namespace ExcelExporter
                 //IExcelDataReader excelReader = ExcelReaderFactory.CreateBinaryReader(stream);
                 //2. Reading from a OpenXml Excel file (2007 format; *.xlsx)
                 IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream);
+                //IExcelDataReader excelReader = ExcelReaderFactory.CreateReader(stream);
                 //...
                 //3. DataSet - The result of each spreadsheet will be created in the result.Tables
                 StringBuilder sb = new StringBuilder();
-                string dot = "|";
+                
                 while (excelReader.Read())
                 {
                     sb.Clear();
-                    var rowCount = excelReader.ResultsCount;
-                    for (int i = 0; i < rowCount; i++)
+                    var colCount = excelReader.FieldCount;
+                    sb.Append(excelReader.Depth);
+                    for (int i = 0; i < colCount; i++)
                     {
-                        sb.Append(excelReader.GetString(i));
+                        if (!excelReader.IsDBNull(i))
+                        {
+                            sb.Append(excelReader[i].ToString());
+                        }
+                        else
+                        {
+                            sb.Append(_NULL);
+                        }
                         sb.Append(dot);
                     }
                     Debug.Log(sb.ToString());
