@@ -8,5 +8,7 @@ namespace ExcelExporter
         public string[] excelFolders = new string[0];
 
         public string excelPattern = "*.xlsx";
+        
+        public string outputPath = "";
     }
 }

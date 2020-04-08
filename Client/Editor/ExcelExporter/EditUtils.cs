@@ -30,6 +30,13 @@ namespace ExcelExporter
             Selection.activeObject = asset;
         }
         
+        public static bool IsNumberic(string message)
+        {
+            System.Text.RegularExpressions.Regex rex=
+                new System.Text.RegularExpressions.Regex(@"^\d+$");
+            return rex.IsMatch(message);
+        }
+        
         public static void SaveUTF8TextFile(string fn, string txt)
         {
             byte[] data = System.Text.UTF8Encoding.UTF8.GetBytes(txt);

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Text;
@@ -8,13 +9,17 @@ namespace ExcelExporter
 {
     public class ExcelReader
     {
+        public delegate void OnRowRead(int rowIndex, List<string> colList);
         private string _path;
-        private readonly string dot = "|";
-        private readonly string _NULL = "null";
+        const string Empty = "";
+        
         public ExcelReader(string path)
         {
             _path = path;
-            using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
+        }
+        public void Read(OnRowRead onRowRead)
+        {
+            using (FileStream stream = File.Open(_path, FileMode.Open, FileAccess.Read))
             {
                 //Choose one of either 1 or 2
                 //1. Reading from a binary Excel file ('97-2003 format; *.xls)
@@ -24,27 +29,24 @@ namespace ExcelExporter
                 //IExcelDataReader excelReader = ExcelReaderFactory.CreateReader(stream);
                 //...
                 //3. DataSet - The result of each spreadsheet will be created in the result.Tables
-                StringBuilder sb = new StringBuilder();
-                
                 while (excelReader.Read())
                 {
-                    sb.Clear();
+                    List<string> colList = new List<string>();
                     var colCount = excelReader.FieldCount;
-                    sb.Append(excelReader.Depth);
                     for (int i = 0; i < colCount; i++)
                     {
                         if (!excelReader.IsDBNull(i))
-                        {
-                            sb.Append(excelReader[i].ToString());
-                        }
+                            colList.Add(excelReader[i].ToString());
                         else
-                        {
-                            sb.Append(_NULL);
-                        }
-                        sb.Append(dot);
+                            colList.Add(Empty);
                     }
-                    Debug.Log(sb.ToString());
+                    onRowRead(excelReader.Depth, colList);
                 }
+                
+                excelReader.Close();
+                excelReader.Dispose();
+                stream.Close();
+                stream.Dispose();
             }
         }
     }
