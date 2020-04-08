@@ -7,6 +7,7 @@ namespace AStar
     {
 
         public bool walkable;
+        public int inWalkingSid;
         public Vector3 worldPosition;
         public int gridX;
         public int gridY;
@@ -19,6 +20,7 @@ namespace AStar
 
         public Node(bool _walkable, Vector3 _worldPos, int _gridX, int _gridY, int _penalty)
         {
+            inWalkingSid = 0;
             walkable = _walkable;
             worldPosition = _worldPos;
             gridX = _gridX;

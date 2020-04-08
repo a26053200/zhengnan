@@ -19,6 +19,7 @@ namespace AStar
         Node[,] grid;
 
         float nodeDiameter;
+        [HideInInspector]
         public int gridSizeX, gridSizeY;
 
         int penaltyMin = int.MaxValue;
@@ -176,7 +177,7 @@ namespace AStar
             return grid[x, y];
         }
 
-        public Node GetNode(int x,int y)
+        public Node GetNode(int x, int y)
         {
             return grid[x, y];
         }
