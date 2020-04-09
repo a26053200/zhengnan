@@ -130,7 +130,6 @@ public static class CustomWrap
         _GT (typeof(AStar.Grid)),
         _GT (typeof(AStar.Node)),
         _GT (typeof(AStar.DebugPoints)),
-        _GT (typeof(AStar.MarkBox)),
         //_GT (typeof(VertexEffects.CircleOutline)),
         //_GT (typeof(VertexEffects.BoxOutline)),
         //Live2D
