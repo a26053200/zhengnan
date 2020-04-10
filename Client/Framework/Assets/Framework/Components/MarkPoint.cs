@@ -13,11 +13,15 @@ namespace Framework
     {
         public Color color = Color.yellow;
         [Range(0.01f, 100f)]
-        public float radius = 1;
+        public float radius = 0.5f;
+        [Range(0.01f, 10)]
+        public float arrow = 1f;
         private void OnDrawGizmos()
         {
             Gizmos.color = color;
-            Gizmos.DrawWireSphere(transform.position, radius);
+            var position = transform.position;
+            Gizmos.DrawWireSphere(position, radius);
+            Gizmos.DrawLine(position, position + transform.forward * arrow);
         }
     }
 }
