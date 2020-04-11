@@ -2,18 +2,20 @@ using System;
 using DG.Tweening;
 using LuaInterface;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Framework
 {
     /// <summary>
     /// 相机追踪
     /// </summary>
+    [ExecuteInEditMode]
     public class AttachCamera : MonoBehaviour
     {
         public float attachMinDistance = 0.1f;
         public bool isAttaching;
         public bool isSmooth;
-        public Camera camera;
+        public Camera tagCamera;
         public GameObject target;
         public Vector3 targetPos;
         public Vector3 offset;
@@ -22,25 +24,44 @@ namespace Framework
         public bool noShake;
         public float radius  = 12f;
         //public float roundY = 0f;
-        public float angle = 30f;
+        public Vector3 angle = Vector3.zero;
 
         //private Vector3 _lastTagPos = Vector3.positiveInfinity;
         private Vector3 _tempTagPos;
         
         private float _orgRadius;
-        private float _orgAngle;
+        private Vector3 _orgAngle;
         private float _orgUpdateSpeed;
 
         //private float _tempScale = 1;
         private Transform _targetTransform;
+
+        private Transform targetTransform
+        {
+            get
+            {
+                if (!_targetTransform && target)
+                    _targetTransform = target.transform;
+                return _targetTransform;
+            }
+        }
         private Transform _cameraTransform;
+        private Transform cameraTransform
+        {
+            get
+            {
+                if (!_cameraTransform && tagCamera)
+                    _cameraTransform = tagCamera.transform;
+                return _cameraTransform;
+            }
+        }
         private LuaFunction _attachCallback;
        
         private Sequence _shakeTween;
 
         public void Init(Camera camera)
         {
-            this.camera = camera;
+            this.tagCamera = camera;
             _cameraTransform = camera.transform;
         }
         public void Attach(GameObject target)
@@ -60,8 +81,8 @@ namespace Framework
         public void Reset()
         {
             _tempTagPos = GetTargetPos();
-            _cameraTransform.position = GetCameraPos(_tempTagPos) + offset;
-            _cameraTransform.forward = (_tempTagPos - _cameraTransform.position).normalized;
+            cameraTransform.position = GetCameraPos(_tempTagPos) + offset;
+            cameraTransform.forward = (_tempTagPos - cameraTransform.position).normalized;
         }
         private void LateUpdate()
         {
@@ -74,20 +95,20 @@ namespace Framework
                 var camDestPos = GetCameraPos(_tempTagPos);
                 if (isSmooth)
                 {
-                    var position = _cameraTransform.position;
+                    var position = cameraTransform.position;
                     position = Vector3.Lerp(position, camDestPos + offset, updateSpeed);
-                    _cameraTransform.position = position;
-                    _cameraTransform.forward = Vector3.Lerp(_cameraTransform.forward, (_tempTagPos - camDestPos).normalized, updateSpeed);
+                    cameraTransform.position = position;
+                    cameraTransform.forward = Vector3.Lerp(cameraTransform.forward, (_tempTagPos - camDestPos).normalized, updateSpeed);
                 }
                 else
                 {
-                    _cameraTransform.position = camDestPos + offset;
-                    _cameraTransform.forward = (_tempTagPos - camDestPos).normalized;
+                    cameraTransform.position = camDestPos + offset;
+                    cameraTransform.forward = (_tempTagPos - camDestPos).normalized;
                 }
 //                _lastTagPos = _tempTagPos;
                 if (_attachCallback != null)
                 {
-                    if (attachMinDistance > Vector3.Distance(_cameraTransform.position, camDestPos))
+                    if (attachMinDistance > Vector3.Distance(cameraTransform.position, camDestPos))
                     {
                         _attachCallback.BeginPCall();
                         _attachCallback.PCall();
@@ -106,17 +127,17 @@ namespace Framework
             _shakeTween = DOTween.Sequence();
             if (delay > 0)
                 _shakeTween.AppendInterval(delay);
-            _shakeTween.Append(camera.DOShakePosition(duration,strength,vibrato,randomness,fadeOut));
+            _shakeTween.Append(tagCamera.DOShakePosition(duration,strength,vibrato,randomness,fadeOut));
         }
 
         public void ShakeCameraStop()
         {
             _shakeTween?.Kill();
             _shakeTween = null;
-            camera.DOPause();
+            tagCamera.DOPause();
         }
         //特写镜头
-        public void CloseupShot(float radius, float angle, float updateSpeed, LuaFunction callback)
+        public void CloseupShot(float radius, Vector3 angle, float updateSpeed, LuaFunction callback)
         {
             _orgRadius = this.radius;
             _orgAngle = this.angle;
@@ -137,27 +158,29 @@ namespace Framework
 
         private Vector3 GetTargetPos()
         {
-            if (target)
-                return _targetTransform.position;
+            if (targetTransform)
+                return targetTransform.position;
             else
                 return targetPos;
         }
         private Vector3 GetCameraPos(Vector3 tagPos)
         {
             Vector3 camPos = tagPos;
-            camPos += Vector3.back * (radius * Mathf.Cos(angle * Mathf.Deg2Rad));
-            camPos += Vector3.up * (radius * Mathf.Sin(angle * Mathf.Deg2Rad));
+            Vector3 back = Quaternion.Euler(0,angle.y,0) * Vector3.back;
+            camPos += back * (radius * Mathf.Cos(angle.x * Mathf.Deg2Rad));
+            camPos += Vector3.up * (radius * Mathf.Sin(angle.x * Mathf.Deg2Rad));
             return camPos;
         }
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
-            if (_targetTransform && _cameraTransform)
+            if (targetTransform && cameraTransform)
             {
-                var tempPos0 = _tempTagPos + Vector3.back * (radius * Mathf.Cos(angle * Mathf.Deg2Rad));
-                var tempPos1 = tempPos0 + Vector3.up * (radius * Mathf.Sin(angle * Mathf.Deg2Rad));
+                Vector3 back = Quaternion.Euler(0,angle.y,0) * Vector3.back;
+                var tempPos0 = _tempTagPos + back * (radius * Mathf.Cos(angle.x * Mathf.Deg2Rad));
+                var tempPos1 = tempPos0 + Vector3.up * (radius * Mathf.Sin(angle.x * Mathf.Deg2Rad));
                 Gizmos.color = Color.cyan;
-                Gizmos.DrawLine(_tempTagPos, _cameraTransform.position);
+                Gizmos.DrawLine(_tempTagPos, cameraTransform.position);
                 Gizmos.DrawLine(_tempTagPos, tempPos0);
                 Gizmos.DrawLine(tempPos0, tempPos1);
             }
