@@ -20,7 +20,7 @@ end
 function IocBinder:ToSingleton()
     local singleton = self.type.New()
     table.insert(self.singleList,singleton)
-    log("[Bind singleton] -- {0}",self.type.__cname)
+    log("[Bind singleton] -- {0}",self.type.__classname)
     return singleton
 end
 
@@ -32,8 +32,8 @@ end
 -- inject all the singleton in to the object,but not then self
 function IocBinder:InjectSingle(obj)
     for _, singleton in pairs(self.singleList) do
-        if singleton.__cname ~= obj.__cname then
-            local index = string.startLower(singleton.__cname) -- the first word startLower
+        if singleton.__classname ~= obj.__classname then
+            local index = string.startLower(singleton.__classname) -- the first word startLower
             obj[index] = singleton
         end
     end
