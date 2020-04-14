@@ -33,6 +33,7 @@ end
 function IocBinder:InjectSingle(obj)
     for _, singleton in pairs(self.singleList) do
         if singleton.__classname ~= obj.__classname then
+            --print(string.format("InjectSingle %s - %s:",singleton.__classname,obj.__classname))
             local index = string.startLower(singleton.__classname) -- the first word startLower
             obj[index] = singleton
         end

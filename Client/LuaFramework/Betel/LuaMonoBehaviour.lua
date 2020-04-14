@@ -87,6 +87,15 @@ function LuaMonoBehaviour:Dispose()
     self.delayList = {}
 end
 
+--调试
+function LuaMonoBehaviour:_debug(msg)
+    if self.gameObject then
+        print(string.format("<color=#FFFF00FF>[%s]</color>\n<color=#00EE00FF>%s</color>",self.gameObject.name,msg))
+    else
+        print(string.format("<color=#FFFF00FF>[%s]</color>\n<color=#00EE00FF>%s</color>",self.__classname,msg))
+    end
+end
+
 function LuaMonoBehaviour:Destroy()
     destroy(self.gameObject)
     self:Dispose()
