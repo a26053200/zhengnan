@@ -5,13 +5,19 @@
 --- LuaMonoBehaviour
 ---
 
-local BehaviourFun = {"Awake","Start","OnEnable","OnDisable","OnDestroy","Update","LateUpdate","FixedUpdate"}
+
 local LuaObject = require("Betel.LuaObject")
 
 ---@class Betel.LuaMonoBehaviour : Betel.LuaObject
 ---@field gameObject UnityEngine.GameObject
 ---@field transform UnityEngine.Transform
-local LuaMonoBehaviour = class("LuaMonoBehaviour",LuaObject)
+---@field sequenceList List | table<number, DG.Tweening.Sequence>
+---@field delayList List | table<number, Handler>
+---@field delayFrameFunList List | table<number, Handler>
+---@field globalEdpEventMap List | table<number, table> 全局时间派发器
+local LuaMonoBehaviour = class("Betel.LuaMonoBehaviour",LuaObject)
+
+local co_id = 1
 
 ---@param gameObject UnityEngine.GameObject
 function LuaMonoBehaviour:Ctor(gameObject)
@@ -19,85 +25,139 @@ function LuaMonoBehaviour:Ctor(gameObject)
     if not isNull(gameObject) then
         self.transform = gameObject.transform
     end
-    self.coMap = {}
-    self.eventMap = {}
-    self.delayList = {}
 end
 
 function LuaMonoBehaviour:AddLuaMonoBehaviour(go,name)
-    self.luaBehaviour = nil
     for k, v in pairs(BehaviourFun) do
         if self[v] and isFunction(self[v]) then
-            self.luaBehaviour = LuaHelper.AddLuaMonoBehaviour(go,name,v,handler(self,self[v]))
+            LuaHelper.AddLuaMonoBehaviour(go,name,v,handler(self,self[v]))
         end
     end
-    return self.luaBehaviour
 end
 
-function LuaMonoBehaviour:AddGlobalEventListener(type, listener)
-    if self.eventMap[listener] == nil then
-        self.eventMap[listener] = {type = type, handler = handler(self,listener)}
-        edp:AddEventListener(type, self.eventMap[listener].handler)
+function LuaMonoBehaviour:AddGlobalEventListener(type, handler)
+    if self.globalEdpEventMap == nil then
+        self.globalEdpEventMap = {}
+    end
+    if self.globalEdpEventMap[handler] == nil then
+        self.globalEdpEventMap[handler] = { type = type, handler = handler}
+        edp:AddEventListener(type, self.globalEdpEventMap[handler].handler, self)
     end
 end
 
 function LuaMonoBehaviour:RemoveGlobalEventListener(type, handler)
-    if self.eventMap[handler] then
-        edp:RemoveEventListener(type, self.eventMap[handler].handler)
+    if self.globalEdpEventMap and self.globalEdpEventMap[handler] then
+        edp:RemoveEventListener(type, self.globalEdpEventMap[handler].handler, self)
+        self.globalEdpEventMap[handler] = nil
     end
 end
 
+---@param coFun fun()
 function LuaMonoBehaviour:StartCoroutine(coFun)
-    if self.coMap[coFun] == nil then
-        self.coMap[coFun] = coroutine.start(function ()
-            coFun()
-        end)
-    else
-        logError("StartCoroutine has already exits" .. tostring(coFun))
+    local co
+    co = coroutine.start(function ()
+        coFun()
+    end)
+    if self.coMap == nil then
+        self.coMap = {}
+        setmetatable(self.coMap, {__mode = "kv"})
     end
-    return self.coMap[coFun]
+    --if self.gameObject then
+    --self.coList[co] = self.gameObject.name .. " Widget:CO"
+    --else
+    self.coMap[co] = co_id
+    co_id = co_id + 1
+    --end
+    return co
 end
 
 ---@param delay number
----@param callback Handler
-function LuaMonoBehaviour:CreateDelay(delay, callback)
-    local d = DelayCallback(delay,callback)
-    table.insert(self.delayList, d)
-    return d
+---@param callback fun()
+---@param ignoreTimeScale boolean
+function LuaMonoBehaviour:CreateDelay(delay, callback,ignoreTimeScale)
+    if self.delayList == nil then
+        self.delayList = List.New()
+    end
+    if not isNumber(delay) or not isFunction(callback) or delay == nil or callback == nil then
+        logError("Delay fun params is wrong")
+        return
+    end
+    local delayFun ---@type Handler
+    delayFun = DelayCallback(delay,Handler.New(function ()
+        callback()
+        CancelDelayCallback(delayFun)
+        self.delayList:Remove(delayFun)
+        delayFun:Recycl()
+    end, self),ignoreTimeScale)
+    self.delayList:Add(delayFun)
+    return delayFun
+end
+
+---@param callback fun()
+---@param frameCount number 延迟帧数
+---@return Handler
+function LuaMonoBehaviour:CreateDelayedFrameCall(callback, frameCount)
+    if self.delayFrameFunList == nil then
+        self.delayFrameFunList = List.New()
+    end
+    local delayFun ---@type Handler
+    delayFun = DelayedFrameCall(function ()
+        callback()
+        CancelDelayCallback(delayFun)
+        self.delayFrameFunList:Remove(delayFun)
+        delayFun:Recycl()
+    end,self, frameCount)
+    self.delayFrameFunList:Add(delayFun)
+    return delayFun
+end
+
+---@return DG.Tweening.Sequence
+function LuaMonoBehaviour:CreateSequence()
+    if self.sequenceList == nil then
+        self.sequenceList = {}
+    end
+    local sequence = DOTween.Sequence()
+    table.insert(self.sequenceList, sequence)
+    return sequence
 end
 
 function LuaMonoBehaviour:Dispose()
     if self.coMap then
-        for _, co in pairs(self.coMap) do
+        for co, id in pairs(self.coMap) do
             coroutine.stop(co)
         end
     end
-    if self.eventMap then
-        for _, event in pairs(self.eventMap) do
-            edp:RemoveEventListener(event.type, event.handler)
+    if self.globalEdpEventMap then
+        for _, event in pairs(self.globalEdpEventMap) do
+            edp:RemoveEventListener(event.type, event.handler, self)
         end
     end
     if self.delayList then
-        for _, d in pairs(self.delayList) do
-            CancelDelayCallback(d)
+        for i = 1, self.delayList:Size() do
+            CancelDelayCallback(self.delayList[i])
+        end
+        self.delayList:Clear()
+    end
+    if self.delayFrameFunList then
+        for i = 1, self.delayFrameFunList:Size() do
+            CancelDelayCallback(self.delayFrameFunList[i])
+        end
+        self.delayFrameFunList:Clear()
+    end
+    if self.sequenceList then
+        for _, s in pairs(self.sequenceList) do
+            s:Kill()
         end
     end
-    self.coMap = {}
-    self.eventMap = {}
-    self.delayList = {}
-end
-
---调试
-function LuaMonoBehaviour:_debug(msg)
-    if self.gameObject then
-        print(string.format("<color=#FFFF00FF>[%s]</color>\n<color=#00EE00FF>%s</color>",self.gameObject.name,msg))
-    else
-        print(string.format("<color=#FFFF00FF>[%s]</color>\n<color=#00EE00FF>%s</color>",self.__classname,msg))
-    end
+    self.coMap = nil
+    self.globalEdpEventMap = nil
+    self.delayList = nil
+    self.delayFrameFunList = nil
+    self.sequenceList = nil
 end
 
 function LuaMonoBehaviour:Destroy()
-    destroy(self.gameObject)
+    Destroy(self.gameObject)
     self:Dispose()
 end
 
