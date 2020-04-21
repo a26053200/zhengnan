@@ -86,7 +86,9 @@ function LuaMonoBehaviour:CreateDelay(delay, callback,ignoreTimeScale)
     delayFun = DelayCallback(delay,Handler.New(function ()
         callback()
         CancelDelayCallback(delayFun)
-        self.delayList:Remove(delayFun)
+        if self.delayList then
+            self.delayList:Remove(delayFun)
+        end
         delayFun:Recycl()
     end, self),ignoreTimeScale)
     self.delayList:Add(delayFun)
