@@ -56,7 +56,7 @@ end
 
 --在列表末尾添加一个数据项，
 function List:UnShift(item)
-    table.insert(self._array,item)
+    table.insert(self._array,1, item)
 end
 
 --在列表末尾添加一个数据项，
