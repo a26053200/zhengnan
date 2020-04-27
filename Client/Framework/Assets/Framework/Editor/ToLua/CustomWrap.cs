@@ -89,6 +89,7 @@ public static class CustomWrap
         //================
         // FrameWork Core
         //================
+        _GT(typeof(LuaReflect)),
         _GT(typeof(GlobalConsts)),
         _GT(typeof(ShowFPS)),
         _GT(typeof(EventTriggerListener)),
