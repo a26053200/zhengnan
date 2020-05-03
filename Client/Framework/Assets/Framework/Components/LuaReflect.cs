@@ -33,7 +33,7 @@ namespace Framework
                 keyValueMap[key] = value;
             else
                 keyValueMap.Add(key, value);
-            Debug.Log("Push " + value);
+//            Debug.Log("Push " + value);
         }
         
         public void PushLuaJson(string key, string json)
@@ -61,7 +61,7 @@ namespace Framework
                 luaFuncDict[key] = func;
             else
                 luaFuncDict.Add(key, func);
-            Debug.Log($"LuaReflect PushLuaFunction:{key} - {func.name}");
+//            Debug.Log($"LuaReflect PushLuaFunction:{key} - {func.name}");
         }
         
         public void Dispose()
