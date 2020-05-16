@@ -7,6 +7,7 @@ import com.betel.center.core.consts.ReturnCode;
 import com.betel.mrpg.server.account.beans.Account;
 import com.betel.consts.FieldName;
 import com.betel.session.Session;
+import com.betel.session.SessionState;
 import com.betel.utils.IdGenerator;
 import com.betel.utils.JwtHelper;
 import org.apache.logging.log4j.LogManager;
@@ -71,10 +72,12 @@ public class AccountBusiness extends Business<Account>
                 updateAccount(session,account.getId());
             } else {//密码错误，登陆失败
                 logger.info(String.format("用户:%s 登陆失败", username));
+                session.setState(SessionState.Fail);
                 rspdMessage(session, ReturnCode.Wrong_password);
             }
         }else{//还未注册过
             logger.info(String.format("用户:%s 登陆失败", username));
+            session.setState(SessionState.Fail);
             rspdMessage(session,ReturnCode.Register_not_yet);
         }
     }
@@ -99,6 +102,7 @@ public class AccountBusiness extends Business<Account>
         if (allAccount.size() > 0)
         {//已经注册过
             //Account account = allAccount.get(0);
+            session.setState(SessionState.Fail);
             rspdMessage(session,ReturnCode.Error_already_exits);
         }else{
             String nowTime = now();
