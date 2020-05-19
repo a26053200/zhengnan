@@ -60,7 +60,7 @@ public class AccountBusiness extends Business<Account>
         String username = session.getRecvJson().getString(Field.USERNAME);
         String password = session.getRecvJson().getString(Field.PASSWORD);
 
-        List<Account> allAccount = service.getViceEntrys(username);
+        List<Account> allAccount = service.getViceEntities(username);
 
         if (allAccount.size() > 0)
         {//已经注册过
@@ -98,7 +98,7 @@ public class AccountBusiness extends Business<Account>
         String username = session.getRecvJson().getString(Field.USERNAME);
         String password = session.getRecvJson().getString(Field.PASSWORD);
         String clientIpAddress = session.getRecvJson().getString(FieldName.CLIENT_IP);
-        List<Account> allAccount = service.getViceEntrys(username);
+        List<Account> allAccount = service.getViceEntities(username);
         if (allAccount.size() > 0)
         {//已经注册过
             //Account account = allAccount.get(0);
@@ -114,20 +114,20 @@ public class AccountBusiness extends Business<Account>
             account.setRegisterIp(clientIpAddress);
             account.setLastLoginTime(nowTime);
             account.setLastLoginIp(clientIpAddress);
-            service.addEntry(account);
+            service.addEntity(account);
             rspdMessage(session,ReturnCode.Register_success);
         }
     }
 
     public void updateAccount(Session session, String accountId)
     {
-        Account account = service.getEntryById(accountId);
+        Account account = service.getEntity(accountId);
         if(account != null)
         {
             String clientIpAddress = session.getRecvJson().getString(FieldName.CLIENT_IP);
             account.setLastLoginTime(now());
             account.setLastLoginIp(clientIpAddress);
-            service.updateEntry(account);
+            service.updateEntity(account);
         }else{
             logger.error("There is no account tha id = " + accountId);
         }

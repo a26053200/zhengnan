@@ -1,14 +1,15 @@
 package com.betel.mrpg.server.account.beans;
 
+import com.betel.asd.BaseVo;
+
 /**
  * @ClassName: Account
  * @Description: TODO
  * @Author: zhengnan
  * @Date: 2018/12/5 22:57
  */
-public class Account
+public class Account extends BaseVo
 {
-    private String id;
     private String username;
     private String password;
     private String registerTime;
@@ -16,14 +17,14 @@ public class Account
     private String lastLoginIp;
     private String lastLoginTime;
 
-    public String getId()
-    {
-        return id;
+    @Override
+    public String getVid() {
+        return this.username;
     }
 
-    public void setId(String id)
-    {
-        this.id = id;
+    @Override
+    public void setVid(String vid) {
+        this.username = vid;
     }
 
     public String getUsername()

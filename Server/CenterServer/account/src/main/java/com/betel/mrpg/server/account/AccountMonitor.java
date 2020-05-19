@@ -3,8 +3,11 @@ package com.betel.mrpg.server.account;
 import com.betel.center.core.consts.Bean;
 import com.betel.config.ServerConfigVo;
 import com.betel.mrpg.server.account.beans.Account;
+import com.betel.mrpg.server.account.services.AccountService;
 import com.betel.servers.action.ImplAction;
 import com.betel.servers.node.NodeServerMonitor;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * @ClassName: AccountMonitor
@@ -17,7 +20,9 @@ public class AccountMonitor extends NodeServerMonitor
     public AccountMonitor(ServerConfigVo serverCfgInfo)
     {
         super(serverCfgInfo);
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+        AccountService accountService = (AccountService) applicationContext.getBean("accountService");
 
-        actionMap.put(Bean.ACCOUNT,      new ImplAction<>(this, Bean.ACCOUNT,     Account.class,       new AccountBusiness()));
+        actionMap.put(Bean.ACCOUNT,      new ImplAction<>(this, Bean.ACCOUNT, new AccountBusiness(), accountService));
     }
 }
