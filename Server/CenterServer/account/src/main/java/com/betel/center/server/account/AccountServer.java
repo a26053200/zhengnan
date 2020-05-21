@@ -1,4 +1,4 @@
-package com.betel.mrpg.server.account;
+package com.betel.center.server.account;
 
 import com.betel.center.core.consts.ServerName;
 import com.betel.common.Monitor;

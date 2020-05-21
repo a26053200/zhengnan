@@ -1,4 +1,4 @@
-package com.betel.mrpg.server.account.beans;
+package com.betel.center.server.account.beans;
 
 import com.betel.asd.BaseVo;
 

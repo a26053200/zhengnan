@@ -1,10 +1,8 @@
-package com.betel.mrpg.server.account;
+package com.betel.center.server.account;
 
-import com.betel.asd.RedisDao;
 import com.betel.center.core.consts.Bean;
 import com.betel.config.ServerConfigVo;
-import com.betel.mrpg.server.account.beans.Account;
-import com.betel.mrpg.server.account.services.AccountService;
+import com.betel.center.server.account.services.AccountService;
 import com.betel.servers.action.ImplAction;
 import com.betel.servers.node.NodeServerMonitor;
 import org.springframework.context.ApplicationContext;

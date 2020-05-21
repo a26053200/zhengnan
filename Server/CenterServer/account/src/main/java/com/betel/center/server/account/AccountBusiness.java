@@ -1,10 +1,10 @@
-package com.betel.mrpg.server.account;
+package com.betel.center.server.account;
 
 import com.alibaba.fastjson.JSONObject;
 import com.betel.asd.Business;
 import com.betel.center.core.consts.Action;
 import com.betel.center.core.consts.ReturnCode;
-import com.betel.mrpg.server.account.beans.Account;
+import com.betel.center.server.account.beans.Account;
 import com.betel.consts.FieldName;
 import com.betel.session.Session;
 import com.betel.session.SessionState;

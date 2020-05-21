@@ -36,7 +36,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.betel.mrpg.server.balance.BalanceServer</mainClass>
+                            <mainClass>com.betel.center.server.balance.BalanceServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

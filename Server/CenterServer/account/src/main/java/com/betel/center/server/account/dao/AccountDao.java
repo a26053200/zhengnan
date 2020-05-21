@@ -1,7 +1,7 @@
-package com.betel.mrpg.server.account.dao;
+package com.betel.center.server.account.dao;
 
 import com.betel.asd.RedisDao;
-import com.betel.mrpg.server.account.beans.Account;
+import com.betel.center.server.account.beans.Account;
 
 /**
  * @Description

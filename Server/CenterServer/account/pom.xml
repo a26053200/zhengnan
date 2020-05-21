@@ -36,7 +36,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.betel.mrpg.server.account.AccountServer</mainClass>
+                            <mainClass>com.betel.center.server.account.AccountServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

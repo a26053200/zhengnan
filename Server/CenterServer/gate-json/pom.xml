@@ -36,7 +36,7 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
-                            <mainClass>com.betel.mrpg.server.gate.GateJsonServer</mainClass>
+                            <mainClass>com.betel.center.server.gate.GateJsonServer</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

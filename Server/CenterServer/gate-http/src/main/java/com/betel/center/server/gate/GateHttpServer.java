@@ -1,4 +1,4 @@
-package com.betel.mrpg.server.gate;
+package com.betel.center.server.gate;
 
 import com.betel.center.core.consts.ServerName;
 import com.betel.common.Monitor;

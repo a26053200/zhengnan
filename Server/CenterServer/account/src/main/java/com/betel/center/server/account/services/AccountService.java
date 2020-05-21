@@ -1,8 +1,8 @@
-package com.betel.mrpg.server.account.services;
+package com.betel.center.server.account.services;
 
 import com.betel.asd.RedisDao;
-import com.betel.mrpg.server.account.beans.Account;
-import com.betel.mrpg.server.account.dao.AccountDao;
+import com.betel.center.server.account.beans.Account;
+import com.betel.center.server.account.dao.AccountDao;
 import com.betel.spring.IRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 

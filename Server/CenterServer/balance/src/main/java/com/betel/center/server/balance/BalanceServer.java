@@ -1,4 +1,4 @@
-package com.betel.mrpg.server.balance;
+package com.betel.center.server.balance;
 
 import com.betel.center.core.consts.ServerName;
 import com.betel.config.ServerConfigVo;

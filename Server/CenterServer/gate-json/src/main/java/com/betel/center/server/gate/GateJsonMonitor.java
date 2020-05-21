@@ -1,4 +1,4 @@
-package com.betel.mrpg.server.gate;
+package com.betel.center.server.gate;
 
 import com.alibaba.fastjson.JSONObject;
 import com.betel.center.core.consts.Action;

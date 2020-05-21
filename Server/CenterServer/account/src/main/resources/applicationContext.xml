@@ -35,8 +35,8 @@
         <property name="keySerializer" ref="stringRedisSerializer" />
         <property name="connectionFactory" ref="connectionFactory" />
     </bean>
-    <bean id="accountDao" class="com.betel.mrpg.server.account.dao.AccountDao"/>
-    <bean id="accountService" class="com.betel.mrpg.server.account.services.AccountService">
+    <bean id="accountDao" class="com.betel.center.server.account.dao.AccountDao"/>
+    <bean id="accountService" class="com.betel.center.server.account.services.AccountService">
         <property name="tableName" value="Account"/>
     </bean>
 
