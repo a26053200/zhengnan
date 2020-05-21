@@ -9,7 +9,8 @@ local json = require("cjson")
 local NetworkListener = require("Betel.Net.NetworkListener")
 local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
 ---@class Betel.Net.NetworkManager : Betel.LuaMonoBehaviour
----@field public listenerList table<number,Betel.Net.NetworkListener>
+---@field listenerList table<number,Betel.Net.NetworkListener>
+---@field listener Betel.Net.NetworkListener
 local NetworkManager = class("NetworkManager", LuaMonoBehaviour)
 
 
@@ -65,7 +66,7 @@ function NetworkManager:HttpRqst(url, data, params, callback)
     end
     data = self:parseParams(data,params)
     local jsonStr = json.encode(data)
-    print("[Http Rqst]" .. jsonStr)
+    log("<color=#266484ff>[Http Rqst]</color><color=#ffffffff>{0}</color>", jsonStr)
     netMgr:HttpRequest(url, jsonStr)
 end
 
@@ -81,12 +82,13 @@ function NetworkManager:Request(data, params, callback)
     end
     data = self:parseParams(data,params)
     local jsonStr = json.encode(data)
-    --print("[Send]" .. jsonStr)
+    log("<color=#266484ff>[Send]</color><color=#ffffffff>{0}</color>", jsonStr)
     netMgr:SendJson(jsonStr)
 end
 
 function NetworkManager:OnHttpRspd(jsonStr)
     local jsonData = json.decode(jsonStr)
+    log("<color=#cc7832ff>[Http Rspd]</color><color=#ffffffff>{0}</color>", jsonStr)
     for i = 1, self.listenerList:Size() do
         self.listenerList[i]:handlerRqstCallback(jsonData.action, jsonData)
     end
@@ -94,7 +96,7 @@ end
 
 function NetworkManager:OnJsonRspd(jsonStr)
     local jsonData = json.decode(jsonStr)
-    --print("OnJsonRspd " .. jsonStr)
+    log("<color=#cc7832ff>[Rspd]</color><color=#ffffffff>{0}</color>", jsonStr)
     for i = 1, self.listenerList:Size() do
         if string.find(jsonData.action,"push@") ~= nil then
             self.listenerList[i]:handlerPushCallback(jsonData.action, jsonData)
@@ -111,9 +113,38 @@ function NetworkManager:parseParams(data,values)
             data[fields[i]] = values[i]
         end
     end
-    data = Tools.removeElementByKey(data,"fields")
+    data = self:removeElementByKey(data,"fields")
     data.client = "Unity"
     return data
+end
+
+
+-- 删除table中的元素
+function NetworkManager:removeElementByKey(tbl,key)
+    --新建一个临时的table
+    local tmp ={}
+
+    --把每个key做一个下标，保存到临时的table中，转换成{1=a,2=c,3=b}
+    --组成一个有顺序的table，才能在while循环准备时使用#table
+    for i in pairs(tbl) do
+        table.insert(tmp,i)
+    end
+
+    local newTbl = {}
+    --使用while循环剔除不需要的元素
+    local i = 1
+    while i <= #tmp do
+        local val = tmp [i]
+        if val == key then
+            --如果是需要剔除则remove
+            table.remove(tmp,i)
+        else
+            --如果不是剔除，放入新的tabl中
+            newTbl[val] = tbl[val]
+            i = i + 1
+        end
+    end
+    return newTbl
 end
 
 return NetworkManager

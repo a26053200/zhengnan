@@ -76,7 +76,6 @@ DT = {
 
 ---Framework
 logger = Logger
---Math3D = require("Betel.Utils.Math3D")
 Handler = require("Betel.Handler")
 Delegate = require("Betel.Delegate")
 Event = require("Betel.Events.Event")

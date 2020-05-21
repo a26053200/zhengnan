@@ -8,6 +8,7 @@
 
 local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
 ---@class Betel.Net.NetworkListener : Betel.LuaMonoBehaviour
+---@field New fun(errorReport:boolean)
 local NetworkListener = class("NetworkListener",LuaMonoBehaviour)
 
 function NetworkListener:Ctor(errorReport)
