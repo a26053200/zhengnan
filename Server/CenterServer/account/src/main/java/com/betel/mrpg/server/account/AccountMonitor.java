@@ -1,5 +1,6 @@
 package com.betel.mrpg.server.account;
 
+import com.betel.asd.RedisDao;
 import com.betel.center.core.consts.Bean;
 import com.betel.config.ServerConfigVo;
 import com.betel.mrpg.server.account.beans.Account;
@@ -23,6 +24,7 @@ public class AccountMonitor extends NodeServerMonitor
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
         AccountService accountService = (AccountService) applicationContext.getBean("accountService");
 
+        //actionMap.put(Bean.ACCOUNT,      new ImplAction<>(this, Bean.ACCOUNT, new RedisDao<>(Account.class), new AccountBusiness(), accountService));
         actionMap.put(Bean.ACCOUNT,      new ImplAction<>(this, Bean.ACCOUNT, new AccountBusiness(), accountService));
     }
 }

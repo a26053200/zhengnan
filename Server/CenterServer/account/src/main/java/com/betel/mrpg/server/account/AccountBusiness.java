@@ -88,7 +88,7 @@ public class AccountBusiness extends Business<Account>
         JSONObject gameServerJson = JSONObject.parseObject(monitor.getDB().get("GameServer"));
         JSONObject rspdJson = new JSONObject();
         rspdJson.put("aid", account_id);
-        rspdJson.put("token", JwtHelper.createJWT(account_id));
+        rspdJson.put("token", JwtHelper.createJWT(account_id, false));
         rspdJson.put("srvList", gameServerJson);
         action.rspdClient(session, rspdJson);
     }

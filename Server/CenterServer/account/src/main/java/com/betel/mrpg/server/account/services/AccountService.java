@@ -1,9 +1,8 @@
 package com.betel.mrpg.server.account.services;
 
-import com.betel.asd.BaseVo;
 import com.betel.asd.RedisDao;
-import com.betel.center.core.sdr.IUserDao;
 import com.betel.mrpg.server.account.beans.Account;
+import com.betel.mrpg.server.account.dao.AccountDao;
 import com.betel.spring.IRedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,48 +16,54 @@ import java.util.List;
 public class AccountService implements IRedisService<Account>
 {
     @Autowired
-    private IUserDao userDao;
+    protected AccountDao accountDao;
+
+    @Override
+    public void setTableName(String s)
+    {
+        accountDao.setTableName(s);
+    }
 
     @Override
     public RedisDao<Account> getDao()
     {
-        return null;
+        return (RedisDao<Account>) accountDao;
     }
 
     @Override
     public void setDao(RedisDao<Account> redisDao)
     {
-
+        accountDao = (AccountDao)redisDao;
     }
 
     @Override
     public boolean addEntity(Account account)
     {
-        return false;
+        return accountDao.addEntity(account);
     }
 
     @Override
     public boolean batchAddEntity(List<Account> list)
     {
-        return false;
+        return accountDao.batchAddEntity(list);
     }
 
     @Override
     public Account getEntity(String s)
     {
-        return null;
+        return accountDao.getEntity(s);
     }
 
     @Override
     public List<Account> getViceEntities(String s)
     {
-        return null;
+        return accountDao.getViceEntities(s);
     }
 
     @Override
     public boolean updateEntity(Account account)
     {
-        return false;
+        return accountDao.updateEntity(account);
     }
 
     @Override
