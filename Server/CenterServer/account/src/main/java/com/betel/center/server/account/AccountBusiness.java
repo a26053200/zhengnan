@@ -23,6 +23,12 @@ import java.util.List;
  */
 public class AccountBusiness extends Business<Account>
 {
+    //明文Token,用于测试 以后有时间再做加密的
+    //Token 过期时间
+    public final static int expiresSecond = 5 * 60 * 60 * 1000;
+    //Token 密钥
+    public final static String tokenSecretKey = "emhlbmduYW50YW5naHVpanVhbnpoZW5neWk==";
+
     private class Field
     {
         static final String USERNAME = "username";
@@ -88,7 +94,7 @@ public class AccountBusiness extends Business<Account>
         JSONObject gameServerJson = JSONObject.parseObject(monitor.getDB().get("GameServer"));
         JSONObject rspdJson = new JSONObject();
         rspdJson.put("aid", account_id);
-        rspdJson.put("token", JwtHelper.createJWT(account_id, false));
+        rspdJson.put("token", JwtHelper.createJWT(account_id, tokenSecretKey,expiresSecond,false));
         rspdJson.put("srvList", gameServerJson);
         action.rspdClient(session, rspdJson);
     }

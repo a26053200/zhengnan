@@ -25,18 +25,6 @@ public class AccountService implements IRedisService<Account>
     }
 
     @Override
-    public RedisDao<Account> getDao()
-    {
-        return (RedisDao<Account>) accountDao;
-    }
-
-    @Override
-    public void setDao(RedisDao<Account> redisDao)
-    {
-        accountDao = (AccountDao)redisDao;
-    }
-
-    @Override
     public boolean addEntity(Account account)
     {
         return accountDao.addEntity(account);
