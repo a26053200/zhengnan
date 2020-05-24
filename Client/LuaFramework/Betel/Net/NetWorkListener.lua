@@ -66,9 +66,9 @@ function NetworkListener:handlerPushCallback(action, json)
         end
         --self.pushMap[action] = nil
     else
-        if self.errorReport then
-            logError("there is no push callback with action {0}", action)
-        end
+        --if self.errorReport then
+        --    logError("there is no push callback with action {0}", action)
+        --end
     end
 end
 
@@ -87,9 +87,9 @@ function NetworkListener:handlerRqstCallback(action, json)
         end
         self.respondMap[action] = nil
     else
-        if self.errorReport then
-            logError("there is no rqst callback with action {0}", action)
-        end
+        --if self.errorReport then
+        --    logError("there is no rqst callback with action {0}", action)
+        --end
     end
 end
 

@@ -9,10 +9,10 @@ local json = require("cjson")
 local NetworkListener = require("Betel.Net.NetworkListener")
 local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
 ---@class Betel.Net.NetworkManager : Betel.LuaMonoBehaviour
+---@field httpUrl string
 ---@field listenerList table<number,Betel.Net.NetworkListener>
 ---@field listener Betel.Net.NetworkListener
 local NetworkManager = class("NetworkManager", LuaMonoBehaviour)
-
 
 function NetworkManager:Ctor()
     self.listenerList = List.New() ---@type List
