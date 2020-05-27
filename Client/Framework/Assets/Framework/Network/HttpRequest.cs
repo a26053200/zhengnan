@@ -9,16 +9,17 @@ using System.Text;
 // 
 public class HttpRequest : MonoBehaviour
 {
-    public void SendMsg(string requestUrl, JsonData json, string callback)
+    public delegate void OnHttpRspd(JsonData netData);
+    public void SendMsg(string requestUrl, JsonData json, OnHttpRspd callback)
     {
         string dataString = json.ToJson();
         StartCoroutine(Request(requestUrl, dataString, callback));
     }
-    private IEnumerator Request(string requestUrl, string dataString, string callback)
+    private IEnumerator Request(string requestUrl, string dataString, OnHttpRspd callback)
     {
         string error = null;
-        if (GlobalConsts.EnableLogNetwork)
-            MyDebug.Log(string.Format("[Http] {0}/{1}", requestUrl, dataString));
+//        if (GlobalConsts.EnableLogNetwork)
+//            MyDebug.Log(string.Format("[Http] {0}/{1}", requestUrl, dataString));
         using (var www = new WWW(requestUrl, Encoding.UTF8.GetBytes(dataString)))
         {
             yield return www;
@@ -36,9 +37,10 @@ public class HttpRequest : MonoBehaviour
                 //最终通过打印2进制数组一个一个字节对比才发现的 - -!
                 //string json = Encoding.UTF8.GetString(www.bytes,0, www.bytes.Length - 1);
                 string json = Encoding.UTF8.GetString(www.bytes, 0, www.bytes.Length);
-                MyDebug.Log("[Http recv] " + json);
+                //MyDebug.Log("[Http recv] " + json);
                 JsonData netData = JsonMapper.ToObject(json);
-                SendMessage(callback, netData);
+                //SendMessage(callback, netData);
+                callback.Invoke(netData);
                 yield break;
             }
         }
