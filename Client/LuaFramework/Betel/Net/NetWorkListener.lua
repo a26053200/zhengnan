@@ -9,6 +9,7 @@
 local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
 ---@class Betel.Net.NetworkListener : Betel.LuaMonoBehaviour
 ---@field New fun(errorReport:boolean)
+---@field respondMap table<string, List>
 local NetworkListener = class("NetworkListener",LuaMonoBehaviour)
 
 function NetworkListener:Ctor(errorReport)
@@ -25,6 +26,15 @@ function NetworkListener:addCallback(action, handler)
     end
     if not callbackList:Contain(handler) then
         callbackList:Add(handler)
+    end
+end
+
+function NetworkListener:removeCallback(action, handler)
+    local callbackList = self.respondMap[action]
+    if callbackList ~= nil then
+        if callbackList:Contain(handler) then
+            callbackList:Remove(handler)
+        end
     end
 end
 

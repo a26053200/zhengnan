@@ -9,9 +9,12 @@ local json = require("cjson")
 local NetworkListener = require("Betel.Net.NetworkListener")
 local LuaMonoBehaviour = require('Betel.LuaMonoBehaviour')
 ---@class Betel.Net.NetworkManager : Betel.LuaMonoBehaviour
+---@field New fun() : Betel.Net.NetworkManager
 ---@field httpUrl string
 ---@field listenerList table<number,Betel.Net.NetworkListener>
 ---@field listener Betel.Net.NetworkListener
+---@field timeout number
+---@field timeoutCo table
 local NetworkManager = class("NetworkManager", LuaMonoBehaviour)
 
 function NetworkManager:Ctor()
@@ -20,7 +23,7 @@ function NetworkManager:Ctor()
     self.listenerList:Add(self.listener)
 
     netMgr:SetLuaFun("OnReConnect", handler(self, self.OnReConnect))
-    netMgr:SetLuaFun("OnHttpRspd", handler(self, self.OnHttpRspd))
+    --netMgr:SetLuaFun("OnHttpRspd", handler(self, self.OnHttpRspd))
     netMgr:SetLuaFun("OnJsonRspd", handler(self, self.OnJsonRspd))
 end
 
@@ -60,14 +63,17 @@ function NetworkManager:AddPush(action, callback)
 end
 
 --添加Http请求
-function NetworkManager:HttpRqst(url, data, params, callback)
-    if callback ~= nil then
-        self.listener:addCallback(data.action, callback)
-    end
+function NetworkManager:HttpRqst(data, params, callback)
+    local rqstStartTime = Time.realtimeSinceStartup
     data = self:parseParams(data,params)
     local jsonStr = json.encode(data)
     log("<color=#266484ff>[Http Rqst]</color><color=#ffffffff>{0}</color>", jsonStr)
-    netMgr:HttpRequest(url, jsonStr)
+    netMgr:HttpRequest(self.httpUrl, jsonStr, function(jsonStr)
+        self.timeout = Time.realtimeSinceStartup - rqstStartTime
+        local jsonData = json.decode(jsonStr)
+        log("<color=#cc7832ff>[Http Rspd]</color><color=#ffffffff>{0}</color>", jsonStr)
+        callback(jsonData)
+    end)
 end
 
 --异步发送
