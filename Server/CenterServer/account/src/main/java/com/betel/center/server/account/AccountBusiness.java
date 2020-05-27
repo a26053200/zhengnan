@@ -29,37 +29,13 @@ public class AccountBusiness extends Business<Account>
     //Token 密钥
     public final static String tokenSecretKey = "emhlbmduYW50YW5naHVpanVhbnpoZW5neWk==";
 
-    private class Field
+    class Field
     {
         static final String USERNAME = "username";
         static final String PASSWORD = "password";
     }
 
     final static Logger logger = LogManager.getLogger(AccountBusiness.class);
-
-    private static final String ViceKey = "username";
-    @Override
-    public String getViceKey()
-    {
-        return ViceKey;
-    }
-
-    @Override
-    public void Handle(Session session, String method)
-    {
-        switch (method)
-        {
-            case Action.ACCOUNT_LOGIN:
-                accountLogin(session);
-                break;
-            case Action.ACCOUNT_REGISTER:
-                accountRegister(session);
-                break;
-            default:
-                logger.error("Unknown action:"+ method);
-                break;
-        }
-    }
 
     private void accountLogin(Session session)
     {
