@@ -10,5 +10,9 @@ namespace ExcelExporter
         public string excelPattern = "*.xlsx";
         
         public string outputPath = "";
+        
+        public string jsonOutputPath = "";
+
+        public string[] fileList;
     }
 }

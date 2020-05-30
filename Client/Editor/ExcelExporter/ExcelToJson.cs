@@ -1,5 +1,4 @@
 
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -8,11 +7,18 @@ using UnityEngine;
 
 namespace ExcelExporter
 {
-    public static class ExcelToLua
+    public static class ExcelToJson 
     {
+        static readonly string Setting_Path = "Assets/Res/ExcelExporterSetting.asset";
+
         private static ExcelExporterSetting setting;
-       
-        //[MenuItem("Tools/Excel2Lua %#e")]
+        static void LoadSetting()
+        {
+            if(!File.Exists(Setting_Path))
+                EditUtils.CreateAsset<ExcelExporterSetting>(Setting_Path);
+            setting = AssetDatabase.LoadAssetAtPath<ExcelExporterSetting>(Setting_Path);
+        }
+        //[MenuItem("Tools/ExcelToJson %#j")]
         static void DoExcelToLua()
         {
             setting = ExcelExporter.LoadSetting();
@@ -35,30 +41,14 @@ namespace ExcelExporter
         {
             sb.Clear();
             ExcelReader reader = new ExcelReader(path);
-            sb.Append($"-- {Path.GetFileNameWithoutExtension(path)} {DateTime.Now.ToLocalTime().ToString()}");
+            sb.Append("{");
             sb.AppendLine();
-            sb.Append("local Data = {}");
-            sb.AppendLine();
-            sb.Append("Data.table = {");
             reader.Read(delegate(int index, List<string> list)
             {
                 ExecuteFile(index, list, sb);
             });
             sb.Append("}");
             sb.AppendLine();
-            
-            sb.AppendLine(@"
-function Data.Get(id)
-    if Data.table[id] == nil then
-        logError(string.format('There is no id = %s data is table <"+ Path.GetFileName(path) + @">', id))
-        return nil
-    else
-        return Data.table[id]
-    end
-end
-
-return Data
-                ");
             Output(sb, path);
         }
         private static void ExecuteFile(int rowIndex, List<string> list,StringBuilder sb)
@@ -77,22 +67,19 @@ return Data
             }
             else
             {
-                if (headTypes[0] == Type_Number)
-                    sb.Append($"    [{list[0]}]");
-                else
-                    sb.Append($"    [\"{list[0]}\"]");
-                sb.Append(" = {");
+                sb.Append($"    \"{list[0]}\"");
+                sb.Append(": {");
                 for (int i = 0; i < list.Count; i++)
                 {
                     if (headTypes[i] == Type_Number)
                     {
-                       if (string.IsNullOrEmpty(list[i]))
-                            sb.Append($"{headFields[i]} = 0");
+                       if (EditUtils.IsNumberic(list[i]))
+                            sb.Append($"\"{headFields[i]}\": {list[i]}");
                        else
-                            sb.Append($"{headFields[i]} = {list[i]}");
+                           sb.Append($"\"{headFields[i]}\": 0");
                     }
                     else
-                        sb.Append($"{headFields[i]} = \"{list[i]}\"");
+                        sb.Append($"\"{headFields[i]}\": \"{list[i]}\"");
                     if(i < list.Count - 1)
                         sb.Append(", ");
                 }
@@ -100,12 +87,13 @@ return Data
                 sb.AppendLine();
             }
         }
+
         private static void Output(StringBuilder sb, string path)
         {
            Debug.Log(sb.ToString());
-           if (!Directory.Exists(setting.outputPath))
-               Directory.CreateDirectory(setting.outputPath);
-           EditUtils.SaveUTF8TextFile($"{setting.outputPath}/{Path.GetFileNameWithoutExtension(path)}.lua",sb.ToString());
+           if (!Directory.Exists(setting.jsonOutputPath))
+               Directory.CreateDirectory(setting.jsonOutputPath);
+           EditUtils.SaveUTF8TextFile($"{setting.jsonOutputPath}/{Path.GetFileNameWithoutExtension(path)}.json",sb.ToString());
         }
     }
 }

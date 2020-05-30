@@ -6,7 +6,6 @@ namespace DataEditor
 {
     public class DataEditorWnd : EditorWindow
     {
-        [MenuItem("DataEditor/Open")]
         static void ShowWnd()
         {
             Rect rect = new Rect(100,100,1024,768);
