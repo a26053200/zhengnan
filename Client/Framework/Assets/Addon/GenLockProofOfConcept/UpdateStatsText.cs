@@ -7,7 +7,7 @@ public class UpdateStatsText : MonoBehaviour
 {
     [Tooltip("Number of frames to average together in frame rate statistics (1 corresponds to no averaging)")]
     [Range(1,999)]
-    public int SampleWindow = 50;
+    public int SampleWindow = 60;
     public Text Text;
 
     float lastRealtime = 0.0f;
@@ -78,8 +78,8 @@ public class UpdateStatsText : MonoBehaviour
 
             if (deltaRealtime >= 0.0f && deltaTime >= 0.0f)
                 Text.text =
-                    "Render FPS: " + (1.0f/deltaRealtime).ToString("0.0") + " (" + (deltaRealtime*1000).ToString("0.0ms") + ")\n" +
-                    "  Game FPS: " + (1.0f/deltaTime).ToString("0.0") + " (" + (deltaTime*1000).ToString("0.0ms") + ")";
+                    "GPU:" + (1.0f/deltaRealtime).ToString("0.0") + " (" + (deltaRealtime*1000).ToString("0.0") + ")\n" +
+                    "CPU:" + (1.0f/deltaTime).ToString("0.0") + " (" + (deltaTime*1000).ToString("0.0") + ")";
         }
 
         lastRealtime = realtime;

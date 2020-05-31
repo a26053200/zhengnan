@@ -1,11 +1,11 @@
-﻿using System;
-using UnityEngine;
-using System.Collections.Generic;
+﻿using UnityEngine;
 using UnityEditor;
 using LuaInterface;
 using System.Collections;
 using System.IO;
 using UnityEngine.UI;
+
+using Object = UnityEngine.Object;
 /// <summary>
 /// <para>资源管理,资源加载和缓存</para>
 /// <para>Author: zhengnan</para>
@@ -189,7 +189,12 @@ namespace Framework
 #if UNITY_EDITOR
                 T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
                 if (t == default(T))
-                    Logger.LogError("Asset:'{0}' has not found", path);
+                {
+                    if(File.Exists(EDITOT_MODE_ROOT_PATH + path))
+                        Logger.LogError("Asset:'{0}' has not found", path);
+                    else
+                        Logger.LogError("Asset:'{0}' file has not exists", path);
+                }
                 return t;
 #else
                 return null;
@@ -293,7 +298,8 @@ namespace Framework
             }else
             {
 #if UNITY_EDITOR
-                return LoadAsset<Sprite>(path);
+                Texture2D texture2D = LoadAsset<Texture2D>(path);
+                return Sprite.Create(texture2D, new Rect(0,0,texture2D.width, texture2D.height), new Vector2());
 #else
                 return null;
 #endif

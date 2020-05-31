@@ -111,7 +111,7 @@ public static class CustomWrap
         _GT(typeof(AroundPoint)),
         _GT(typeof(AroundPosition)),
         _GT(typeof(Chains)),
-        //_GT(typeof(PointerScaler)),
+        _GT(typeof(ClickFeedback)),
         _GT(typeof(AutoMove)),
         _GT(typeof(AutoPath)),
         _GT(typeof(AttachCamera)),

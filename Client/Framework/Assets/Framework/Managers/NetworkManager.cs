@@ -39,16 +39,17 @@ public class NetworkManager : BaseManager
         luaFun[funName] = func;
     }
 
-    public void HttpRequest(string url, string json, LuaFunction func)
+    public void HttpRequest(string url, string data, LuaFunction func)
     {
-        JsonData netData = JsonMapper.ToObject(json);
-        httpRequest.SendMsg(url, netData, delegate(JsonData data)
+        httpRequest.StartUnityWebRequest(url, data, delegate(string json)
+        //httpRequest.SendMsg(url, netData, delegate(JsonData data)
         {
             func.BeginPCall();
-            func.Push(data.ToJson());
+            func.Push(json);
             func.PCall();
             func.EndPCall();
         });
+
     }
 
     public void SendJson(string json)

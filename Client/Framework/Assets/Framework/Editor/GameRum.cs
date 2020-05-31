@@ -6,6 +6,11 @@ using UnityEngine.SceneManagement;
 public static class GameRum
 {
 
+    [MenuItem("Tools/Clear Progress Bar",false,1)]
+    public static void ClearBuild()
+    {
+        EditorUtility.ClearProgressBar();
+    }
     [MenuItem("Run/Run Game")]
 	static void RunGame()
     {

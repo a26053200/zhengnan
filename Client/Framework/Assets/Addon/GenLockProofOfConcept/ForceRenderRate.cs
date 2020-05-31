@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class ForceRenderRate : MonoBehaviour
 {
-    public float Rate = 50.0f;
+    public float Rate = 60.0f;
     float currentFrameTime;
 
     void Start()

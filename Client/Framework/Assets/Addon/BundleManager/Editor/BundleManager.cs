@@ -14,11 +14,6 @@ namespace BM
     /// </summary> 
     public static class BundleManager
     {
-        [MenuItem("Tools/Build/Clear Build",false,1)]
-        public static void ClearBuild()
-        {
-            EditorUtility.ClearProgressBar();
-        }
         [MenuItem("Tools/Build/Force Build Bundle(IOS)",false,1)]
         public static void ForceBuildIOS()
         {
