@@ -170,6 +170,17 @@ function table2json(t)
 end
 
 ---回调
+function invoke(fun,...)
+    if fun ~= nil then
+        if isFunction(fun) then
+            fun(...)
+        else
+            fun:Execute(...)
+        end
+    end
+end
+
+---回调
 function handler(caller,method)
     --if method == nil then
     --    logError("method is nil")
