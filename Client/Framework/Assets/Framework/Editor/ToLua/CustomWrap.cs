@@ -66,7 +66,7 @@ public static class CustomWrap
         //================
         //_GT(typeof(RectTransform)),
         //_GT(typeof(Text)),
-        //_GT(typeof(Image)),
+        _GT(typeof(Image.Type)),
         _GT(typeof(ToggleGroup)),
         _GT(typeof(Canvas)),
         _GT(typeof(Sprite)),

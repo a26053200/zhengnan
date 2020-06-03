@@ -187,8 +187,8 @@ namespace Framework
             else
             {
 #if UNITY_EDITOR
-                T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
-                if (t == default(T))
+                T t = Resources.Load<T>(EDITOT_MODE_ROOT_PATH + path);
+                if (!t)
                 {
                     if(File.Exists(EDITOT_MODE_ROOT_PATH + path))
                         Logger.LogError("Asset:'{0}' has not found", path);
@@ -256,8 +256,8 @@ namespace Framework
             {
 #if UNITY_EDITOR
                 yield return new WaitForEndOfFrame();
-                T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
-                if (t == default(T))
+                T t = Resources.Load<T>(EDITOT_MODE_ROOT_PATH + path);
+                if (!t)
                     Logger.LogError("Asset:'{0}' has not found", path);
                 luaFunc.BeginPCall();
                 luaFunc.Push(t);
@@ -298,7 +298,8 @@ namespace Framework
             }else
             {
 #if UNITY_EDITOR
-                Texture2D texture2D = LoadAsset<Texture2D>(path);
+                Object obj = LoadAsset<Object>(path);
+                Texture2D texture2D = obj as Texture2D;
                 return Sprite.Create(texture2D, new Rect(0,0,texture2D.width, texture2D.height), new Vector2());
 #else
                 return null;
