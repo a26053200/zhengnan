@@ -19,6 +19,12 @@ public class AccountService implements IRedisService<Account>
     protected AccountDao accountDao;
 
     @Override
+    public RedisDao<Account> getDao()
+    {
+        return accountDao;
+    }
+
+    @Override
     public void setTableName(String s)
     {
         accountDao.setTableName(s);

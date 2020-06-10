@@ -1,6 +1,6 @@
 package com.betel.center.server.account.beans;
 
-import com.betel.asd.BaseVo;
+import com.betel.asd.interfaces.IVo;
 
 /**
  * @ClassName: Account
@@ -8,14 +8,27 @@ import com.betel.asd.BaseVo;
  * @Author: zhengnan
  * @Date: 2018/12/5 22:57
  */
-public class Account extends BaseVo
+public class Account implements IVo
 {
+    private String id;
     private String username;
     private String password;
     private String registerTime;
     private String registerIp;
     private String lastLoginIp;
     private String lastLoginTime;
+
+    @Override
+    public String getId()
+    {
+        return id;
+    }
+
+    @Override
+    public void setId(String s)
+    {
+        id = s;
+    }
 
     @Override
     public String getVid() {

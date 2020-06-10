@@ -9,6 +9,7 @@ import com.betel.consts.FieldName;
 import com.betel.session.Session;
 import com.betel.session.SessionState;
 import com.betel.utils.IdGenerator;
+import com.betel.utils.JSONArrayUtils;
 import com.betel.utils.JwtHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -67,12 +68,18 @@ public class AccountBusiness extends Business<Account>
     private void onLoginSuccess(Session session, String account_id)
     {
         //游戏服务器的网关地址列表 json
-        JSONObject gameServerJson = JSONObject.parseObject(monitor.getDB().get("GameServer"));
+        JSONObject gameServerJson = getGameServers();
         JSONObject rspdJson = new JSONObject();
         rspdJson.put("aid", account_id);
         rspdJson.put("token", JwtHelper.createJWT(account_id, tokenSecretKey,expiresSecond,false));
         rspdJson.put("srvList", gameServerJson);
         action.rspdClient(session, rspdJson);
+    }
+
+    public JSONObject getGameServers()
+    {
+        String path = AccountBusiness.class.getResource("/GameServer.json").getPath();
+        return JSONArrayUtils.getJsonObject(path);
     }
 
     private void accountRegister(Session session)
