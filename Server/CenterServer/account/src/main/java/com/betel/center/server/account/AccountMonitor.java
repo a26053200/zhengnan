@@ -1,10 +1,8 @@
 package com.betel.center.server.account;
 
-import com.betel.center.core.consts.Bean;
 import com.betel.center.server.account.beans.Account;
 import com.betel.config.ServerConfigVo;
 import com.betel.center.server.account.services.AccountService;
-import com.betel.servers.action.ImplAction;
 import com.betel.servers.node.NodeServerMonitor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -23,6 +21,6 @@ public class AccountMonitor extends NodeServerMonitor
         ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
         AccountService accountService = (AccountService) applicationContext.getBean("accountService");
 
-        pushService(Account.class, new AccountBusiness(), accountService);
+        pushService(Account.class, accountService);
     }
 }
