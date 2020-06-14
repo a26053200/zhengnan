@@ -187,11 +187,11 @@ namespace Framework
             else
             {
 #if UNITY_EDITOR
-                T t = Resources.Load<T>(EDITOT_MODE_ROOT_PATH + path);
+                T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
                 if (!t)
                 {
                     if(File.Exists(EDITOT_MODE_ROOT_PATH + path))
-                        Logger.LogError("Asset:'{0}' has not found", path);
+                        Logger.LogError("Asset:'{0}' load failed", path);
                     else
                         Logger.LogError("Asset:'{0}' file has not exists", path);
                 }
@@ -256,7 +256,7 @@ namespace Framework
             {
 #if UNITY_EDITOR
                 yield return new WaitForEndOfFrame();
-                T t = Resources.Load<T>(EDITOT_MODE_ROOT_PATH + path);
+                T t = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(T)) as T;
                 if (!t)
                     Logger.LogError("Asset:'{0}' has not found", path);
                 luaFunc.BeginPCall();
@@ -267,6 +267,7 @@ namespace Framework
             }
         }
 
+        
         public AsyncOperation GetBundleRequest(string path)
         {
             string assetPath = (GlobalConsts.ResRootDir + path).ToLower();
@@ -289,48 +290,51 @@ namespace Framework
         //Sprite
         public Sprite LoadSprite(string path)
         {
-            if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
-            {
-                string spritePrefabPath = GetSpritePrefabPath(path);
-                //Debug.LogFormat("Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
-                GameObject prefab = LoadPrefab(spritePrefabPath);
-                return prefab.GetComponent<Image>().sprite;
-            }else
-            {
-#if UNITY_EDITOR
-                Object obj = LoadAsset<Object>(path);
-                Texture2D texture2D = obj as Texture2D;
-                return Sprite.Create(texture2D, new Rect(0,0,texture2D.width, texture2D.height), new Vector2());
-#else
-                return null;
-#endif
-            }
+            string spritePrefabPath = GetSpritePrefabPath(path);
+            Debug.LogFormat("Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
+            GameObject prefab = LoadPrefab(spritePrefabPath);
+            return prefab.GetComponent<SpriteRenderer>().sprite;
         }
 
         public void LoadSpriteAsync(string path, LuaFunction luaFunc)
         {
+            string spritePrefabPath = GetSpritePrefabPath(path);
             if (GlobalConsts.isRunningInMobileDevice || GlobalConsts.isResBundleMode)
             {
-                string spritePrefabPath = GetSpritePrefabPath(path);
                 StartCoroutine(resLoader.AddLoadAssetBundleAsync(spritePrefabPath, delegate(AssetBundle assetBundle)
                 {
                     GameObject prefab = assetBundle.LoadAsset<GameObject>(spritePrefabPath);
-                    Sprite sp = prefab.GetComponent<Image>().sprite;
+                    Sprite sp = prefab.GetComponent<SpriteRenderer>().sprite;
 
                     luaFunc.BeginPCall();
                     luaFunc.Push(sp);
                     luaFunc.PCall();
                     luaFunc.EndPCall();
                 }));
-                //Debug.LogFormat("Async Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
+                Debug.LogFormat("Async Load Sprite Prefab: {0} -- ({1})", path, spritePrefabPath);
             }
             else
             {
 #if UNITY_EDITOR
-                LoadAssetAsync<Sprite>(path, luaFunc);
+                StartCoroutine(LoadSpriteAsyncEditor(path, luaFunc));
 #endif
             }
         }
+        
+#if UNITY_EDITOR
+        IEnumerator LoadSpriteAsyncEditor(string path, LuaFunction luaFunc)
+        {
+            yield return new WaitForEndOfFrame();
+            GameObject prefab = AssetDatabase.LoadAssetAtPath(EDITOT_MODE_ROOT_PATH + path, typeof(GameObject)) as GameObject;
+            if (!prefab)
+                Logger.LogError("Asset:'{0}' has not found", path);
+            Sprite sp = prefab.GetComponent<Image>().sprite;
+            luaFunc.BeginPCall();
+            luaFunc.Push(sp);
+            luaFunc.PCall();
+            luaFunc.EndPCall();
+        }
+#endif
         #endregion
 
         public void UnloadAssetBundle(string path, bool unloadAllDependence, bool unloadAllLoadedObjects)

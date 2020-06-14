@@ -1,9 +1,12 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEditor;
 using System.IO;
 using System.Collections.Generic;
+using UnityEditor.U2D;
+using UnityEngine.U2D;
+using File = UnityEngine.Windows.File;
+using Object = UnityEngine.Object;
 
 namespace BM
 {
@@ -95,39 +98,7 @@ namespace BM
                     UpdatePackingTag(_settings.uiSpriteDir);
                 }
             }
-            
-//            
-//            EditorGUILayout.Space();
-//            foreach (var folder in _settings.scenesFolderList)
-//            {
-//                FileInfo[] sceneFiles = BMEditUtility.GetAllFiles(folder, _settings.scenesPattern);
-//                    
-//                for (int i = 0; i < sceneFiles.Length; i++)
-//                {
-//                    string path = BMEditUtility.Absolute2Relativity(sceneFiles[i].DirectoryName) + "/" + sceneFiles[i].Name; //相对路径
-//                    int index = _settings.scenePaths.IndexOf(path);
-//                    EditorGUILayout.BeginHorizontal();
-//                    int oldVer = index == -1 ? 0 : _settings.sceneVersions[index];
-//                    if (index == -1)
-//                    {
-//                        EditorGUILayout.LabelField(path.Replace(_settings.resDir,""), "new", _newSceneStyle);
-//                    }
-//                    else
-//                    {
-//                        int ver = EditorGUILayout.IntField(path.Replace(_settings.resDir,""), oldVer);
-//                        if (oldVer != ver)
-//                        {
-//                            _settings.sceneVersions[i] = ver;
-//                            serializedObject.ApplyModifiedProperties();
-//                            BMEditUtility.SaveSetting(_settings);
-//                            Debug.Log("ApplyModifiedProperties scene version");
-//                        }
-//                    }
-//                    
-//                    EditorGUILayout.EndHorizontal();
-//                    
-//                }
-//            }
+
            
         }
 
@@ -136,8 +107,11 @@ namespace BM
             for (int i = 0; i < _settings.atlasSpriteFolderList.Count; i++)
             {
                 string atlasDir = _settings.atlasSpriteFolderList[i];
-                if(forceGenerate || CheckModify(atlasDir))
+                if (forceGenerate || CheckModify(atlasDir))
+                {
+//                    AutoSetAtlasContents(atlasDir);
                     GenerateAtlasSpritePrefab(atlasDir);
+                }
                 else
                 {
                     Debug.Log($"There is not modify in atlas directory -- {atlasDir}");
@@ -182,38 +156,97 @@ namespace BM
         private void GenerateAtlasSpritePrefab(string atlasDir)
         {
             Dictionary<string, string> md5Map = new Dictionary<string, string>();
-            string dirName = Path.GetFileName(atlasDir);
-            string outPath = _settings.atlasSpritePrefabDir + dirName + "/";
-            if (Directory.Exists(outPath))
-                BMEditUtility.DelFolder(outPath);
-            Directory.CreateDirectory(outPath);
             FileInfo[] resFiles = BMEditUtility.GetAllFiles(atlasDir, "*.*");
             for (int j = 0; j < resFiles.Length; j++)
             {
                 FileInfo info = resFiles[j];
                 if (info.FullName.EndsWith(".meta", StringComparison.Ordinal) || info.FullName.EndsWith(".txt", StringComparison.Ordinal))
                     continue;
+                
+                string dirName = Path.GetFileName(info.DirectoryName);
+                string outPath = $"{_settings.atlasSpritePrefabDir}{dirName}/";
                 string spriteFileName = Path.GetFileName(info.FullName);
-                string md5 = HashHelper.ComputeMD5(Path.Combine(atlasDir, spriteFileName));
-                md5Map.Add(spriteFileName, md5);
                 string spriteName = Path.GetFileNameWithoutExtension(info.FullName);
-                GameObject spritePrefab = new GameObject(spriteName);
-                Image img = spritePrefab.AddComponent<Image>();
-                string rPath = BMEditUtility.Absolute2Relativity(info.FullName);
-                TextureImporter ti = AssetImporter.GetAtPath(rPath) as TextureImporter;
+                string texPath = BMEditUtility.Absolute2Relativity(info.FullName);
+                string md5 = HashHelper.ComputeMD5(texPath);
+                md5Map.Add(texPath, md5);
+                TextureImporter ti = AssetImporter.GetAtPath(texPath) as TextureImporter;
                 if (ti)
                 {
+                    if (!Directory.Exists(outPath))
+                        Directory.CreateDirectory(outPath);
+                    GameObject spritePrefab = new GameObject(spriteName);
+                    SpriteRenderer spriteRenderer = spritePrefab.AddComponent<SpriteRenderer>();
+                    Vector4 border = ti.spriteBorder;
                     ti.spritePackingTag = "Atlas_" + dirName;
                     ti.SaveAndReimport();
+                    spriteRenderer.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(texPath);;
+                    //spritePrefab.hideFlags = HideFlags.HideInHierarchy;
+                    var savePath = outPath + spriteName + ".prefab";
+                    if(File.Exists(savePath))
+                        File.Delete(savePath);
+                    PrefabUtility.SaveAsPrefabAsset(spritePrefab, savePath);
+                    //var texture2D = AssetDatabase.LoadAssetAtPath<Texture2D>(rPath);
+                    //var sprite = Sprite.Create(texture2D, new Rect(0,0,texture2D.width,texture2D.height), new Vector2(0.5f,0.5f), 400, 0,SpriteMeshType.FullRect,border);
+                    DestroyImmediate(spritePrefab);
                 }
-                img.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(rPath);
-                //spritePrefab.hideFlags = HideFlags.HideInHierarchy;
-                PrefabUtility.SaveAsPrefabAsset(spritePrefab, outPath + spriteName + ".prefab");
-                DestroyImmediate(spritePrefab);
             }
 
             //Save md5
             BMEditUtility.SaveDictionary(Path.Combine(atlasDir, "manifest.txt"), md5Map);
+        }
+        
+        void AutoSetAtlasContents(string texturePath)
+        {
+            // 设置参数 可根据项目具体情况进行设置
+            SpriteAtlasPackingSettings packSetting = new SpriteAtlasPackingSettings()
+            {
+                blockOffset = 1,
+                enableRotation = false,
+                enableTightPacking = false,
+                padding = 2,
+            };
+            SpriteAtlasTextureSettings textureSetting = new SpriteAtlasTextureSettings()
+            {
+                readable = false,
+                generateMipMaps = false,
+                sRGB = true,
+                filterMode = FilterMode.Bilinear,
+            };
+            TextureImporterPlatformSettings platformSetting = new TextureImporterPlatformSettings()
+            {
+                maxTextureSize = 2048,
+                format = TextureImporterFormat.Automatic,
+                crunchedCompression = true,
+                textureCompression = TextureImporterCompression.Compressed,
+                compressionQuality = 50,
+            };
+            DirectoryInfo root = new DirectoryInfo(texturePath);
+            DirectoryInfo[] dirs = root.GetDirectories();
+            foreach (DirectoryInfo dir in dirs)
+            {
+                SpriteAtlas atlas = new SpriteAtlas();
+                atlas.SetPackingSettings(packSetting);
+                atlas.SetTextureSettings(textureSetting);
+                atlas.SetPlatformSettings(platformSetting);
+           
+                // 这里我使用的是png图片，已经生成Sprite精灵了
+                FileInfo[] files = dir.GetFiles("*.png");
+                foreach (FileInfo file in files)
+                {
+                    string dirName = Path.GetFileName(file.DirectoryName);
+                    string texPath = $"{texturePath}/{dirName}/{file.Name}";
+                    atlas.Add(new[] {AssetDatabase.LoadAssetAtPath<Sprite>(texPath)});
+                    //Debug.Log($"Create sprite {texPath}");
+                }
+                string atlasPath = $"{texturePath}/{dir.Name}.spriteatlas";
+                //Debug.Log($"Create sprite {atlasPath}");
+                AssetDatabase.CreateAsset(atlas, atlasPath);
+                AssetDatabase.SaveAssets();
+            }
+            // 2、添加文件夹
+            //Object obj = AssetDatabase.LoadAssetAtPath(texturePath, typeof(Object));
+            //atlas.Add(new[] {obj});
         }
         
         private void UpdatePackingTag(string dir)

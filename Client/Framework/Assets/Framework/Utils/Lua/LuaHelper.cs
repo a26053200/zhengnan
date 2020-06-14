@@ -170,10 +170,13 @@ namespace Framework
         {
             return EventHelper.AddObjectEvent(go, EventTriggerType.EndDrag, luaFunc, passEvent);
         }
-        
         public static void RemoveObjectEvent(GameObject go, LuaFunction luaFunc, bool passEvent = false)
         {
             EventHelper.RemoveObjectEvent(go, luaFunc);
+        }
+        public static void ClearObjectEvent(GameObject go)
+        {
+            EventHelper.ClearObjectEvent(go);
         }
         /// <summary>
         /// 判断是否按下(跨平台)

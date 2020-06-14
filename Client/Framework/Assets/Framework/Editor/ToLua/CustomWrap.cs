@@ -115,7 +115,7 @@ public static class CustomWrap
         _GT(typeof(AutoMove)),
         _GT(typeof(AutoPath)),
         _GT(typeof(AttachCamera)),
-        
+        _GT(typeof(SpriteList)),
         
         //==============
         // Image Renderer

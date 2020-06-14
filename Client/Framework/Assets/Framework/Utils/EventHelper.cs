@@ -78,9 +78,18 @@ namespace Framework
             return luaFunc;
         }
 
+        public static void ClearObjectEvent(GameObject gameObject)
+        {
+            EventTriggerListener listener = gameObject.GetComponent<EventTriggerListener>();
+            if(listener)
+                GameObject.Destroy(listener);
+        }
+
         public static void RemoveObjectEvent(GameObject gameObject, LuaFunction luaFunc)
         {
-            EventTriggerListener listener = EventTriggerListener.Get(gameObject);
+            EventTriggerListener listener = gameObject.GetComponent<EventTriggerListener>();
+            if(!listener)
+                return;
             foreach(var type in listener.luaFuncHash.Keys)
             {
                 List<EventTriggerListener.EventDelegate> list = listener.GetLuaFuncHashSet(type, luaFunc);

@@ -5,6 +5,8 @@ using UnityEngine.EventSystems;
 using System;
 using System.Collections.Generic;
 using DG.Tweening;
+using UnityEngine.Serialization;
+
 /// <summary>
 /// <para>Class Introduce</para>
 /// <para>Author: zhengnan</para>
@@ -17,9 +19,12 @@ public class ListView : MonoBehaviour
     [SerializeField]
     private GameObject[] prefabs;
 
-    [SerializeField]
-    private float space;
+    [FormerlySerializedAs("h_space")] [HideInInspector]
+    public float space_x;
 
+    [FormerlySerializedAs("v_space")] [HideInInspector]
+    public float space_y;
+    
     [SerializeField]
     private bool isManualFill = false;
 
@@ -105,6 +110,7 @@ public class ListView : MonoBehaviour
         this.cellSizes = new Vector2[this.prefabs.Length];
         for (int i = 0; i < this.prefabs.Length; i++)
         {
+            this.prefabs[i].SetActive(false);
             RectTransform cellRect = this.prefabs[i].GetComponent<RectTransform>();
             this.cellSizes[i] = cellRect.sizeDelta;
         }
@@ -233,7 +239,7 @@ public class ListView : MonoBehaviour
             if (cellInfo.CanShow())
             {
                 int prefabIndex = this.Adapter.GetCellPrefabIndex(i);
-                length += this.cellSizes[prefabIndex].y + this.space;
+                length += this.cellSizes[prefabIndex].y + this.space_y;
             }
             i += this.constrain;
         }
@@ -260,10 +266,10 @@ public class ListView : MonoBehaviour
                     {
                         Vector3 localPos = new Vector3(offsetX, (length / 2.0f - offset - cellHeight / 2.0f), 0.0f);
                         cellInfo.SetLocalPos(localPos);
-                        offsetX += cellWidth + this.space;
+                        offsetX += cellWidth + this.space_x;
                     }
                 }
-                offset += cellHeight + this.space;
+                offset += cellHeight + this.space_y;
             }
             else
             {
@@ -273,7 +279,7 @@ public class ListView : MonoBehaviour
                 {
                     Vector3 localPos = new Vector3(0f, (length / 2.0f - offset - cellHeight / 2.0f), 0.0f);
                     cellInfo.SetLocalPos(localPos);
-                    offset += cellHeight + this.space;
+                    offset += cellHeight + this.space_y;
                 }
             }
             i += this.constrain;
@@ -295,7 +301,7 @@ public class ListView : MonoBehaviour
             if (cellInfo.CanShow())
             {
                 int prefabIndex = this.Adapter.GetCellPrefabIndex(i);
-                length += this.cellSizes[prefabIndex].x + this.space;
+                length += this.cellSizes[prefabIndex].x + this.space_x;
             }
         }
 
@@ -324,7 +330,7 @@ public class ListView : MonoBehaviour
                     localPos = new Vector3((length / 2.0f - offset - cellWidth / 2.0f), 0.0f, 0.0f);
                 }
                 cellInfo.SetLocalPos(localPos);
-                offset += cellWidth + this.space;
+                offset += cellWidth + this.space_x;
             }
         }
 
@@ -492,6 +498,7 @@ public class ListView : MonoBehaviour
             buffer = GameObject.Instantiate<GameObject>(this.prefabs[prefabIndex]).GetComponent<ListViewCell>();
             if (buffer != null)
             {
+                buffer.gameObject.SetActive(true);
                 buffer.transform.SetParent(transform);
                 buffer.transform.localScale = Vector3.one;
                 this.buffersArray[prefabIndex].Add(buffer);
