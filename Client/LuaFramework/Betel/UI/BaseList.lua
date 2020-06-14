@@ -28,6 +28,7 @@ function BaseList:Ctor(gameObject, itemRendererClass, noPassEvent)
     self.adapter = self.listView.Adapter
     self.eventDispatcher = EventDispatcher.New()
     self.itemList = {}
+    self.clickEventMap = {} --主动注册的点击事件
     --self.cell = self.adapter.gameObject:GetCom("LuaListViewCell")
     self:AddLuaMonoBehaviour(gameObject,"BaseList")
 end
@@ -50,9 +51,17 @@ function BaseList:OnItemCreate(cell, index)
     end
     self.itemList[index + 1] = item
     item:UpdateItem(data,index + 1)
-    LuaHelper.AddObjectClickEvent(cell.gameObject,handler(self,function ()
+    local handler = self.clickEventMap[cell.gameObject]
+    if handler ~= nil then
+        LuaHelper.RemoveObjectEvent(cell.gameObject, handler)
+    end
+    handler = function(event)
         self.eventDispatcher:DispatchEvent(ListViewEvent.New(ListViewEvent.ItemClick), data, index + 1)
-    end))
+    end
+    self.clickEventMap[cell.gameObject] = handler
+    LuaHelper.AddObjectClickEvent(cell.gameObject, handler)
+    cell.gameObject:GetOrAddComponent(typeof(Framework.ClickFeedback))
+    --self:AddItemClick(cell.gameObject,data,index + 1)
 end
 
 --单独更新一个
@@ -81,6 +90,9 @@ function BaseList:OnDestroy()
     if self.listExtend then
         self.listExtend:Dispose()
         self.listExtend = nil
+    end
+    for go, handler in pairs(self.clickEventMap) do
+        LuaHelper.RemoveObjectEvent(go, handler)
     end
     self.eventDispatcher:RemoveAllEventListeners(ListViewEvent.ItemClick)
 end
