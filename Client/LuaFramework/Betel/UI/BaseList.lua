@@ -7,14 +7,14 @@
 local LuaMonoBehaviour = require("Betel.LuaMonoBehaviour")
 ---@class Betel.UI.BaseList : Betel.LuaMonoBehaviour
 ---@field New fun(gameObject:UnityEngine.GameObject, itemRendererClass:table, noPassEvent:boolean)
----@field listView ListView
+---@field listView EasyList.ListViewBase
 ---@field scroll UnityEngine.UI.ScrollRect
 ---@field noPassEvent boolean 是否禁止项目事件穿透
----@field adapter LuaListViewAdapter
----@field cell LuaListViewCell
+---@field adapter EasyList.LuaListViewAdapter
+---@field cell EasyList.LuaListViewCell
 ---@field dataList List
 ---@field itemList table<any, Betel.UI.ListItemRenderer>
----@field listExtend Betel.LuaMonoBehaviour
+---@field listExtend Game.Modules.Common.View.ListExtend
 local BaseList = class("Betel.UI.BaseList",LuaMonoBehaviour)
 
 ---@param gameObject UnityEngine.GameObject
@@ -40,15 +40,30 @@ function BaseList:SetData(dataList)
     self.listView:RefreshData()
 end
 
----@param cell LuaListViewCell
+function BaseList:Refresh()
+    self.adapter:Init(self.dataList:Size(),handler(self,self.OnItemCreate))
+    self.listView:RefreshData()
+end
+
+function BaseList:Clear()
+    self.listView:ClearAllCell()
+end
+
+---@param cell EasyList.LuaListViewCell
 ---@param index number
+---@return Betel.UI.ListItemRenderer
 function BaseList:OnItemCreate(cell, index)
+    if index + 1 > self.dataList:Size() then
+        logError(string.format("index %s, size %s",index + 1, self.dataList:Size()))
+        return
+    end
     local data = self.dataList[index + 1]
     local item = self.itemRendererClass.New(cell.gameObject) ---@type Betel.UI.ListItemRenderer
     if not self.noPassEvent then --项目事件是否穿透
-        local listener = cell.gameObject:GetOrAddComponent(typeof(ListItemEventListener))
+        local listener = cell.gameObject:GetOrAddComponent(typeof(EasyList.ListItemEventListener))
         listener.scroll = self.scroll
     end
+    item.data = data
     self.itemList[index + 1] = item
     item:UpdateItem(data,index + 1)
     local handler = self.clickEventMap[cell.gameObject]
@@ -62,6 +77,7 @@ function BaseList:OnItemCreate(cell, index)
     LuaHelper.AddObjectClickEvent(cell.gameObject, handler)
     cell.gameObject:GetOrAddComponent(typeof(Framework.ClickFeedback))
     --self:AddItemClick(cell.gameObject,data,index + 1)
+    return item
 end
 
 --单独更新一个
@@ -71,7 +87,7 @@ function BaseList:UpdateItem(index)
     item:UpdateItem(self.dataList[index],index)
 end
 
---获取当项目
+--获取项目
 ---@param index number
 ---@return Betel.UI.ListItemRenderer
 function BaseList:GetItemRenderByIndex(index)
@@ -79,11 +95,27 @@ function BaseList:GetItemRenderByIndex(index)
     return item
 end
 
+--获取项目
+---@param data any
+---@return Betel.UI.ListItemRenderer
+function BaseList:GetItemRenderByData(data)
+    for _, item in ipairs(self.itemList) do
+        if item.data == data then
+            return item
+        end
+    end
+    return nil
+end
+
 --更新全部
 function BaseList:UpdateAll()
     for index, item in ipairs(self.itemList) do
         item:UpdateItem(self.dataList[index], index)
     end
+end
+
+function BaseList:SetScrollEnable(enable)
+    self.scroll.enabled = enable
 end
 
 function BaseList:OnDestroy()
