@@ -2,6 +2,7 @@
 using BitBenderGames;
 using UnityEngine;
 using DG.Tweening;
+using EasyList;
 using Framework;
 using PathCreation;
 using UnityEngine.Rendering;
@@ -144,6 +145,8 @@ public static class CustomWrap
 
         // Custom Components
         _GT(typeof(ListView)),
+        _GT(typeof(ListPositionView)),
+        _GT(typeof(ListViewBase)),
         _GT(typeof(LuaListViewAdapter)),
         _GT(typeof(LuaListViewCell)),
         _GT(typeof(ListItemEventListener)),
