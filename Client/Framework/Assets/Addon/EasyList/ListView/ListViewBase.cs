@@ -10,7 +10,6 @@ namespace EasyList
     /// <para>Author: zhengnan </para>
     /// <para>Create: DATE TIME</para>
     /// </summary> 
-    [RequireComponent(typeof(ScrollRect))]
     public class ListViewBase : MonoBehaviour
     {
         [SerializeField]
