@@ -8,17 +8,25 @@ local BaseList = require("Betel.UI.BaseList")
 ---@class Betel.UI.PositionList : Betel.UI.BaseList
 ---@field New fun(gameObject:UnityEngine.GameObject, itemRendererClass:table, noPassEvent:boolean):Betel.UI.PositionList
 ---@field posList table<number, UnityEngine.RectTransform>
+---@field itemLayoutObj UnityEngine.GameObject
 local PositionList = class("Betel.UI.PositionList",BaseList)
 
 ---@param gameObject UnityEngine.GameObject
 ---@param itemRendererClass table
 function PositionList:Ctor(gameObject, itemRendererClass, noPassEvent)
     PositionList.super.Ctor(self,gameObject, itemRendererClass, noPassEvent)
+    self.listView = GetListPositionView(gameObject:FindChild("Content"))
+    self.adapter = self.listView.Adapter
 end
 
----@param posList table<number, UnityEngine.RectTransform>
-function PositionList:SetPosList(posList)
-    self.posList = posList
+---@param uiLayoutUrl string
+function PositionList:SetPosList(uiLayoutUrl)
+    self.itemLayoutObj = Instantiate(uiLayoutUrl, self.transform.parent)
+    self.itemLayoutObj.transform:SetSiblingIndex(0)
+    self.itemLayoutObj.transform.localPosition = Vector3.zero
+    self.itemLayoutObj.transform.localScale = Vector3.one
+    --self.scroll.content.gameObject:GetRect().sizeDelta = self.itemLayoutObj:GetRect().sizeDelta
+    self:SetScrollEnable(false)
 end
 
 ---@param cell EasyList.LuaListViewCell
@@ -26,8 +34,10 @@ end
 ---@return Betel.UI.ListItemRenderer
 function PositionList:OnItemCreate(cell, index)
     local item = PositionList.super.OnItemCreate(self,cell, index)---@type Betel.UI.ListItemRenderer
-    item.transform.localPosition = self.posList[index].localPosition
+    --item.transform.localPosition = Vector3.zero
+    item.transform.localPosition = self.itemLayoutObj.transform:GetChild(index).localPosition
     return item
 end
+
 
 return PositionList

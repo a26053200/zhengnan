@@ -23,9 +23,7 @@ function BaseList:Ctor(gameObject, itemRendererClass, noPassEvent)
     BaseList.super.Ctor(self,gameObject)
     self.noPassEvent = noPassEvent
     self.itemRendererClass = itemRendererClass
-    self.listView = GetListView(gameObject:FindChild("Content"))
     self.scroll = gameObject:GetComponent(typeof(UnityEngine.UI.ScrollRect))
-    self.adapter = self.listView.Adapter
     self.eventDispatcher = EventDispatcher.New()
     self.itemList = {}
     self.clickEventMap = {} --主动注册的点击事件

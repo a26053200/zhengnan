@@ -14,6 +14,8 @@ local TableList = class("Betel.UI.TableList",BaseList)
 ---@param itemRendererClass table
 function TableList:Ctor(gameObject, itemRendererClass, noPassEvent)
     TableList.super.Ctor(self,gameObject, itemRendererClass, noPassEvent)
+    self.listView = GetListView(gameObject:FindChild("Content"))
+    self.adapter = self.listView.Adapter
 end
 
 ---@param cell EasyList.LuaListViewCell
