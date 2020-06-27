@@ -48,6 +48,12 @@ public class NetworkManager : BaseManager
             func.Push(json);
             func.PCall();
             func.EndPCall();
+        }, delegate(string netData) 
+        {  
+            //错误返回
+        }, delegate(string netData) 
+        {  
+            //超时返回
         });
 
     }
