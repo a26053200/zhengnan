@@ -108,7 +108,7 @@ namespace FastBehavior
         {
             lastBehavior?.Stop();
             lastBehavior = null;
-            stateMachine.Stop();
+            stateMachine?.Stop();
         }
 
         public void NextState()
@@ -118,7 +118,7 @@ namespace FastBehavior
 
         public override void Dispose()
         {
-            stateMachine.Dispose();
+            stateMachine?.Dispose();
             stateMachine = null;
             lastBehavior = null;
             parentNode = null;

@@ -63,6 +63,7 @@ namespace FastBehavior
         {
             if (execute && m_startTime > 0 && Time.time - m_startTime > m_timeout)
             {
+                Debug.LogErrorFormat("State Machine time out [{0}]", m_node.name);
                 isTimeout = true;
             }
             m_node.OnUpdateDelegate();

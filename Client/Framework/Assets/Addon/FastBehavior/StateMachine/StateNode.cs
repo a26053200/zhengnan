@@ -32,7 +32,7 @@ namespace FastBehavior
             {
                 OnEnter.BeginPCall();
                 OnEnter.PCall();
-                OnEnter.EndPCall();
+                OnEnter?.EndPCall();
             }
             
         }
@@ -43,7 +43,7 @@ namespace FastBehavior
             {
                 OnUpdate.BeginPCall();
                 OnUpdate.PCall();
-                OnUpdate.EndPCall();
+                OnUpdate?.EndPCall();
             }
         }
         
@@ -53,15 +53,18 @@ namespace FastBehavior
             {
                 OnExit.BeginPCall();
                 OnExit.PCall();
-                OnExit.EndPCall();
+                OnExit?.EndPCall();
             }
         }
 
         public override void Dispose()
         {
             duration = 0;
+            OnEnter?.EndPCall();
             OnEnter = null;
+            OnUpdate?.EndPCall();
             OnUpdate = null;
+            OnExit?.EndPCall();
             OnExit = null;
             StateMachineManager.GetInstance().Store(this);
         }
