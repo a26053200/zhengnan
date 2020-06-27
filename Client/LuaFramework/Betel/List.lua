@@ -93,14 +93,16 @@ end
 function List:Remove(item)
     if nil == item then
         logError("List remove a item that is not nil")
+        return 0
     else
         for i = 1,#self._array do
             if self._array[i] == item then
-                table.remove(self._array,i)
-                return
+                table.remove(self._array, i)
+                return i
             end
         end
     end
+    return 0
 end
 
 function List:IndexOf(item)
