@@ -8,7 +8,8 @@ namespace EasyList
     /// <para></para>
     /// <para>Author: zhengnan </para>
     /// <para>Create: DATE TIME</para>
-    /// </summary> 
+    /// </summary>
+    [CustomEditor(typeof(ListView))]
     public class ListViewEditor : Editor
     {
         private SerializedProperty space_x;

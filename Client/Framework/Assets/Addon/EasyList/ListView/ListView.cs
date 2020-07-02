@@ -18,11 +18,10 @@ namespace EasyList
     {
         public Action OnDataFillCompleted;
     
-    
-        [FormerlySerializedAs("h_space")] [HideInInspector]
+        [HideInInspector]
         public float space_x;
     
-        [FormerlySerializedAs("v_space")] [HideInInspector]
+        [HideInInspector]
         public float space_y;
         
         [SerializeField]
