@@ -154,7 +154,10 @@ namespace ToLuaSupport
             StringBuilder sb = new StringBuilder();
             //Header
             sb.AppendLine(string.Format("{0} = {{}}", rootName));
-            foreach (var key in _hashTable.Keys)
+            var keys = _hashTable.Keys;
+            var keyList = new List<string>(keys);
+            keyList.Sort();
+            foreach (var key in keyList)
             {
                 StringBuilder lineSb = new StringBuilder();
                 Dictionary<string, object> tableLine = _hashTable[key];

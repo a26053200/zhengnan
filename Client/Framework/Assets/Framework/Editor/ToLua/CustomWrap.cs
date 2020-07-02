@@ -77,7 +77,7 @@ public static class CustomWrap
         _GT(typeof(Toggle)),
         _GT(typeof(ContentSizeFitter)),
         _GT(typeof(ContentSizeFitter.FitMode)),
-        
+        _GT(typeof(FontStyle)),
         //================
         // DoTween
         //================

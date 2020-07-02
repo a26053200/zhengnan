@@ -75,6 +75,22 @@ public static class UGUIUIEditor
         }
     }
 
+    [MenuItem("GameObject/UI/Text Outline")]
+    static void CreateTextOutline()
+    {
+        GameObject textObj = new GameObject("Text", typeof(Text));
+        Text text = textObj.GetComponent<Text>();
+        text.text = "text";
+        text.fontSize = 16;
+        text.color = Color.white;
+        Outline outline = textObj.AddComponent<Outline>();
+        if (Selection.activeObject)
+        {
+            textObj.transform.SetParent((Selection.activeObject as GameObject).transform);
+            textObj.transform.localScale = Vector3.one;
+        }
+    }
+    
     static void CreateButton(Vector2 size,Color color)
     {
         GameObject btnObj = new GameObject("Button", typeof(Image));
