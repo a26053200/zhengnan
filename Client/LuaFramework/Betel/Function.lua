@@ -254,6 +254,15 @@ function isnull(obj)
     end
 end
 
+---是否空字符串
+function isEmpty(obj)
+    if obj == nil then
+        return true
+    else
+        return obj == ""
+    end
+end
+
 ---异步销毁
 ---@param obj UnityEngine.GameObject
 ---@param delay number 延时销毁
