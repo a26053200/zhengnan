@@ -95,7 +95,7 @@ function LuaMonoBehaviour:CreateDelay(delay, callback,ignoreTimeScale)
     return delayFun
 end
 
----@param callback fun()
+---@param callback fun() | Handler
 ---@param frameCount number 延迟帧数
 ---@return Handler
 function LuaMonoBehaviour:CreateDelayedFrameCall(callback, frameCount)
@@ -104,7 +104,7 @@ function LuaMonoBehaviour:CreateDelayedFrameCall(callback, frameCount)
     end
     local delayFun ---@type Handler
     delayFun = DelayedFrameCall(function ()
-        callback()
+        invoke(callback)
         CancelDelayCallback(delayFun)
         self.delayFrameFunList:Remove(delayFun)
         delayFun:Recycl()
