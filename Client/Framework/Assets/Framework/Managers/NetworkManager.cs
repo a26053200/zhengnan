@@ -57,7 +57,26 @@ public class NetworkManager : BaseManager
         });
 
     }
+    
+    public void HttpPost(string url, string data, LuaFunction func)
+    {
+        httpRequest.StartUnityWebPost(url, data, delegate(string json)
+            //httpRequest.SendMsg(url, netData, delegate(JsonData data)
+        {
+            func.BeginPCall();
+            func.Push(json);
+            func.PCall();
+            func.EndPCall();
+        }, delegate(string netData) 
+        {  
+            //错误返回
+        }, delegate(string netData) 
+        {  
+            //超时返回
+        });
 
+    }
+    
     public void SendJson(string json)
     {
         JsonData netData = JsonMapper.ToObject(json);

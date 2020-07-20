@@ -16,16 +16,17 @@ namespace Framework
         public Vector3 minScale = new Vector3(0.95f,0.95f,0.95f);
         public float duration = 0.18f;
 
-        private Tween _tween;
+        private Tween _tweenDown;
+        private Tween _tweenUp;
         
         public void OnPointerDown(PointerEventData eventData)
         {
-            _tween = transform.DOScale(minScale, duration);
+            _tweenDown = transform.DOScale(minScale, duration);
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            _tween = transform.DOScale(Vector3.one, duration);
+            _tweenUp = transform.DOScale(Vector3.one, duration);
         }
 
         public void OnPointerClick(PointerEventData eventData)
@@ -40,12 +41,13 @@ namespace Framework
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            transform.DOPause();
+            
         }
 
         private void OnDestroy()
         {
-            _tween?.Kill();
+            _tweenDown?.Kill();
+            _tweenUp?.Kill();
         }
     }
 }
