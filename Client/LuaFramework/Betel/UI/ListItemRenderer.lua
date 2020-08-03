@@ -6,7 +6,7 @@
 
 local LuaMonoBehaviour = require("Betel.LuaMonoBehaviour")
 ---@class Betel.UI.ListItemRenderer : Betel.LuaMonoBehaviour
----@field listView EasyList.ListView
+---@field listView Betel.UI.BaseList
 ---@field adapter EasyList.LuaListViewAdapter
 ---@field cell EasyList.LuaListViewCell
 local ListItemRenderer = class("Game.UI.ListItemRenderer",LuaMonoBehaviour)

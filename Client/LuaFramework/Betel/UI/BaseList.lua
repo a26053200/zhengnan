@@ -73,8 +73,9 @@ function BaseList:OnItemCreate(cell, index)
     end
     self.clickEventMap[cell.gameObject] = handler
     LuaHelper.AddObjectClickEvent(cell.gameObject, handler)
-    cell.gameObject:GetOrAddComponent(typeof(Framework.ClickFeedback))
+    --cell.gameObject:GetOrAddComponent(typeof(Framework.ClickFeedback))
     --self:AddItemClick(cell.gameObject,data,index + 1)
+    item.listView = self
     return item
 end
 

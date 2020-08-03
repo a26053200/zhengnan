@@ -67,8 +67,22 @@ function NetworkManager:HttpRqst(data, params, callback)
     local rqstStartTime = Time.realtimeSinceStartup
     data = self:parseParams(data,params)
     local jsonStr = json.encode(data)
-    log("<color=#266484ff>[Http Rqst]</color><color=#ffffffff>{0}</color>", jsonStr)
+    log("<color=#95FF00ff>[Http Rqst]</color><color=#ffffffff>{0}</color>", jsonStr)
     netMgr:HttpRequest(self.httpUrl, jsonStr, function(jsonStr)
+        self.timeout = Time.realtimeSinceStartup - rqstStartTime
+        local jsonData = json.decode(jsonStr)
+        log("<color=#cc7832ff>[Http Rspd]</color><color=#ffffffff>{0}</color>", jsonStr)
+        callback(jsonData)
+    end)
+end
+
+--添加Http Post
+function NetworkManager:HttpPost(data, params, callback)
+    local rqstStartTime = Time.realtimeSinceStartup
+    data = self:parseParams(data,params)
+    local jsonStr = json.encode(data)
+    log("<color=#95FF00ff>[Http Post]</color><color=#ffff00ff>{0}</color>", jsonStr)
+    netMgr:HttpPost(self.httpUrl, jsonStr, function(jsonStr)
         self.timeout = Time.realtimeSinceStartup - rqstStartTime
         local jsonData = json.decode(jsonStr)
         log("<color=#cc7832ff>[Http Rspd]</color><color=#ffffffff>{0}</color>", jsonStr)

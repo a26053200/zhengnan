@@ -25,6 +25,10 @@ function List:Ctor(table)
     self._array = table and table or {}
 end
 
+function List:GetArray()
+    return self._array
+end
+
 function List:Clear()
     self._array = nil
     self._array = {}
