@@ -122,9 +122,9 @@ function BaseList:OnDestroy()
         self.listExtend:Dispose()
         self.listExtend = nil
     end
-    for go, handler in pairs(self.clickEventMap) do
-        LuaHelper.RemoveObjectEvent(go, handler)
-    end
+    --for go, handler in pairs(self.clickEventMap) do
+    --    LuaHelper.RemoveObjectEvent(go, handler)
+    --end
     self.eventDispatcher:RemoveAllEventListeners(ListViewEvent.ItemClick)
 end
 
