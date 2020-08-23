@@ -43,7 +43,7 @@ namespace ToLuaSupport
                 case LuaFolder.Vo:
                     luaFileText = _setting.LuaVoClassFile;
                     break;
-                case LuaFolder.Controller:
+                case LuaFolder.Ctrl:
                     luaFileText = _setting.LuaCommandClassFile;
                     break;
             }
@@ -227,7 +227,7 @@ namespace ToLuaSupport
         Model,
         Service,
         Vo,
-        Controller,
+        Ctrl,
     }
 
     public enum LuaFileStatus

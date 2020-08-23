@@ -48,10 +48,7 @@ namespace Framework
             if (list.Contains(t))
             {
                 if (list.IndexOf(t) <= _icout)
-                {
-                    _icout--;
-                }
-
+                    _icout = _icout > 0 ? _icout - 1 : 0;
                 list.Remove(t);
             }
         }

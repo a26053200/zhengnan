@@ -134,13 +134,13 @@ namespace ToLuaSupport
                 string moduleDirPath = moduleDirs[i]; //模块目录路径
                 LuaModuleInfo moduleInfo = new LuaModuleInfo(Path.GetFileName(moduleDirs[i]));
                 moduleInfo.moduleDirPath = moduleDirPath; //模块目录路径
-                if (moduleDirPath.IndexOf("Common") != -1)
-                    continue;
+//                if (moduleDirPath.IndexOf("Common") != -1)
+//                    continue;
                 moduleInfo.viewDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.View);
                 moduleInfo.modelDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Model);
                 moduleInfo.serviceDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Service);
                 moduleInfo.voDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Vo);
-                moduleInfo.controllerDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Controller);
+                moduleInfo.controllerDirPath = moduleDirPath + ToLuaGenerater.Folder2Directory(LuaFolder.Ctrl);
                 //Views
                 if (!Directory.Exists(moduleDirPath))
                     continue;
@@ -272,7 +272,7 @@ namespace ToLuaSupport
                                 EditorGUILayout.LabelField((j + 1).ToString(), moduleInfo.ctrlList[j] + ".lua");
                         }
 
-                        EditFolder(moduleInfo, LuaFolder.Controller);
+                        EditFolder(moduleInfo, LuaFolder.Ctrl);
                     }
                     EditorGUI.indentLevel--;
 
@@ -338,7 +338,7 @@ namespace ToLuaSupport
                 case LuaFileStatus.Folder_Only:
                     if (folder == LuaFolder.Vo)
                         AddVoFile(moduleInfo);
-                    else  if (folder == LuaFolder.Controller)
+                    else  if (folder == LuaFolder.Ctrl)
                         AddCommandFile(moduleInfo);
                     else if (GUILayout.Button("生成 " + folder + ".lua 文件"))
                         ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName,
@@ -347,7 +347,7 @@ namespace ToLuaSupport
                 case LuaFileStatus.Folder_And_LuaFile:
                     if (folder == LuaFolder.Vo)
                         AddVoFile(moduleInfo);
-                    else if (folder == LuaFolder.Controller)
+                    else if (folder == LuaFolder.Ctrl)
                         AddCommandFile(moduleInfo);
                     else
                         EditorGUILayout.LabelField(moduleInfo.moduleName + folder + ".lua 文件已经生成");
@@ -382,10 +382,10 @@ namespace ToLuaSupport
             {
                 if (!ToLuaGenerater.FileNameValid(newCommandName, this))
                     return;
-                if (newCommandName.EndsWith(LuaFolder.Controller.ToString()))
+                if (newCommandName.EndsWith(LuaFolder.Ctrl.ToString()))
                     newCommandName = newCommandName.Substring(0, newCommandName.Length - 3);
                 ToLuaGenerater.GeneratedLuaFile(moduleInfo.moduleDirPath, moduleInfo.moduleName, newCommandName,
-                    LuaFolder.Controller);
+                    LuaFolder.Ctrl);
                 moduleInfo.ctrlList = RefreshSingleFile(moduleInfo, moduleInfo.controllerDirPath);
                 newCommandName = "";
             }

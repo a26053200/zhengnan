@@ -159,9 +159,9 @@ namespace FastBehavior
                     NextState();
                 else
                 {
-                    if(state.isTimeout)
-                        NextState();
-                    else 
+//                    if(state.isTimeout)
+//                        NextState();
+//                    else 
                         state.Update();
                 }
                     
